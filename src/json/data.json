@@ -1,0 +1,26 @@
+[
+    {
+        "id" : 1,
+        "name" : "Pizza 1",
+        "size" : "Large",
+        "price" : "$12.5"
+    },
+    {
+        "id" : 2,
+        "name" : "Pizza 2",
+        "size" : "Extra Large",
+        "price" : "$14.2"
+    },
+    {
+        "id" : 3,
+        "name" : "Pizza 3",
+        "size" : "Large",
+        "price" : "$10.89"
+    },
+    {
+        "id" : 4,
+        "name" : "Pizza 4",
+        "size" : "Extra Large",
+        "price" : "$18.25"
+    }
+]

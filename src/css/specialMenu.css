@@ -1,0 +1,14 @@
+.customize {
+  background-color: #ff8c00;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.customize:hover {
+  color: #ffffff;
+}
+.customizablePizza {
+  max-height: 100vh;
+  overflow-y: scroll;
+}

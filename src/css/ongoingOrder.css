@@ -1,0 +1,72 @@
+tr:nth-child(even),
+.topping-headings,
+.addToCartList {
+  background-color: #fff8ee;
+}
+.divider {
+  border-color: #ff8c00 !important;
+}
+thead {
+  background-color: #ff8c00;
+  color: #fff;
+}
+h6 {
+  font-size: 0.8rem;
+}
+.nav-tabs .nav-item.show .nav-link,
+.nav-tabs .nav-link.active {
+  color: #7a3ee7;
+}
+.nav-tabs .nav-link {
+  color: #525252;
+}
+.topping-list {
+  max-height: 12rem;
+  overflow-y: auto;
+  width: 100%;
+}
+.tab-content {
+  min-width: 100%;
+}
+.addToCartList {
+  min-height: 19rem;
+  overflow-y: auto;
+}
+.inputGroupTxt {
+  background-color: #f7f7f7;
+}
+.form-control,
+.form-select,
+.inputGroupTxt {
+  font-size: 0.75rem;
+}
+.form-select,
+.form-control {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.addToCartbtn,
+.submitOrderbtn {
+  background-color: #ff8c00;
+  color: #ffffff;
+}
+
+/* Pizza Selection Tabs Menu */
+.psTabs {
+  background-color: white;
+  border: none !important;
+}
+.psTabsUl {
+  border-bottom: none;
+  box-shadow: 1px 2px 4px 1px rgba(173, 173, 173, 0.2);
+}
+.psTabs:hover {
+  border: none;
+}
+.psTabs.active {
+  border: none;
+  background-color: #ffcb8a !important;
+  border-radius: 0%;
+  color: #a46000 !important;
+  font-weight: 600;
+}

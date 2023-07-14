@@ -1,0 +1,38 @@
+.header {
+  z-index: 1000;
+  box-shadow: 0px 2px 2px 1px rgba(76, 76, 76, 0.2);
+}
+.brandName {
+  font-size: 1.1rem !important;
+  color: #ff8c00;
+}
+.profile-menu,
+.notify-menu {
+  z-index: 1001;
+  width: auto;
+  font-size: 0.75rem;
+}
+.imgDiv {
+  width: 40px;
+  height: 40px;
+}
+.profileDiv,
+.notify-header {
+  background-color: #ff9b21;
+}
+.profileDiv {
+  padding-right: 2.8rem !important;
+}
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  background-color: #e2e2e2;
+}
+.nav-text {
+  color: #525252;
+}
+.orderDropdown {
+  font-size: 0.75rem !important;
+}
+.orderDrop:hover {
+  background-color: #e2e2e2;
+}

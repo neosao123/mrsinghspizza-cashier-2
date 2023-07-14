@@ -1,0 +1,24 @@
+.orderList {
+  background-color: #fff8ee;
+  cursor: pointer;
+  border-right: none;
+  border-top: none;
+  border-left: none;
+  border-bottom: 2px solid #ffb65d !important;
+}
+.list-group {
+  background-color: #fff8ee;
+}
+.main {
+  background-color: #fff8ee;
+}
+.orderType-selection {
+  border: none;
+}
+.options {
+  border: none !important;
+  padding: 20px;
+}
+.orderTitle {
+  background-color: #ff8c00;
+}
