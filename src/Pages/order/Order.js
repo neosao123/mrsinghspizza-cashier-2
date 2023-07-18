@@ -15,7 +15,8 @@ function Order() {
                 className="form-select px-4 py-2 orderType-selection"
                 onChange={(e) => setOrderType(e.target.value)}
               >
-                <option value="store" className="options py-2">
+                <option value="">--Choose --</option>
+                <option value="store" className="options">
                   Store Order
                 </option>
                 <option value="online" className="options">
@@ -23,171 +24,106 @@ function Order() {
                 </option>
               </select>
             </div>
-            {orderType === "store" ? (
-              <>
-                <h6 className="orderTitle mb-0 py-2 text-white">Store Order</h6>
-                <ul className="list-group list-group-flush">
-                  <li className="list-group-item p-3 orderList">
-                    <div className="d-flex px-3 my-1 justify-content-between align-items-center">
-                      <div>
-                        <span>
-                          <strong>#</strong>
-                        </span>
-                        <span className="mx-3">9877676543</span>
-                      </div>
-                      <div>
-                        <span className="mx-2">$21.56</span>
-                      </div>
-                    </div>
-                    <div className="d-flex px-3 my-1 justify-content-start">
+            <div>
+              {orderType &&
+                <h6 className={"orderTitle mb-0 py-1 text-white " + (orderType === "store" ? "bg-info" : "bg-dark")}>{orderType.toLocaleUpperCase()}</h6>
+              }
+              <ul className="list-group list-group-flush">
+                <li className="list-group-item p-1 orderList">
+                  <div className="d-flex px-3 my-1 justify-content-between align-items-center">
+                    <div>
                       <span>
-                        <i class="fa fa-user" aria-hidden="true"></i>
+                        <strong>#</strong>
                       </span>
-                      <span className="mx-3">ABC PQR</span>
+                      <span className="mx-3">9877676543</span>
                     </div>
-                    <div className="d-flex px-3 my-1 justify-content-start">
+                    <div>
+                      <span className="mx-2">$21.56</span>
+                    </div>
+                  </div>
+                  <div className="d-flex px-3 my-1 justify-content-start">
+                    <span>
+                      <i class="fa fa-user" aria-hidden="true"></i>
+                    </span>
+                    <span className="mx-3">ABC PQR</span>
+                  </div>
+                  <div className="d-flex px-3 my-1 justify-content-start">
+                    <span>
+                      <i class="fa fa-phone" aria-hidden="true"></i>
+                    </span>
+                    <span className="mx-3">9767656546</span>
+                  </div>
+                  <div className="d-flex px-3 my-1 justify-content-start">
+                    <span>
+                      <i class="fa fa-map-marker" aria-hidden="true"></i>
+                    </span>
+                    <span className="mx-3 badge bg-dark">Online</span>
+                  </div>
+                </li>
+                <li className="list-group-item p-1 orderList">
+                  <div className="d-flex px-3 my-1 justify-content-between align-items-center">
+                    <div>
                       <span>
-                        <i class="fa fa-phone" aria-hidden="true"></i>
+                        <strong>#</strong>
                       </span>
-                      <span className="mx-3">9767656546</span>
+                      <span className="mx-3">9877676543</span>
                     </div>
-                  </li>
-                  <li className="list-group-item p-3 orderList">
-                    <div className="d-flex px-3 my-1 justify-content-between align-items-center">
-                      <div>
-                        <span>
-                          <strong>#</strong>
-                        </span>
-                        <span className="mx-3">9877676543</span>
-                      </div>
-                      <div>
-                        <span className="mx-2">$21.56</span>
-                      </div>
+                    <div>
+                      <span className="mx-2">$21.56</span>
                     </div>
-                    <div className="d-flex px-3 my-1 justify-content-start">
+                  </div>
+                  <div className="d-flex px-3 my-1 justify-content-start">
+                    <span>
+                      <i class="fa fa-user" aria-hidden="true"></i>
+                    </span>
+                    <span className="mx-3">ABC PQR</span>
+                  </div>
+                  <div className="d-flex px-3 my-1 justify-content-start">
+                    <span>
+                      <i class="fa fa-phone" aria-hidden="true"></i>
+                    </span>
+                    <span className="mx-3">9767656546</span>
+                  </div>
+                  <div className="d-flex px-3 my-1 justify-content-start">
+                    <span>
+                      <i class="fa fa-map-marker" aria-hidden="true"></i>
+                    </span>
+                    <span className="mx-3 badge bg-info">Store</span>
+                  </div>
+                </li>
+                <li className="list-group-item p-1 orderList">
+                  <div className="d-flex px-3 my-1 justify-content-between align-items-center">
+                    <div>
                       <span>
-                        <i class="fa fa-user" aria-hidden="true"></i>
+                        <strong>#</strong>
                       </span>
-                      <span className="mx-3">ABC PQR</span>
+                      <span className="mx-3">9877676543</span>
                     </div>
-                    <div className="d-flex px-3 my-1 justify-content-start">
-                      <span>
-                        <i class="fa fa-phone" aria-hidden="true"></i>
-                      </span>
-                      <span className="mx-3">9767656546</span>
-                    </div>{" "}
-                  </li>
-                  <li className="list-group-item p-3 orderList">
-                    <div className="d-flex px-3 my-1 justify-content-between align-items-center">
-                      <div>
-                        <span>
-                          <strong>#</strong>
-                        </span>
-                        <span className="mx-3">9877676543</span>
-                      </div>
-                      <div>
-                        <span className="mx-2">$21.56</span>
-                      </div>
+                    <div>
+                      <span className="mx-2">$21.56</span>
                     </div>
-                    <div className="d-flex px-3 my-1 justify-content-start">
-                      <span>
-                        <i class="fa fa-user" aria-hidden="true"></i>
-                      </span>
-                      <span className="mx-3">ABC PQR</span>
-                    </div>
-                    <div className="d-flex px-3 my-1 justify-content-start">
-                      <span>
-                        <i class="fa fa-phone" aria-hidden="true"></i>
-                      </span>
-                      <span className="mx-3">9767656546</span>
-                    </div>
-                  </li>
-                </ul>
-              </>
-            ) : (
-              <>
-                <h6 className="orderTitle mb-0 py-2 text-white">
-                  Online Order
-                </h6>
-                <ul className="list-group list-group-flush">
-                  <li className="list-group-item p-3 orderList">
-                    <div className="d-flex px-3 my-1 justify-content-between align-items-center">
-                      <div>
-                        <span>
-                          <strong>#</strong>
-                        </span>
-                        <span className="mx-3">5666466797</span>
-                      </div>
-                      <div>
-                        <span className="mx-2">$21.56</span>
-                      </div>
-                    </div>
-                    <div className="d-flex px-3 my-1 justify-content-start">
-                      <span>
-                        <i class="fa fa-user" aria-hidden="true"></i>
-                      </span>
-                      <span className="mx-3">ABC PQR</span>
-                    </div>
-                    <div className="d-flex px-3 my-1 justify-content-start">
-                      <span>
-                        <i class="fa fa-phone" aria-hidden="true"></i>
-                      </span>
-                      <span className="mx-3">9767656546</span>
-                    </div>
-                  </li>
-                  <li className="list-group-item p-3 orderList">
-                    <div className="d-flex px-3 my-1 justify-content-between align-items-center">
-                      <div>
-                        <span>
-                          <strong>#</strong>
-                        </span>
-                        <span className="mx-3">9877676543</span>
-                      </div>
-                      <div>
-                        <span className="mx-2">$21.56</span>
-                      </div>
-                    </div>
-                    <div className="d-flex px-3 my-1 justify-content-start">
-                      <span>
-                        <i class="fa fa-user" aria-hidden="true"></i>
-                      </span>
-                      <span className="mx-3">ABC PQR</span>
-                    </div>
-                    <div className="d-flex px-3 my-1 justify-content-start">
-                      <span>
-                        <i class="fa fa-phone" aria-hidden="true"></i>
-                      </span>
-                      <span className="mx-3">9767656546</span>
-                    </div>{" "}
-                  </li>
-                  <li className="list-group-item p-3 orderList">
-                    <div className="d-flex px-3 my-1 justify-content-between align-items-center">
-                      <div>
-                        <span>
-                          <strong>#</strong>
-                        </span>
-                        <span className="mx-3">9877676543</span>
-                      </div>
-                      <div>
-                        <span className="mx-2">$21.56</span>
-                      </div>
-                    </div>
-                    <div className="d-flex px-3 my-1 justify-content-start">
-                      <span>
-                        <i class="fa fa-user" aria-hidden="true"></i>
-                      </span>
-                      <span className="mx-3">ABC PQR</span>
-                    </div>
-                    <div className="d-flex px-3 my-1 justify-content-start">
-                      <span>
-                        <i class="fa fa-phone" aria-hidden="true"></i>
-                      </span>
-                      <span className="mx-3">9767656546</span>
-                    </div>
-                  </li>
-                </ul>
-              </>
-            )}
+                  </div>
+                  <div className="d-flex px-3 my-1 justify-content-start">
+                    <span>
+                      <i class="fa fa-user" aria-hidden="true"></i>
+                    </span>
+                    <span className="mx-3">ABC PQR</span>
+                  </div>
+                  <div className="d-flex px-3 my-1 justify-content-start">
+                    <span>
+                      <i class="fa fa-phone" aria-hidden="true"></i>
+                    </span>
+                    <span className="mx-3">9767656546</span>
+                  </div>
+                  <div className="d-flex px-3 my-1 justify-content-start">
+                    <span>
+                      <i class="fa fa-map-marker" aria-hidden="true"></i>
+                    </span>
+                    <span className="mx-3 badge bg-info">Store</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

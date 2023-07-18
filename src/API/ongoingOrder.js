@@ -1,21 +1,16 @@
 import axios from "axios";
-import { privateAPi } from "./apiFunction";
+import { privateAPi } from "./privateapis";
+import { publicApi } from "./publicapis";
 
-const token = localStorage.getItem("token");
-console.log("token from ongoing API Function: ", token);
-
+import AxiosPrivate from "./AxiosPrivate";
 // Get Cashier Details using Token
 export const cashierDetails = async (authToken) => {
-  return await axios.get(`cashier/detailsByToken?token=${authToken}`, {
-    headers: {
-      Authorization: token ? "Bearer " + authToken : "",
-    },
-  });
+  return await publicApi.get(`/cashier/detailsByToken?token=${authToken}`);
 };
 
 // Get Pizza Requirements
 export const allIngredientsApi = async () => {
-  return await privateAPi.get("/getAllIngredients");
+  return await AxiosPrivate.sendGetApi("/getAllIngredients", {});
 };
 
 // Get Pizza Requirements
@@ -46,4 +41,14 @@ export const dipsApi = async () => {
 // SoftDrinks Data
 export const softDrinksApi = async () => {
   return await privateAPi.get("/softdrinks");
+};
+
+// Add To Cart
+export const addToCartApi = async (payload) => {
+  return await privateAPi.post("/cart/add", payload);
+};
+
+// Add To Cart
+export const storeLocationApi = async () => {
+  return await privateAPi.get("/storelocation");
 };

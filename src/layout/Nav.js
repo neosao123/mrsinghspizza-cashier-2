@@ -1,6 +1,6 @@
 import React, { Profiler, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import navStylesheet from "../css/nav.css";
+import "../css/nav.css";
 import logo from "../assets/logo.png";
 import profileImg from "../assets/user.png";
 import arrowKey from "../assets/arrow-key.png";
@@ -162,25 +162,25 @@ function Nav() {
               <NavLink
                 to="/ongoing-orders"
                 className="nav-link"
-                activeClassName="active"
+                activeclassname="active"
               >
-                <strong className="nav-text">Ongoing Order</strong>
+                <strong className="nav-text">New Order</strong>
               </NavLink>
             </li>
             <li className="nav-item dropdown">
               <NavLink
                 to="/orders"
                 className="nav-link"
-                activeClassName="active"
+                activeclassname="active"
               >
-                <strong className="nav-text">Order</strong>
+                <strong className="nav-text">Orders</strong>
               </NavLink>
             </li>
             <li className="nav-item">
               <NavLink
                 to="/invoices"
                 className="nav-link"
-                activeClassName="active"
+                activeclassname="active"
               >
                 <strong className="nav-text">Invoices</strong>
               </NavLink>
@@ -189,7 +189,7 @@ function Nav() {
               <NavLink
                 to="/reports"
                 className="nav-link"
-                activeClassName="active"
+                activeclassname="active"
               >
                 <strong className="nav-text">Reports</strong>
               </NavLink>

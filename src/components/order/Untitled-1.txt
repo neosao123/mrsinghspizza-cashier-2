@@ -1,0 +1,130 @@
+{
+    "cartCode": "#NA",
+    "customerCode": "#NA",
+    "customerName": "ABC",
+    "mobileNumber": "9876466889",
+    "address": "qwert",
+    "deliveryType": "pickup",
+    "storeLocation": "Dixie/NorthPark",
+    "productCode": "",
+    "productName": "",
+    "productType": "Pizza",
+    "config": {
+        "pizza": [
+            {
+                "crust": {
+                    "crustCode": "CR_4",
+                    "crustName": "Whole Weat",
+                    "crustPrice": "0"
+                },
+                "cheese": {
+                    "cheeseCode": "CHE_5",
+                    "cheeseName": "Vegan",
+                    "cheesePrice": "0"
+                },
+                "specialBases": {
+                    "specialBaseCode": "SPB_5",
+                    "specialBaseName": "Shahi",
+                    "specialBasesPrice": "2.00"
+                },
+                "toppings": {
+                    "countAsTwoToppings": [
+                        {
+                            "toppingsCode": "TOP_38",
+                            "toppingsName": "SHAHI PANEER",
+                            "toppingsPrice": "10.00",
+                            "toppingsPlacement": "whole"
+                        },
+                        {
+                            "toppingsCode": "TOP_29",
+                            "toppingsName": "ACHARI PANEER",
+                            "toppingsPrice": "10.00",
+                            "toppingsPlacement": "righthalf"
+                        },
+                        {
+                            "toppingsCode": "TOP_26",
+                            "toppingsName": "SWEET CORN",
+                            "toppingsPrice": "10.00",
+                            "toppingsPlacement": "whole"
+                        }
+                    ],
+                    "countAsOneToppings": [
+                        {
+                            "toppingsCode": "TOP_14",
+                            "toppingsName": "Green Peppers",
+                            "toppingsPrice": "10.00",
+                            "toppingsPlacement": "righthalf"
+                        },
+                        {
+                            "toppingsCode": "TOP_13",
+                            "toppingsName": "Green Peas",
+                            "toppingsPrice": "10.00",
+                            "toppingsPlacement": "whole"
+                        },
+                        {
+                            "toppingsCode": "TOP_11",
+                            "toppingsName": "Extra Cheese",
+                            "toppingsPrice": "10.00",
+                            "toppingsPlacement": "lefthalf"
+                        }
+                    ],
+                    "freeToppings": [
+                        {
+                            "toppingsCode": "TOP_49",
+                            "toppingsName": "Thick Crust",
+                            "toppingsPrice": "10.00",
+                            "toppingsPlacement": "whole"
+                        },
+                        {
+                            "toppingsCode": "TOP_48",
+                            "toppingsName": "Red Chilli",
+                            "toppingsPrice": "10.00",
+                            "toppingsPlacement": "whole"
+                        },
+                        {
+                            "toppingsCode": "TOP_47",
+                            "toppingsName": "Green Chilli",
+                            "toppingsPrice": "10.00",
+                            "toppingsPlacement": "whole"
+                        },
+                        {
+                            "toppingsCode": "TOP_43",
+                            "toppingsName": "Coriander",
+                            "toppingsPrice": "10.00",
+                            "toppingsPlacement": "whole"
+                        }
+                    ]
+                }
+            }
+        ],
+        "sides": [
+            {
+                "sidesCode": "SD_15",
+                "sidesName": "Plant Bites",
+                "sidesType": "poutine"
+                "lineCode": "SDL_38"
+                "sidesPlacement": "1 BOX - $ 14.99"
+                "sidesPrice": "0",
+            },
+        ],
+        "dips": [
+            {
+                "dipsCode": "DI_2",
+                "dipsName": "Chilli Chipotle",
+                "dipsPrice": "1.50"
+            }
+        ],
+        "drinks": [
+            {
+                "drinksCode": "SFD_1",
+                "drinksName": "2l Coke",
+                "dipsPrice": "4.43"
+            }
+        ]
+    },
+    "quantity": "",
+    "price": "",
+    "amount": "",
+    "comment": "qwerty",
+    "pizzaSize": "Large"
+}

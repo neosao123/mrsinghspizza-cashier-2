@@ -1,27 +1,33 @@
 import React, { useEffect, useState } from "react";
 import "../../css/ongoingOrder.css";
-import orderDetails from "../../json/data.json";
 import Nav from "../../layout/Nav";
 import SpecialMenu from "./SpecialMenu";
 import CreateYourOwn from "../../components/order/CreateYourOwn";
-import { allIngredientsApi, sidesApi } from "../../API/ongoingOrder";
-import { useSelector } from "react-redux";
+import {
+  allIngredientsApi,
+  sidesApi,
+  storeLocationApi,
+} from "../../API/ongoingOrder";
 import SidesMenu from "./SidesMenu";
 import DipsMenu from "./DipsMenu";
 import DrinksMenu from "./DrinksMenu";
+import $ from "jquery";
 
 function OngoingOrder() {
-  const [data, setData] = useState(orderDetails);
   const [allIngredients, setAllIngredients] = useState();
   const [sidesData, setSidesData] = useState();
-  const token = localStorage.getItem("token");
-  console.log("token from ongoing page: ", token);
+  const [customerName, setCustomerName] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [address, setAddress] = useState("");
+  const [deliveryType, setDeliveryType] = useState("");
+  const [storesLocationData, setStoreLocationData] = useState();
+  const [storesCode, setStoresCode] = useState();
+
   useEffect(() => {
-    if (token !== undefined && token !== "") {
-      pizzaIngredients();
-      sidesIngredient();
-    }
-  }, [token]);
+    pizzaIngredients();
+    sidesIngredient();
+    storeLocation();
+  }, []);
 
   //API - Pizza All Ingredients
   const pizzaIngredients = async () => {
@@ -43,8 +49,25 @@ function OngoingOrder() {
         console.log("Error From All Ingredient API: ", err);
       });
   };
+  //API - Store Location
+  const storeLocation = async () => {
+    await storeLocationApi()
+      .then((res) => {
+        setStoreLocationData(res.data.data);
+      })
+      .catch((err) => {
+        console.log("ERROR From Store Location API : ", err);
+      });
+  };
+  
+  // handle Stores Location --> Store Code
+  const handleStores = (e) => {
+    let storesCode = $("#storesID").find(":selected").attr("data-key");
+    setStoresCode(storesCode);
+  };
 
   // // Delete OrderDetails Data
+  // const [data, setData] = useState(orderDetails);
   // const deleteItem = (index) => {
   //   index = index + 1;
   //   const updatedData = data.filter((item) => item.id !== index);
@@ -60,19 +83,51 @@ function OngoingOrder() {
           <div className="col-lg-3">
             <form>
               <label className="form-label my-1">Customer Name</label>
-              <input className="form-control" type="text" />
+              <input
+                className="form-control"
+                type="text"
+                onChange={(e) => setCustomerName(e.target.value)}
+              />
               <label className="form-label mt-2 mb-1">Phone</label>
-              <input className="form-control" type="tel" />
+              <input
+                className="form-control"
+                type="tel"
+                onChange={(e) => setMobileNumber(e.target.value)}
+              />
               <label className="form-label mt-2 mb-1">Address</label>
-              <textarea className="form-control" rows="4" cols="50" />
+              <textarea
+                className="form-control"
+                rows="4"
+                cols="50"
+                onChange={(e) => setAddress(e.target.value)}
+              />
               <label className="form-label mt-2 mb-1">Store Location</label>
-              <select className="form-select">
-                <option value="1" selected>
-                  Dixie/NorthPark
+              <select
+                className="form-select"
+                id="storesID"
+                onChange={handleStores}
+              >
+                <option value="" selected>
+                  Choose Stores Location
                 </option>
+                {storesLocationData?.map((stores) => {
+                  return (
+                    <option key={stores.code} data-key={stores.code}>
+                      {stores.storeLocation}
+                    </option>
+                  );
+                })}
               </select>
               <label className="radio-inline mt-3">
-                <input className="mx-2" type="radio" name="category" checked />
+                <input
+                  className="mx-2"
+                  type="radio"
+                  checked={deliveryType === "pickup"}
+                  onClick={(e) => {
+                    setDeliveryType(e.target.value);
+                  }}
+                  name="category"
+                />
                 Pickup
               </label>
               <label className="radio-inline mx-4">
@@ -113,7 +168,7 @@ function OngoingOrder() {
           </div>
 
           {/* Section 2 */}
-          <div className="col-lg-5 my-1 section2">
+          <div className="col-lg-6 my-1 section2">
             {/* Tabs Headings */}
             <ul
               className="nav nav-tabs psTabsUl mt-2 d-flex justify-content-between mb-3"
@@ -167,7 +222,7 @@ function OngoingOrder() {
             </ul>
             {/* Tab Content */}
             <div className="tab-content m-0 p-0 w-100">
-              {/* Toppings */}
+              {/* Create Your Own */}
               <div
                 id="createByOwn"
                 className="container tab-pane active m-0 p-0"
@@ -175,10 +230,15 @@ function OngoingOrder() {
                 <CreateYourOwn
                   allIngredients={allIngredients}
                   sidesData={sidesData}
+                  customerName={customerName}
+                  mobileNumber={mobileNumber}
+                  address={address}
+                  deliveryType={deliveryType}
+                  storeLocation={storesCode}
                 />
               </div>
 
-              {/* Special */}
+              {/* SpecialMenu */}
               <div id="special" className="container tab-pane m-0 p-0">
                 <SpecialMenu />
               </div>
@@ -204,7 +264,7 @@ function OngoingOrder() {
           </div>
 
           {/* Section 3 */}
-          <div className="col-lg-4 my-1">
+          <div className="col-lg-3 my-1">
             <h6 className="text-center">Order</h6>
             {/* Add to Cart */}
             <div className="p-3 rounded mb-3 addToCartList">
@@ -246,50 +306,86 @@ function OngoingOrder() {
             {/* Order Submit */}
             <div className="my-1">
               <form>
-                <div className="d-flex flex-wrap justify-content-end align-items-center OrderAmount">
-                  <label className="form-label w-25 my-2">Price</label>
-                  <span className="input-group-text inputGroupTxt">$</span>
-                  <input
-                    className="form-control my-2 w-25"
-                    type="number"
-                    placeholder="0.00"
-                    step="0.01"
-                  ></input>
-                  <span className="input-group-text inputGroupTxt">USD</span>
+                <div className="d-flex flex-wrap my-2 justify-content-end align-items-center OrderAmount">
+                  <label className="form-label w-25">Price</label>
+                  <div className="input-group w-50">
+                    <div class="input-group-prepend">
+                      <span className="input-group-text inputGroupTxt">$</span>
+                    </div>
+                    <input
+                      className="form-control w-25"
+                      type="number"
+                      placeholder="0.00"
+                      step="0.01"
+                    ></input>
+                    <div class="input-group-append">
+                      <span className="input-group-text inputGroupTxt">
+                        USD
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="d-flex flex-wrap justify-content-end align-items-center">
-                  <label className="form-label w-25 my-2">Discount</label>
-                  <span className="input-group-text inputGroupTxt">$</span>
-                  <input
-                    className="form-control w-25 my-2"
-                    type="number"
-                    placeholder="0.00"
-                    step="0.01"
-                  ></input>
-                  <span className="input-group-text inputGroupTxt">USD</span>
+
+                <div className="d-flex flex-wrap my-2 my-2 justify-content-end align-items-center">
+                  <label className="form-label w-25">Discount</label>
+                  <div className="input-group w-50">
+                    <div class="input-group-prepend">
+                      <span className="input-group-text inputGroupTxt">$</span>
+                    </div>
+                    <input
+                      className="form-control w-25"
+                      type="number"
+                      placeholder="0.00"
+                      step="0.01"
+                    ></input>
+                    <div class="input-group-append">
+                      <span className="input-group-text inputGroupTxt">
+                        USD
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="d-flex flex-wrap justify-content-end align-items-center">
-                  <label className="form-label w-25 my-2">Tax</label>
-                  <span className="input-group-text inputGroupTxt">$</span>
-                  <input
-                    className="form-control w-25 my-2"
-                    type="number"
-                    placeholder="0.00"
-                    step="0.01"
-                  ></input>
-                  <span className="input-group-text inputGroupTxt">USD</span>
+
+                <div className="d-flex flex-wrap my-2 justify-content-end align-items-center">
+                  <label className="form-label w-25">Tax</label>
+                  <div className="input-group w-50">
+                    <div class="input-group-prepend">
+                      <span className="input-group-text inputGroupTxt">$</span>
+                    </div>
+                    <input
+                      className="form-control w-25"
+                      type="number"
+                      placeholder="0.00"
+                      step="0.01"
+                    ></input>
+                    <div class="input-group-append">
+                      <span className="input-group-text inputGroupTxt">
+                        USD
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="d-flex flex-wrap justify-content-end align-items-center">
-                  <label className="form-label w-25 my-2">Total Price</label>
-                  <span className="input-group-text inputGroupTxt">$</span>
-                  <input
-                    className="form-control w-25 my-2"
-                    type="number"
-                    placeholder="0.00"
-                    step="0.01"
-                  ></input>
-                  <span className="input-group-text inputGroupTxt">USD</span>
+
+                <div className="d-flex flex-wrap my-2 justify-content-end align-items-center">
+                  <label className="form-label w-25">Total Price</label>
+                  <div className="input-group w-50">
+                    <div class="input-group-prepend">
+                      <span className="input-group-text inputGroupTxt">$</span>
+                    </div>
+                    <input
+                      className="form-control w-25"
+                      type="number"
+                      placeholder="0.00"
+                      step="0.01"
+                    ></input>
+                    <div class="input-group-append">
+                      <span className="input-group-text inputGroupTxt">
+                        USD
+                      </span>
+                    </div>
+                  </div>
                 </div>
+
                 <div className="d-flex flex-row justify-content-end align-items-center">
                   <button
                     type="submit"

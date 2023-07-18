@@ -9,8 +9,12 @@ import {
   specialPizzaApi,
   toppingsApi,
 } from "../../API/ongoingOrder";
+import Selection from "../../json/Selection.json";
 
 function SpecialMenu() {
+  //
+  const [crust, setCrust] = useState([{}]);
+
   // For Conditions
   const [show, setShow] = useState(false);
   const [pizzaSize, setPizzaSize] = useState("L");
@@ -33,9 +37,14 @@ function SpecialMenu() {
         getSpecialData={getSpecialData}
         count={i}
         toppingsData={toppingsData}
+        setCrust={setCrust}
       />
     );
   }
+
+  const handleAddToCart = () => {
+    console.log(crust);
+  };
 
   // Customize Details
   const handleGetSpecial = (speicalPizza) => {
@@ -292,6 +301,7 @@ function SpecialMenu() {
                   <button
                     type="submit"
                     className="btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn"
+                    onClick={handleAddToCart}
                   >
                     Add to Cart
                   </button>

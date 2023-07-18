@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-function SpecialPizzaSelection({ getSpecialData, count, toppingsData }) {
+function SpecialPizzaSelection({
+  getSpecialData,
+  count,
+  toppingsData,
+  setCrust,
+}) {
   return (
     <>
       <div className="jumbotron">
@@ -9,7 +14,20 @@ function SpecialPizzaSelection({ getSpecialData, count, toppingsData }) {
           {/*  */}
           <div className="col-lg-4 col-md-4">
             <label className="mt-2 mb-1">Crust</label>
-            <select className="form-select">
+            <select
+              className="form-select"
+              onChange={(e) => {
+                getSpecialData?.crust?.map((crustData) => {
+                  if (e.target.value === crustData.crustName) {
+                    setCrust({
+                      crustCode: crustData.crustCode,
+                      crustName: crustData.crustName,
+                      crustPrice: !crustData.price ? "0" : crustData.price,
+                    });
+                  }
+                });
+              }}
+            >
               {getSpecialData?.crust?.map((data) => {
                 return (
                   <>

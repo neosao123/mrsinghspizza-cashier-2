@@ -43,7 +43,7 @@ function SidesMenu() {
                     <h6 className="mb-2">{data.sideName}</h6>
                   </div>
                   <div className="d-flex justify-content-between align-items-center">
-                    <select className="form-control" style={{ width: "35%" }}>
+                    <select className="form-select" style={{ width: "35%" }}>
                       {data?.combination?.map((combinationData) => {
                         return (
                           <>

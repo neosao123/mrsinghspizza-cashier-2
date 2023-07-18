@@ -22,34 +22,37 @@ const ValidateSchema = Yup.object({
 
 function Login() {
   const [loginObj, setLoginObj] = new useState({
-    userName: "",
-    password: "",
+    userName: "cashier",
+    password: "12345678",
   });
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation;
 
-  const authToken = localStorage.getItem("token");
+  const { user } = useSelector((state) => ({ ...state }));
 
+  const intended = location.state;
   useEffect(() => {
-    const intended = location.state;
+    console.log("intended", intended);
     if (intended) {
-      navigate("/");
+      return;
     } else {
-      if (authToken) {
+      if (user?.data?.token) {
         navigate("/ongoing-orders");
-      } else if (!authToken) {
-        navigate("/");
       }
     }
-  }, [authToken, navigate]);
+  }, [intended, user?.data?.token, navigate]);
 
   const onSubmit = async (values) => {
     console.log(values);
     try {
-      loginApi(values)
+      await loginApi(values)
         .then(async (res) => {
+          // Store res in LocalStorage
+          let parseToken = res.data.token;
+          localStorage.setItem("token", parseToken);
+
           dispatch({
             type: "LOGGD_IN_USER",
             payload: {
@@ -66,11 +69,9 @@ function Login() {
             },
           });
 
-          // Store res in LocalStorage
-          let parseToken = res.data.token;
-          localStorage.setItem("token", parseToken);
-
-          navigate("/ongoing-orders");
+          setTimeout(() => {
+            navigate("/ongoing-orders");
+          }, 2000);
         })
         .catch((err) => {
           console.log("Error From LoginApi: ", err);
