@@ -52,3 +52,12 @@ export const addToCartApi = async (payload) => {
 export const storeLocationApi = async () => {
   return await privateAPi.get("/storelocation");
 };
+
+// Get Cart List
+export const getCartListApi = async (payload) => {
+  return await privateAPi.post("/cart/list", payload);
+};
+
+export const deleteCartItemApi = async (payload) => {
+  return await privateAPi.post("/cart/deleteItem", payload);
+};

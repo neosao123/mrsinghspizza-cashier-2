@@ -12,10 +12,13 @@ function CreateYourOwn({
   address,
   deliveryType,
   storeLocation,
+  discount,
+  taxPer,
+  getCartList,
 }) {
   const [crust, setCrust] = useState({});
   const [cheese, setCheese] = useState({});
-  const [specialBases, setSpecialBases] = useState(null);
+  const [specialBases, setSpecialBases] = useState({});
   const [dips, setDips] = useState([]);
   const [drinks, setDrinks] = useState([]);
   const [pizzaSize, setPizzaSize] = useState("Large");
@@ -25,6 +28,46 @@ function CreateYourOwn({
   const [freeToppingsArr, setFreeToppingsArr] = useState([]);
   const [sidesArr, setSideArr] = useState([]);
   const [price, setPrice] = useState(0);
+  const [count, setCount] = useState(0);
+
+  console.log(price);
+
+  const calculatePrice = () => {
+    let calculatePrice = 0;
+    let crust_price = $("#crust").find(":selected").attr("data-price") || 0;
+    let cheese_price = $("#cheese").find(":selected").attr("data-price") || 0;
+    let specialbase_price =
+      $("#specialbase").find(":selected").attr("data-price") || 0;
+    let totalSidesPrice = Number(0);
+    let totalTwoToppings = Number(0);
+    let totalOneToppings = Number(0);
+    let totalFreeToppings = Number(0);
+    let totalDips = Number(0);
+    let totalDrinks = Number(0);
+
+    countTwoToppingsArr.map(
+      (two) => (totalTwoToppings += Number(two.toppingsPrice))
+    );
+    countOneToppingsArr.map(
+      (one) => (totalOneToppings += Number(one.toppingsPrice))
+    );
+    freeToppingsArr.map((free) => (totalFreeToppings += 0));
+    sidesArr.map((side) => (totalSidesPrice += Number(side.sidesPrice)));
+    dips.map((dips) => (totalDips += Number(dips.dipsPrice)));
+    drinks.map((drinks) => (totalDrinks += Number(drinks.drinksPrice)));
+
+    calculatePrice += Number(crust_price);
+    calculatePrice += Number(cheese_price);
+    calculatePrice += Number(specialbase_price);
+    calculatePrice += totalSidesPrice;
+    calculatePrice += totalTwoToppings;
+    calculatePrice += totalOneToppings;
+    calculatePrice += totalFreeToppings;
+    calculatePrice += totalDips;
+    calculatePrice += totalDrinks;
+
+    setPrice(calculatePrice);
+  };
 
   // Add To Cart - API Payload
   const payload = {
@@ -35,8 +78,8 @@ function CreateYourOwn({
     address: address,
     deliveryType: "pickup",
     storeLocation: storeLocation,
-    productCode: "",
-    productName: "",
+    productCode: "#NA",
+    productName: "Custom Pizza",
     productType: "Pizza",
     config: {
       pizza: [
@@ -55,27 +98,29 @@ function CreateYourOwn({
       dips: dips,
       drinks: drinks,
     },
-    quantity: "",
-    price: "",
-    amount: "",
+    quantity: "1",
+    price: price,
+    amount: price,
     comment: comments,
     pizzaSize: pizzaSize,
+    discountAmount: discount,
+    taxPer: taxPer,
   };
 
-  // API - Add To Cart
-  const addToCart = async () => {
+  // Onclick Add To Cart Button
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
     await addToCartApi(payload)
       .then((res) => {
-        return res.data;
+        localStorage.setItem("CartData", JSON.stringify(res.data.data));
+        //clear fields from create your own
+
+        getCartList();
       })
       .catch((err) => {
         console.log("Error From All Ingredient API: ", err);
       });
-  };
-
-  // Onclick Add To Cart Button
-  const handleAddToCart = () => {
-    // addToCart();
+    console.log("Data Succefully Store in Add To Cart.....", payload);
   };
 
   // handle Pizza Size
@@ -84,27 +129,29 @@ function CreateYourOwn({
   };
 
   // handle Crust
-  const handleCrust = (e) => {
+  const handleCrust = async (e) => {
     console.log(e.target.value);
     allIngredients?.crust?.map((crustData) => {
-      if (e.target.value === crustData.crustName) {
+      if (e.target.value.split(" -")[0] === crustData.crustName) {
         setCrust({
           crustCode: crustData.crustCode,
           crustName: crustData.crustName,
           crustPrice: crustData.price ? crustData.price : "0",
         });
+        calculatePrice();
       }
     });
   };
   // handle Cheese
   const handleCheese = (e) => {
     allIngredients?.cheese?.map((cheeseData) => {
-      if (e.target.value === cheeseData.cheeseName) {
+      if (e.target.value.split("- ")[0] === cheeseData.cheeseName) {
         setCheese({
           cheeseCode: cheeseData.cheeseCode,
           cheeseName: cheeseData.cheeseName,
           cheesePrice: cheeseData.price ? cheeseData.price : "0",
         });
+        calculatePrice();
       }
     });
   };
@@ -282,7 +329,7 @@ function CreateYourOwn({
         sidesPrice: price ? price : "0",
         sidesSize: size,
       };
-
+      console.log(sidesObj);
       setSideArr((prevSides) => [...prevSides, sidesObj]);
     } else {
       setSideArr((prevSides) =>
@@ -310,6 +357,7 @@ function CreateYourOwn({
       filteredSide.sidesPrice = price;
       filteredSide.sidesSize = size;
     }
+    setCount((prevCount) => prevCount + 1);
   };
 
   // handle Dips
@@ -327,6 +375,7 @@ function CreateYourOwn({
       };
       if (e.target.checked === true) {
         setDips([...dips, dipsObj]);
+        calculatePrice();
       } else {
         const newDips = dips.filter(
           (newDips) => newDips.dipsCode !== dipsObj.dipsCode
@@ -362,17 +411,17 @@ function CreateYourOwn({
     }
   };
 
-  console.log("Outside of Calculate :", specialBases);
-  // Price Calculate
-  const calculatePrice = () => {
-    let calulatedPrice = 0;
-
-    let specialbase_price = Number(specialBases?.specialbasePrice ?? 0);
-    console.log("Calculate Method: ", specialbase_price);
-    calulatedPrice = calulatedPrice + specialbase_price;
-    setPrice(calulatedPrice);
-    // console.log(calulatedPrice);
-  };
+  useEffect(() => {
+    calculatePrice();
+  }, [
+    sidesArr,
+    countTwoToppingsArr,
+    countOneToppingsArr,
+    freeToppingsArr,
+    dips,
+    drinks,
+    count,
+  ]);
 
   return (
     <>
@@ -386,22 +435,20 @@ function CreateYourOwn({
           </select>
         </div>
         <h6 className="">
-          <span className="mx-2">$ {price}</span>
+          <span className="mx-2">$ {price.toFixed(2)}</span>
         </h6>
       </div>
       <div className="row my-2">
         {/* Crust, Cheese, SpecialBases */}
         <div className="col-lg-4 col-md-4">
           <label className="mt-2 mb-1">Crust</label>
-          <select className="form-select" onChange={handleCrust}>
-            <option value="" selected>
-              -- Choose from below--
-            </option>
+          <select className="form-select" id="crust" onChange={handleCrust}>
             {allIngredients?.crust?.map((crustData) => {
+              let crustCode = crustData.crustCode;
               return (
                 <>
-                  <option key={crustData.crustCode}>
-                    {crustData.crustName}
+                  <option key={crustCode} data-price={crustData.price}>
+                    {crustData.crustName} - $ {crustData.price}
                   </option>
                 </>
               );
@@ -410,15 +457,13 @@ function CreateYourOwn({
         </div>
         <div className="col-lg-4 col-md-4">
           <label className="mt-2 mb-1">Cheese</label>
-          <select className="form-select" onChange={handleCheese}>
-            <option value="" selected>
-              -- Choose from below--
-            </option>
+          <select className="form-select" id="cheese" onChange={handleCheese}>
             {allIngredients?.cheese?.map((cheeseData) => {
+              let cheeseCode = cheeseData.cheeseCode;
               return (
                 <>
-                  <option key={cheeseData.cheeseCode}>
-                    {cheeseData.cheeseName}
+                  <option key={cheeseCode} data-price={cheeseData.price}>
+                    {cheeseData.cheeseName} - $ {cheeseData.price}
                   </option>
                 </>
               );
@@ -427,14 +472,21 @@ function CreateYourOwn({
         </div>
         <div className="col-lg-4 col-md-4">
           <label className="mt-2 mb-1">Special Bases</label>
-          <select className="form-select" onChange={handleSpecialBases}>
+          <select
+            className="form-select"
+            id="specialbase"
+            onChange={handleSpecialBases}
+          >
             <option value="" selected>
               -- Choose from below--
             </option>
             {allIngredients?.specialbases?.map((specialbasesData) => {
               return (
                 <>
-                  <option key={specialbasesData.specialbaseCode}>
+                  <option
+                    key={specialbasesData.specialbaseCode}
+                    data-price={specialbasesData.price}
+                  >
                     {specialbasesData.specialbaseName} - $
                     {specialbasesData.price}
                   </option>
@@ -454,7 +506,7 @@ function CreateYourOwn({
                 data-bs-toggle="tab"
                 to="#toppings-count-2-tab"
               >
-                Toppings (Count 2)
+                Toppings (2)
               </Link>
             </li>
             <li className="nav-item">
@@ -463,7 +515,7 @@ function CreateYourOwn({
                 data-bs-toggle="tab"
                 to="#toppings-count-1-tab"
               >
-                Toppings (Counts 1)
+                Toppings (1)
               </Link>
             </li>
             <li className="nav-item">
@@ -472,7 +524,7 @@ function CreateYourOwn({
                 data-bs-toggle="tab"
                 to="#toppings-free-tab"
               >
-                Free Toppings (Indian)
+                Indian Toppings (Free)
               </Link>
             </li>
             <li className="nav-item">

@@ -5,6 +5,8 @@ import SpecialMenu from "./SpecialMenu";
 import CreateYourOwn from "../../components/order/CreateYourOwn";
 import {
   allIngredientsApi,
+  deleteCartItemApi,
+  getCartListApi,
   sidesApi,
   storeLocationApi,
 } from "../../API/ongoingOrder";
@@ -22,12 +24,9 @@ function OngoingOrder() {
   const [deliveryType, setDeliveryType] = useState("");
   const [storesLocationData, setStoreLocationData] = useState();
   const [storesCode, setStoresCode] = useState();
-
-  useEffect(() => {
-    pizzaIngredients();
-    sidesIngredient();
-    storeLocation();
-  }, []);
+  const [discount, setDiscount] = useState(0);
+  const [taxPer, setTaxPer] = useState(0);
+  const [cartListData, setCartListData] = useState();
 
   //API - Pizza All Ingredients
   const pizzaIngredients = async () => {
@@ -59,20 +58,61 @@ function OngoingOrder() {
         console.log("ERROR From Store Location API : ", err);
       });
   };
-  
+
   // handle Stores Location --> Store Code
   const handleStores = (e) => {
     let storesCode = $("#storesID").find(":selected").attr("data-key");
     setStoresCode(storesCode);
   };
 
-  // // Delete OrderDetails Data
-  // const [data, setData] = useState(orderDetails);
-  // const deleteItem = (index) => {
-  //   index = index + 1;
-  //   const updatedData = data.filter((item) => item.id !== index);
-  //   setData(updatedData);
-  // };
+  //API - Get Cart List
+  const getCartList = async () => {
+    console.log("cart list called");
+    let cart = JSON.parse(localStorage.getItem("CartData"));
+    let cashierCode = localStorage.getItem("cashierCode");
+    if (cart !== null && cart !== undefined) {
+      let cartCode = cart.cartCode;
+      let payload = {
+        cartCode: cartCode,
+        cashierCode: cashierCode,
+      };
+      await getCartListApi(payload)
+        .then((res) => {
+          setCartListData(res.data.data);
+        })
+        .catch((err) => {
+          console.log("Error From Get Cart List API: ", err);
+        });
+    }
+  };
+
+  const deleteCartItem = async (e, cartLineCode) => {
+    e.preventDefault();
+    let cart = JSON.parse(localStorage.getItem("CartData"));
+
+    let payload = {
+      cartLineCode: cartLineCode,
+      discountAmount: "0",
+      taxPer: "0",
+    };
+    console.log("Delelte Item", payload);
+    await deleteCartItemApi(payload)
+      .then((res) => {
+        console.log(res);
+        getCartList();
+      })
+      .catch((err) => {
+        console.log("Error From Delete Cart Item API: ", err);
+      });
+  };
+
+  useEffect(() => {
+    pizzaIngredients();
+    sidesIngredient();
+    storeLocation();
+    getCartList();
+  }, []);
+
   return (
     <>
       <Nav />
@@ -82,18 +122,36 @@ function OngoingOrder() {
           {/* Section 1 */}
           <div className="col-lg-3">
             <form>
-              <label className="form-label my-1">Customer Name</label>
-              <input
-                className="form-control"
-                type="text"
-                onChange={(e) => setCustomerName(e.target.value)}
-              />
               <label className="form-label mt-2 mb-1">Phone</label>
               <input
                 className="form-control"
                 type="tel"
                 onChange={(e) => setMobileNumber(e.target.value)}
               />
+              <label className="form-label my-1">Customer Name</label>
+              <input
+                className="form-control"
+                type="text"
+                onChange={(e) => setCustomerName(e.target.value)}
+              />
+              <div className="m-0 p-0">
+                <label className="radio-inline mt-3">
+                  <input
+                    className="mx-2"
+                    type="radio"
+                    checked
+                    onClick={(e) => {
+                      setDeliveryType(e.target.value);
+                    }}
+                    name="category"
+                  />
+                  Pickup
+                </label>
+                <label className="radio-inline mx-4">
+                  <input className="mx-2" type="radio" name="category" />
+                  Delivery
+                </label>
+              </div>
               <label className="form-label mt-2 mb-1">Address</label>
               <textarea
                 className="form-control"
@@ -118,22 +176,6 @@ function OngoingOrder() {
                   );
                 })}
               </select>
-              <label className="radio-inline mt-3">
-                <input
-                  className="mx-2"
-                  type="radio"
-                  checked={deliveryType === "pickup"}
-                  onClick={(e) => {
-                    setDeliveryType(e.target.value);
-                  }}
-                  name="category"
-                />
-                Pickup
-              </label>
-              <label className="radio-inline mx-4">
-                <input className="mx-2" type="radio" name="category" />
-                Delivery
-              </label>
             </form>
             <h6 className="my-3">Previous Order</h6>
             <div>
@@ -235,6 +277,9 @@ function OngoingOrder() {
                   address={address}
                   deliveryType={deliveryType}
                   storeLocation={storesCode}
+                  discount={discount}
+                  taxPer={taxPer}
+                  getCartList={getCartList}
                 />
               </div>
 
@@ -268,21 +313,22 @@ function OngoingOrder() {
             <h6 className="text-center">Order</h6>
             {/* Add to Cart */}
             <div className="p-3 rounded mb-3 addToCartList">
-              {/* {data.map((item, index) => {
+              {console.log(cartListData)}
+              {cartListData?.cartItems?.map((data) => {
                 return (
                   <div>
                     <div className="d-flex justify-content-between">
-                      <h6>{item.name}</h6>
-                      <span className="mx-4">{item.price}</span>
+                      <h6>{data.productName}</h6>
+                      <span className="mx-4">${data.price}</span>
                     </div>
                     <div className="d-flex justify-content-left mb-1">
                       <h6>Size : </h6>
-                      <span className="mx-1">{item.size}</span>
+                      <span className="mx-1">{data.pizzaSize}</span>
                     </div>
                     <div className="d-flex align-items-center">
                       <button
-                        onClick={(e) => deleteItem(index)}
                         className="btn m-0 p-0"
+                        onClick={(e) => deleteCartItem(e, data.code)}
                       >
                         <i
                           className="fa fa-trash-o"
@@ -301,7 +347,7 @@ function OngoingOrder() {
                     <hr className="border border-2 my-2 divider"></hr>
                   </div>
                 );
-              })} */}
+              })}
             </div>
             {/* Order Submit */}
             <div className="my-1">
@@ -317,6 +363,7 @@ function OngoingOrder() {
                       type="number"
                       placeholder="0.00"
                       step="0.01"
+                      onChange={(e) => setDiscount(e.target.value)}
                     ></input>
                     <div class="input-group-append">
                       <span className="input-group-text inputGroupTxt">
@@ -337,6 +384,7 @@ function OngoingOrder() {
                       type="number"
                       placeholder="0.00"
                       step="0.01"
+                      onChange={(e) => setTaxPer(e.target.value)}
                     ></input>
                     <div class="input-group-append">
                       <span className="input-group-text inputGroupTxt">

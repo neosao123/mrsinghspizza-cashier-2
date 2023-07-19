@@ -52,7 +52,7 @@ function Login() {
           // Store res in LocalStorage
           let parseToken = res.data.token;
           localStorage.setItem("token", parseToken);
-
+          localStorage.setItem("cashierCode", res.data.data.code);
           dispatch({
             type: "LOGGD_IN_USER",
             payload: {
