@@ -3,6 +3,7 @@ import { addToCartApi } from "../../API/ongoingOrder";
 import $ from "jquery";
 import { Link } from "react-router-dom";
 import { number } from "yup";
+import { toast } from "react-toastify";
 
 function CreateYourOwn({
   allIngredients,
@@ -30,8 +31,7 @@ function CreateYourOwn({
   const [price, setPrice] = useState(0);
   const [count, setCount] = useState(0);
 
-  console.log(price);
-
+  // Calculate Price
   const calculatePrice = () => {
     let calculatePrice = 0;
     let crust_price = $("#crust").find(":selected").attr("data-price") || 0;
@@ -114,8 +114,11 @@ function CreateYourOwn({
       .then((res) => {
         localStorage.setItem("CartData", JSON.stringify(res.data.data));
         //clear fields from create your own
-
         getCartList();
+        const productName = res?.data?.data?.cartItems?.map((data) => {
+          return data.productName;
+        });
+        toast.success(`Custom Pizza Added Successfully...`);
       })
       .catch((err) => {
         console.log("Error From All Ingredient API: ", err);
@@ -130,7 +133,6 @@ function CreateYourOwn({
 
   // handle Crust
   const handleCrust = async (e) => {
-    console.log(e.target.value);
     allIngredients?.crust?.map((crustData) => {
       if (e.target.value.split(" -")[0] === crustData.crustName) {
         setCrust({
@@ -207,8 +209,6 @@ function CreateYourOwn({
     const filteredToppings = countTwoToppingsArr.filter(
       (topping) => topping.toppingsCode === toppingCode
     );
-    console.log("Placement Selected", placement);
-    console.log("Filtered Topping ", filteredToppings);
     if (filteredToppings.length > 0) {
       let filteredTopping = filteredToppings[0];
       filteredTopping.toppingsPlacement = placement;
@@ -252,8 +252,6 @@ function CreateYourOwn({
     const filteredToppings = countOneToppingsArr.filter(
       (topping) => topping.toppingsCode === toppingCode
     );
-    console.log("Placement Selected", placement);
-    console.log("Filtered Topping ", filteredToppings);
     if (filteredToppings.length > 0) {
       let filteredTopping = filteredToppings[0];
       filteredTopping.toppingsPlacement = placement;
@@ -297,8 +295,6 @@ function CreateYourOwn({
     const filteredToppings = freeToppingsArr.filter(
       (topping) => topping.toppingsCode === toppingCode
     );
-    console.log("Placement Selected", placement);
-    console.log("Filtered Topping ", filteredToppings);
     if (filteredToppings.length > 0) {
       let filteredTopping = filteredToppings[0];
       filteredTopping.toppingsPlacement = placement;
@@ -329,7 +325,6 @@ function CreateYourOwn({
         sidesPrice: price ? price : "0",
         sidesSize: size,
       };
-      console.log(sidesObj);
       setSideArr((prevSides) => [...prevSides, sidesObj]);
     } else {
       setSideArr((prevSides) =>
@@ -365,8 +360,6 @@ function CreateYourOwn({
     const selectedDips = allIngredients?.dips.filter(
       (dips) => dips.dipsCode === code
     );
-
-    console.log(selectedDips);
     if (selectedDips.length > 0) {
       let dipsObj = {
         dipsCode: selectedDips[0].dipsCode,
@@ -399,10 +392,6 @@ function CreateYourOwn({
       if (e.target.checked === true) {
         setDrinks([...drinks, drinksObj]);
       } else {
-        drinks.map((data) => {
-          console.log(data.drinksCode);
-        });
-        console.log(drinksObj.drinksCode);
         const newDrinks = drinks.filter(
           (updatedDrinks) => updatedDrinks.drinksCode !== drinksObj.drinksCode
         );
