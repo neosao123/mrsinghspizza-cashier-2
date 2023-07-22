@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "../../css/ongoingOrder.css";
 import Nav from "../../layout/Nav";
 import SpecialMenu from "./SpecialMenu";
@@ -18,6 +18,7 @@ import $ from "jquery";
 import swal from "sweetalert";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import GlobalContext from "../../context/GlobalContext";
 
 function OngoingOrder() {
   const [allIngredients, setAllIngredients] = useState();
@@ -31,6 +32,11 @@ function OngoingOrder() {
   const [discount, setDiscount] = useState(0);
   const [taxPer, setTaxPer] = useState(0);
   const [cartListData, setCartListData] = useState();
+  const [isEdit, setIsEdit] = useState(false);
+  const [cartCode, setCartCode] = useState();
+  const [cartLineCode, setCartLineCode] = useState();
+  const globalCtx = useContext(GlobalContext);
+  const [cartItemDetails, setCartItemDetails] = globalCtx.cartItem;
 
   //API - Pizza All Ingredients
   const pizzaIngredients = async () => {
@@ -127,10 +133,24 @@ function OngoingOrder() {
     await orderPlaceApi({ cartCode: cartCode })
       .then((res) => {
         toast.success(res.data.message);
+        localStorage.removeItem("customerCode");
       })
       .catch((err) => {
         console.log("ERROR From Order Place API : ", err);
       });
+  };
+
+  // Edit Cart Item
+  const handleEditCartItem = (e, cartLineCode, cartCode) => {
+    e.preventDefault();
+    console.log(cartLineCode);
+    setIsEdit(true);
+    setCartCode(cartCode);
+    setCartLineCode(cartLineCode);
+    const filteredCart = cartListData?.cartItems?.filter(
+      (cartItem) => cartItem.code === cartLineCode
+    );
+    setCartItemDetails(filteredCart[0]);
   };
 
   useEffect(() => {
@@ -303,6 +323,10 @@ function OngoingOrder() {
                   discount={discount}
                   taxPer={taxPer}
                   getCartList={getCartList}
+                  isEdit={isEdit}
+                  cartListData={cartListData}
+                  cartCode={cartCode}
+                  cartLineCode={cartLineCode}
                 />
               </div>
 
@@ -401,6 +425,9 @@ function OngoingOrder() {
                           className="fa fa-pencil-square-o"
                           aria-hidden="true"
                           style={{ fontSize: "1.1rem", color: "#7a3ee7" }}
+                          onClick={(e) =>
+                            handleEditCartItem(e, data.code, cartListData?.code)
+                          }
                         ></i>
                       </button>
                     </div>

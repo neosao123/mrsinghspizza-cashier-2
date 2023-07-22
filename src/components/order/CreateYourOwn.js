@@ -4,6 +4,7 @@ import $ from "jquery";
 import { Link } from "react-router-dom";
 import { number } from "yup";
 import { toast } from "react-toastify";
+import EditCartProduct from "./EditCartProduct";
 
 function CreateYourOwn({
   allIngredients,
@@ -16,6 +17,9 @@ function CreateYourOwn({
   discount,
   taxPer,
   getCartList,
+  isEdit,
+  cartLineCode,
+  cartCode,
 }) {
   const [crust, setCrust] = useState({});
   const [cheese, setCheese] = useState({});
@@ -30,7 +34,7 @@ function CreateYourOwn({
   const [sidesArr, setSideArr] = useState([]);
   const [price, setPrice] = useState(0);
   const [count, setCount] = useState(0);
-
+  const [allCheckBoxes, setAllCheckBoxes] = useState([]);
   // Calculate Price
   const calculatePrice = () => {
     let calculatePrice = 0;
@@ -112,12 +116,28 @@ function CreateYourOwn({
     e.preventDefault();
     await addToCartApi(payload)
       .then((res) => {
+        const resData = res.data.data;
         localStorage.setItem("CartData", JSON.stringify(res.data.data));
+        localStorage.setItem("cartCode", resData.cartCode);
+        localStorage.setItem("customerCode", resData.customerCode);
+        // setCartRes(res.data.data);
         //clear fields from create your own
+
+        //reset all states
+        setCrust({});
+        setCheese({});
+        setSpecialBases({});
+        setDips([]);
+        setDrinks([]);
+        setSideArr([]);
+        setCountTwoToppingsArr([]);
+        setCountOneToppingsArr([]);
+        setFreeToppingsArr([]);
+        setPrice(0);
+
+        uncheckAllCheckboxes();
+
         getCartList();
-        const productName = res?.data?.data?.cartItems?.map((data) => {
-          return data.productName;
-        });
         toast.success(`Custom Pizza Added Successfully...`);
       })
       .catch((err) => {
@@ -147,7 +167,7 @@ function CreateYourOwn({
   // handle Cheese
   const handleCheese = (e) => {
     allIngredients?.cheese?.map((cheeseData) => {
-      if (e.target.value.split("- ")[0] === cheeseData.cheeseName) {
+      if (e.target.value.split(" -")[0] === cheeseData.cheeseName) {
         setCheese({
           cheeseCode: cheeseData.cheeseCode,
           cheeseName: cheeseData.cheeseName,
@@ -202,6 +222,12 @@ function CreateYourOwn({
         )
       );
     }
+
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) =>
+        checkbox.id === toppingCode ? { ...checkbox, checked } : checkbox
+      )
+    );
   };
   // handle Two Toppings Placement
   const handleCountTwoPlacementChange = (e, toppingCode) => {
@@ -245,6 +271,11 @@ function CreateYourOwn({
         )
       );
     }
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) =>
+        checkbox.id === toppingCode ? { ...checkbox, checked } : checkbox
+      )
+    );
   };
   // handle One Toppings Placement
   const handleCountOnePlacementChange = (e, toppingCode) => {
@@ -288,6 +319,11 @@ function CreateYourOwn({
         )
       );
     }
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) =>
+        checkbox.id === toppingCode ? { ...checkbox, checked } : checkbox
+      )
+    );
   };
   // handle Free Toppings Placement
   const handleFreePlacementChange = (e, toppingCode) => {
@@ -331,6 +367,11 @@ function CreateYourOwn({
         prevSides.filter((sidesObj) => sidesObj.sidesCode !== sideCode)
       );
     }
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) =>
+        checkbox.id === sideCode ? { ...checkbox, checked } : checkbox
+      )
+    );
   };
   // handle Sides Placement
   const handleSidePlacementChange = (e, sideCode) => {
@@ -357,6 +398,7 @@ function CreateYourOwn({
 
   // handle Dips
   const handleDips = (e, code) => {
+    const { checked } = e.target;
     const selectedDips = allIngredients?.dips.filter(
       (dips) => dips.dipsCode === code
     );
@@ -375,11 +417,17 @@ function CreateYourOwn({
         );
         setDips(newDips);
       }
+      setAllCheckBoxes((prevCheckboxes) =>
+        prevCheckboxes.map((checkbox) =>
+          checkbox.id === code ? { ...checkbox, checked } : checkbox
+        )
+      );
     }
   };
 
   // handle Drinks
   const handleDrinks = (e, code) => {
+    const { checked } = e.target;
     const selectedDrinks = allIngredients?.softdrinks.filter(
       (drinks) => drinks.softdrinkCode === code
     );
@@ -397,8 +445,61 @@ function CreateYourOwn({
         );
         setDrinks(newDrinks);
       }
+      setAllCheckBoxes((prevCheckboxes) =>
+        prevCheckboxes.map((checkbox) =>
+          checkbox.id === code ? { ...checkbox, checked } : checkbox
+        )
+      );
     }
   };
+
+  const uncheckAllCheckboxes = () => {
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) => ({ ...checkbox, checked: false }))
+    );
+  };
+
+  useEffect(() => {
+    const toppingtwo = allIngredients?.toppings?.countAsTwo?.map((d, index) => {
+      setAllCheckBoxes((prevCheckboxes) => [
+        ...prevCheckboxes,
+        { id: d.toppingsCode, checked: false },
+      ]);
+    });
+    const t2 = allIngredients?.toppings?.countAsOne?.map((d, index) => {
+      setAllCheckBoxes((prevCheckboxes) => [
+        ...prevCheckboxes,
+        { id: d.toppingsCode, checked: false },
+      ]);
+    });
+    const t3 = allIngredients?.toppings?.freeToppings?.map((d, index) => {
+      setAllCheckBoxes((prevCheckboxes) => [
+        ...prevCheckboxes,
+        { id: d.toppingsCode, checked: false },
+      ]);
+    });
+    const dps = allIngredients?.toppings?.dips?.map((d, index) => {
+      setAllCheckBoxes((prevCheckboxes) => [
+        ...prevCheckboxes,
+        { id: d.dipsCode, checked: false },
+      ]);
+    });
+    const sds = sidesData?.map((d) => {
+      setAllCheckBoxes((prevCheckboxes) => [
+        ...prevCheckboxes,
+        { id: d.sideCode, checked: false },
+      ]);
+    });
+
+    const dnks = allIngredients?.toppings?.softdrinks?.map((d, index) => {
+      setAllCheckBoxes((prevCheckboxes) => [
+        ...prevCheckboxes,
+        { id: d.softdrinkCode, checked: false },
+      ]);
+    });
+
+    console.log("all checkboxes", allCheckBoxes);
+  }, [allIngredients]);
 
   useEffect(() => {
     calculatePrice();
@@ -414,428 +515,488 @@ function CreateYourOwn({
 
   return (
     <>
-      <h6 className="text-center">Pizza Selection</h6>
-      <div className="d-flex justify-content-between">
-        <div className="d-flex justify-content-center align-items-center">
-          <span>Size: </span>
-          <select className="form-select mx-2" onChange={handlePizzaSize}>
-            <option>Large</option>
-            <option>Extra Large</option>
-          </select>
-        </div>
-        <h6 className="">
-          <span className="mx-2">$ {price.toFixed(2)}</span>
-        </h6>
-      </div>
-      <div className="row my-2">
-        {/* Crust, Cheese, SpecialBases */}
-        <div className="col-lg-4 col-md-4">
-          <label className="mt-2 mb-1">Crust</label>
-          <select className="form-select" id="crust" onChange={handleCrust}>
-            {allIngredients?.crust?.map((crustData) => {
-              let crustCode = crustData.crustCode;
-              return (
-                <>
-                  <option key={crustCode} data-price={crustData.price}>
-                    {crustData.crustName} - $ {crustData.price}
-                  </option>
-                </>
-              );
-            })}
-          </select>
-        </div>
-        <div className="col-lg-4 col-md-4">
-          <label className="mt-2 mb-1">Cheese</label>
-          <select className="form-select" id="cheese" onChange={handleCheese}>
-            {allIngredients?.cheese?.map((cheeseData) => {
-              let cheeseCode = cheeseData.cheeseCode;
-              return (
-                <>
-                  <option key={cheeseCode} data-price={cheeseData.price}>
-                    {cheeseData.cheeseName} - $ {cheeseData.price}
-                  </option>
-                </>
-              );
-            })}
-          </select>
-        </div>
-        <div className="col-lg-4 col-md-4">
-          <label className="mt-2 mb-1">Special Bases</label>
-          <select
-            className="form-select"
-            id="specialbase"
-            onChange={handleSpecialBases}
-          >
-            <option value="" selected>
-              -- Choose from below--
-            </option>
-            {allIngredients?.specialbases?.map((specialbasesData) => {
-              return (
-                <>
-                  <option
-                    key={specialbasesData.specialbaseCode}
-                    data-price={specialbasesData.price}
+      {isEdit === true ? (
+        <>
+          <EditCartProduct
+            allIngredients={allIngredients}
+            sidesData={sidesData}
+            customerName={customerName}
+            mobileNumber={mobileNumber}
+            address={address}
+            deliveryType={deliveryType}
+            storeLocation={storeLocation}
+            discount={discount}
+            taxPer={taxPer}
+            getCartList={getCartList}
+            cartLineCode={cartLineCode}
+            cartCode={cartCode}
+          />
+        </>
+      ) : (
+        <>
+          <h6 className="text-center">Pizza Selection</h6>
+          <div className="d-flex justify-content-between">
+            <div className="d-flex justify-content-center align-items-center">
+              <span>Size: </span>
+              <select className="form-select mx-2" onChange={handlePizzaSize}>
+                <option>Large</option>
+                <option>Extra Large</option>
+              </select>
+            </div>
+            <h6 className="">
+              <span className="mx-2">$ {price.toFixed(2)}</span>
+            </h6>
+          </div>
+          <div className="row my-2">
+            {/* Crust, Cheese, SpecialBases */}
+            <div className="col-lg-4 col-md-4">
+              <label className="mt-2 mb-1">Crust</label>
+              <select className="form-select" id="crust" onChange={handleCrust}>
+                {allIngredients?.crust?.map((crustData) => {
+                  let crustCode = crustData.crustCode;
+                  return (
+                    <>
+                      <option key={crustCode} data-price={crustData.price}>
+                        {crustData.crustName} - $ {crustData.price}
+                      </option>
+                    </>
+                  );
+                })}
+              </select>
+            </div>
+            <div className="col-lg-4 col-md-4">
+              <label className="mt-2 mb-1">Cheese</label>
+              <select
+                className="form-select"
+                id="cheese"
+                onChange={handleCheese}
+              >
+                {allIngredients?.cheese?.map((cheeseData) => {
+                  let cheeseCode = cheeseData.cheeseCode;
+                  return (
+                    <>
+                      <option key={cheeseCode} data-price={cheeseData.price}>
+                        {cheeseData.cheeseName} - $ {cheeseData.price}
+                      </option>
+                    </>
+                  );
+                })}
+              </select>
+            </div>
+            <div className="col-lg-4 col-md-4">
+              <label className="mt-2 mb-1">Special Bases</label>
+              <select
+                className="form-select"
+                id="specialbase"
+                onChange={handleSpecialBases}
+              >
+                <option value="" selected>
+                  -- Choose from below--
+                </option>
+                {allIngredients?.specialbases?.map((specialbasesData) => {
+                  return (
+                    <>
+                      <option
+                        key={specialbasesData.specialbaseCode}
+                        data-price={specialbasesData.price}
+                      >
+                        {specialbasesData.specialbaseName} - $
+                        {specialbasesData.price}
+                      </option>
+                    </>
+                  );
+                })}
+              </select>
+            </div>
+
+            {/* Tabs */}
+            <div className="mt-3 mb-3">
+              {/* Tabs Headings */}
+              <ul className="nav nav-tabs mt-2" role="tablist">
+                <li className="nav-item">
+                  <Link
+                    className="nav-link active py-2 px-4"
+                    data-bs-toggle="tab"
+                    to="#toppings-count-2-tab"
                   >
-                    {specialbasesData.specialbaseName} - $
-                    {specialbasesData.price}
-                  </option>
-                </>
-              );
-            })}
-          </select>
-        </div>
+                    Toppings (2)
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link py-2 px-4"
+                    data-bs-toggle="tab"
+                    to="#toppings-count-1-tab"
+                  >
+                    Toppings (1)
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link py-2 px-4"
+                    data-bs-toggle="tab"
+                    to="#toppings-free-tab"
+                  >
+                    Indian Toppings (Free)
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link py-2 px-4"
+                    data-bs-toggle="tab"
+                    to="#sides"
+                  >
+                    Sides
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link py-2 px-4"
+                    data-bs-toggle="tab"
+                    to="#dips"
+                  >
+                    Dips
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link py-2 px-4"
+                    data-bs-toggle="tab"
+                    to="#drinks"
+                  >
+                    Drinks
+                  </Link>
+                </li>
+              </ul>
 
-        {/* Tabs */}
-        <div className="mt-3 mb-3">
-          {/* Tabs Headings */}
-          <ul className="nav nav-tabs mt-2" role="tablist">
-            <li className="nav-item">
-              <Link
-                className="nav-link active py-2 px-4"
-                data-bs-toggle="tab"
-                to="#toppings-count-2-tab"
-              >
-                Toppings (2)
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                className="nav-link py-2 px-4"
-                data-bs-toggle="tab"
-                to="#toppings-count-1-tab"
-              >
-                Toppings (1)
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                className="nav-link py-2 px-4"
-                data-bs-toggle="tab"
-                to="#toppings-free-tab"
-              >
-                Indian Toppings (Free)
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                className="nav-link py-2 px-4"
-                data-bs-toggle="tab"
-                to="#sides"
-              >
-                Sides
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                className="nav-link py-2 px-4"
-                data-bs-toggle="tab"
-                to="#dips"
-              >
-                Dips
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                className="nav-link py-2 px-4"
-                data-bs-toggle="tab"
-                to="#drinks"
-              >
-                Drinks
-              </Link>
-            </li>
-          </ul>
+              {/* Tab Content */}
+              <div className="tab-content m-0 p-0 w-100">
+                {/* Count 2 Toppings */}
+                <div
+                  id="toppings-count-2-tab"
+                  className="container tab-pane active m-0 p-0 topping-list"
+                >
+                  {allIngredients?.toppings?.countAsTwo?.map(
+                    (countAsTwoToppings, index) => {
+                      const toppingCode = countAsTwoToppings.toppingsCode;
+                      const st = allCheckBoxes.find(
+                        (ck) => ck.id === toppingCode
+                      ) ?? { id: toppingCode, checked: false };
 
-          {/* Tab Content */}
-          <div className="tab-content m-0 p-0 w-100">
-            {/* Count 2 Toppings */}
-            <div
-              id="toppings-count-2-tab"
-              className="container tab-pane active m-0 p-0 topping-list"
-            >
-              {allIngredients?.toppings?.countAsTwo?.map(
-                (countAsTwoToppings, index) => {
-                  const toppingCode = countAsTwoToppings.toppingsCode;
-                  return (
-                    <>
-                      <li
-                        className="list-group-item d-flex justify-content-between align-items-center"
-                        key={countAsTwoToppings.toppingsCode}
-                      >
-                        <label className="">
-                          <input
-                            type="checkbox"
-                            className="mx-3 d-inline-block"
-                            onChange={(e) =>
-                              handleTwoToppings(e, index, toppingCode)
-                            }
-                          />
-                          {countAsTwoToppings.toppingsName}
-                        </label>
-                        <div
-                          className="d-flex justify-content-between align-items-center"
-                          style={{ width: "12rem" }}
+                      return (
+                        <>
+                          <li
+                            className="list-group-item d-flex justify-content-between align-items-center"
+                            key={countAsTwoToppings.toppingsCode}
+                          >
+                            <label className="">
+                              <input
+                                type="checkbox"
+                                className="mx-3 d-inline-block"
+                                checked={st.checked}
+                                onChange={(e) =>
+                                  handleTwoToppings(e, index, toppingCode)
+                                }
+                              />
+                              {countAsTwoToppings.toppingsName}
+                            </label>
+                            <div
+                              className="d-flex justify-content-between align-items-center"
+                              style={{ width: "12rem" }}
+                            >
+                              <p
+                                className="mx-2 mb-0 text-end"
+                                style={{ width: "35%" }}
+                              >
+                                $ {countAsTwoToppings.price}
+                              </p>
+                              <select
+                                className="form-select d-inline-block"
+                                style={{ width: "65%" }}
+                                id={"placement-" + toppingCode}
+                                onChange={(e) =>
+                                  handleCountTwoPlacementChange(e, toppingCode)
+                                }
+                              >
+                                <option value="whole" selected>
+                                  Whole
+                                </option>
+                                <option value="lefthalf">Left Half</option>
+                                <option value="righthalf">Right Half</option>
+                              </select>
+                            </div>
+                          </li>
+                        </>
+                      );
+                    }
+                  )}
+                </div>
+                {/* Count 1 Toppings */}
+                <div
+                  id="toppings-count-1-tab"
+                  className="container tab-pane m-0 p-0 topping-list"
+                >
+                  {allIngredients?.toppings?.countAsOne?.map(
+                    (countAsOneToppings, index) => {
+                      const toppingCode = countAsOneToppings.toppingsCode;
+                      const st = allCheckBoxes.find(
+                        (te) => te.id == toppingCode
+                      ) ?? { id: toppingCode, checked: false };
+                      return (
+                        <>
+                          <li
+                            className="list-group-item d-flex justify-content-between align-items-center"
+                            key={toppingCode}
+                          >
+                            <label className="">
+                              <input
+                                type="checkbox"
+                                className="mx-3 d-inline-block toppingsChk"
+                                checked={st.checked}
+                                onChange={(e) =>
+                                  handleOneToppings(e, toppingCode)
+                                }
+                              />
+                              {countAsOneToppings.toppingsName}
+                            </label>
+                            <div
+                              className="d-flex justify-content-between align-items-center"
+                              style={{ width: "12rem" }}
+                            >
+                              <p
+                                className="mx-2 mb-0 text-end"
+                                style={{ width: "35%" }}
+                              >
+                                $ {countAsOneToppings.price}
+                              </p>
+                              <select
+                                className="form-select d-inline-block"
+                                style={{ width: "65%" }}
+                                id={"placement-" + toppingCode}
+                                onChange={(e) =>
+                                  handleCountOnePlacementChange(e, toppingCode)
+                                }
+                              >
+                                <option value="whole" selected>
+                                  Whole
+                                </option>
+                                <option value="lefthalf">Left Half</option>
+                                <option value="righthalf">Right Half</option>
+                              </select>
+                            </div>
+                          </li>
+                        </>
+                      );
+                    }
+                  )}
+                </div>
+                {/* Free Toppings */}
+                <div
+                  id="toppings-free-tab"
+                  className="container tab-pane m-0 p-0 topping-list"
+                >
+                  {allIngredients?.toppings?.freeToppings?.map(
+                    (freeToppings, index) => {
+                      const toppingCode = freeToppings.toppingsCode;
+                      const st = allCheckBoxes.find(
+                        (te) => te.id == toppingCode
+                      ) ?? { id: toppingCode, checked: false };
+                      return (
+                        <>
+                          <li
+                            className="list-group-item d-flex justify-content-between align-items-center"
+                            key={toppingCode}
+                          >
+                            <label className="d-flex align-items-center">
+                              <input
+                                type="checkbox"
+                                className="mx-3 d-inline-block toppingsChk"
+                                checked={st.checked}
+                                onChange={(e) =>
+                                  handleFreeToppings(e, toppingCode)
+                                }
+                              />
+                              {freeToppings.toppingsName}
+                            </label>
+                            <div
+                              className="d-flex justify-content-between align-items-center"
+                              style={{ width: "12rem" }}
+                            >
+                              <p
+                                className="mx-2 mb-0 text-end"
+                                style={{ width: "35%" }}
+                              >
+                                $ 0
+                              </p>
+                              <select
+                                data-topping-area={toppingCode}
+                                className="form-select d-inline-block"
+                                style={{ width: "65%" }}
+                                id={"placement-" + toppingCode}
+                                onChange={(e) =>
+                                  handleFreePlacementChange(e, toppingCode)
+                                }
+                              >
+                                <option value="whole" selected>
+                                  Whole
+                                </option>
+                                <option value="lefthalf">Left Half</option>
+                                <option value="righthalf">Right Half</option>
+                              </select>
+                            </div>
+                          </li>
+                        </>
+                      );
+                    }
+                  )}
+                </div>
+
+                {/* Sides */}
+                <div
+                  id="sides"
+                  className="container tab-pane m-0 p-0 topping-list"
+                >
+                  {sidesData?.map((sidesData) => {
+                    const sideCode = sidesData.sideCode;
+                    const st = allCheckBoxes.find(
+                      (te) => te.id == sideCode
+                    ) ?? { id: sideCode, checked: false };
+                    return (
+                      <>
+                        <li
+                          className="list-group-item d-flex justify-content-between align-items-center"
+                          key={sidesData.sideCode}
                         >
-                          <p
-                            className="mx-2 mb-0 text-end"
-                            style={{ width: "35%" }}
-                          >
-                            $ {countAsTwoToppings.price}
-                          </p>
-                          <select
-                            className="form-select d-inline-block"
-                            style={{ width: "65%" }}
-                            id={"placement-" + toppingCode}
-                            onChange={(e) =>
-                              handleCountTwoPlacementChange(e, toppingCode)
-                            }
-                          >
-                            <option value="whole" selected>
-                              Whole
-                            </option>
-                            <option value="lefthalf">Left Half</option>
-                            <option value="righthalf">Right Half</option>
-                          </select>
-                        </div>
-                      </li>
-                    </>
-                  );
-                }
-              )}
-            </div>
-            {/* Count 1 Toppings */}
-            <div
-              id="toppings-count-1-tab"
-              className="container tab-pane m-0 p-0 topping-list"
-            >
-              {allIngredients?.toppings?.countAsOne?.map(
-                (countAsOneToppings, index) => {
-                  const toppingCode = countAsOneToppings.toppingsCode;
-                  return (
-                    <>
+                          <label className="d-flex align-items-center">
+                            <input
+                              type="checkbox"
+                              className="mx-3 d-inline-block sidesChk"
+                              checked={st.checked}
+                              onChange={(e) => {
+                                handleSides(e, sideCode);
+                              }}
+                            />
+                            {sidesData.sideName}
+                          </label>
+                          <div style={{ width: "12rem" }}>
+                            <select
+                              className="form-select w-100 d-inline-block"
+                              id={"placement-" + sideCode}
+                              onChange={(e) => {
+                                handleSidePlacementChange(e, sideCode);
+                              }}
+                            >
+                              {sidesData.combination.map((combination) => {
+                                return (
+                                  <option
+                                    key={combination.lineCode}
+                                    data-key={combination.lineCode}
+                                    data-price={combination.price}
+                                    data-size={combination.size}
+                                  >
+                                    <span>{combination.size} - </span>
+                                    <span className="mb-0 mx-2">
+                                      $ {combination.price}
+                                    </span>
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </div>
+                        </li>
+                      </>
+                    );
+                  })}
+                </div>
+
+                {/* Dips */}
+                <div
+                  id="dips"
+                  className="container tab-pane m-0 p-0 topping-list"
+                >
+                  {allIngredients?.dips?.map((dipsData) => {
+                    const dipCode = dipsData.dipsCode;
+                    const st = allCheckBoxes.find((te) => te.id == dipCode) ?? {
+                      id: dipCode,
+                      checked: false,
+                    };
+                    return (
                       <li
                         className="list-group-item d-flex justify-content-between align-items-center"
-                        key={toppingCode}
-                      >
-                        <label className="">
-                          <input
-                            type="checkbox"
-                            className="mx-3 d-inline-block"
-                            onChange={(e) => handleOneToppings(e, toppingCode)}
-                          />
-                          {countAsOneToppings.toppingsName}
-                        </label>
-                        <div
-                          className="d-flex justify-content-between align-items-center"
-                          style={{ width: "12rem" }}
-                        >
-                          <p
-                            className="mx-2 mb-0 text-end"
-                            style={{ width: "35%" }}
-                          >
-                            $ {countAsOneToppings.price}
-                          </p>
-                          <select
-                            className="form-select d-inline-block"
-                            style={{ width: "65%" }}
-                            id={"placement-" + toppingCode}
-                            onChange={(e) =>
-                              handleCountOnePlacementChange(e, toppingCode)
-                            }
-                          >
-                            <option value="whole" selected>
-                              Whole
-                            </option>
-                            <option value="lefthalf">Left Half</option>
-                            <option value="righthalf">Right Half</option>
-                          </select>
-                        </div>
-                      </li>
-                    </>
-                  );
-                }
-              )}
-            </div>
-            {/* Free Toppings */}
-            <div
-              id="toppings-free-tab"
-              className="container tab-pane m-0 p-0 topping-list"
-            >
-              {allIngredients?.toppings?.freeToppings?.map(
-                (freeToppings, index) => {
-                  const toppingCode = freeToppings.toppingsCode;
-                  return (
-                    <>
-                      <li
-                        className="list-group-item d-flex justify-content-between align-items-center"
-                        key={toppingCode}
+                        key={dipCode}
                       >
                         <label className="d-flex align-items-center">
                           <input
                             type="checkbox"
-                            className="mx-3 d-inline-block"
-                            onChange={(e) => handleFreeToppings(e, toppingCode)}
+                            className="mx-3 d-inline-block dipsChk"
+                            checked={st.checked}
+                            onChange={(e) => {
+                              handleDips(e, dipCode);
+                            }}
                           />
-                          {freeToppings.toppingsName}
+                          {dipsData.dipsName}
                         </label>
-                        <div
-                          className="d-flex justify-content-between align-items-center"
-                          style={{ width: "12rem" }}
-                        >
-                          <p
-                            className="mx-2 mb-0 text-end"
-                            style={{ width: "35%" }}
-                          >
-                            $ 0
-                          </p>
-                          <select
-                            data-topping-area={toppingCode}
-                            className="form-select d-inline-block"
-                            style={{ width: "65%" }}
-                            id={"placement-" + toppingCode}
-                            onChange={(e) =>
-                              handleFreePlacementChange(e, toppingCode)
-                            }
-                          >
-                            <option value="whole" selected>
-                              Whole
-                            </option>
-                            <option value="lefthalf">Left Half</option>
-                            <option value="righthalf">Right Half</option>
-                          </select>
-                        </div>
+                        <p className="mb-0 mx-2">$ {dipsData.price}</p>
                       </li>
-                    </>
-                  );
-                }
-              )}
+                    );
+                  })}
+                </div>
+
+                {/* Drinks */}
+                <div
+                  id="drinks"
+                  className="container tab-pane m-0 p-0 topping-list"
+                >
+                  {allIngredients?.softdrinks?.map((drinksData) => {
+                    const softdrinkCode = drinksData.softdrinkCode;
+                    const st = allCheckBoxes.find(
+                      (te) => te.id == softdrinkCode
+                    ) ?? { id: softdrinkCode, checked: false };
+                    return (
+                      <li
+                        className="list-group-item d-flex justify-content-between align-items-center"
+                        key={softdrinkCode}
+                      >
+                        <label className="d-flex align-items-center">
+                          <input
+                            type="checkbox"
+                            className="mx-3 d-inline-block drinksChk"
+                            checked={st.checked}
+                            onChange={(e) => handleDrinks(e, softdrinkCode)}
+                          />
+                          {drinksData.softDrinksName}
+                        </label>
+                        <p className="mb-0 mx-2">$ {drinksData.price}</p>
+                      </li>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
-            {/* Sides */}
-            <div id="sides" className="container tab-pane m-0 p-0 topping-list">
-              {sidesData?.map((sidesData) => {
-                const sidesCode = sidesData.sideCode;
-                return (
-                  <>
-                    <li
-                      className="list-group-item d-flex justify-content-between align-items-center"
-                      key={sidesData.sideCode}
-                    >
-                      <label className="d-flex align-items-center">
-                        <input
-                          type="checkbox"
-                          className="mx-3 d-inline-block"
-                          onChange={(e) => {
-                            handleSides(e, sidesCode);
-                          }}
-                        />
-                        {sidesData.sideName}
-                      </label>
-                      <div style={{ width: "12rem" }}>
-                        <select
-                          className="form-select w-100 d-inline-block"
-                          id={"placement-" + sidesCode}
-                          onChange={(e) => {
-                            handleSidePlacementChange(e, sidesCode);
-                          }}
-                        >
-                          {sidesData.combination.map((combination) => {
-                            return (
-                              <option
-                                key={combination.lineCode}
-                                data-key={combination.lineCode}
-                                data-price={combination.price}
-                                data-size={combination.size}
-                              >
-                                <span>{combination.size} - </span>
-                                <span className="mb-0 mx-2">
-                                  $ {combination.price}
-                                </span>
-                              </option>
-                            );
-                          })}
-                        </select>
-                      </div>
-                    </li>
-                  </>
-                );
-              })}
-            </div>
-
-            {/* Dips */}
-            <div id="dips" className="container tab-pane m-0 p-0 topping-list">
-              {allIngredients?.dips?.map((dipsData) => {
-                return (
-                  <li
-                    className="list-group-item d-flex justify-content-between align-items-center"
-                    key={dipsData.dipsCode}
-                  >
-                    <label className="d-flex align-items-center">
-                      <input
-                        type="checkbox"
-                        className="mx-3 d-inline-block"
-                        onChange={(e) => {
-                          handleDips(e, dipsData.dipsCode);
-                        }}
-                      />
-                      {dipsData.dipsName}
-                    </label>
-                    <p className="mb-0 mx-2">$ {dipsData.price}</p>
-                  </li>
-                );
-              })}
-            </div>
-
-            {/* Drinks */}
-            <div
-              id="drinks"
-              className="container tab-pane m-0 p-0 topping-list"
-            >
-              {allIngredients?.softdrinks?.map((drinksData) => {
-                return (
-                  <li
-                    className="list-group-item d-flex justify-content-between align-items-center"
-                    key={drinksData.softdrinkCode}
-                  >
-                    <label className="d-flex align-items-center">
-                      <input
-                        type="checkbox"
-                        className="mx-3 d-inline-block"
-                        onChange={(e) =>
-                          handleDrinks(e, drinksData.softdrinkCode)
-                        }
-                      />
-                      {drinksData.softDrinksName}
-                    </label>
-                    <p className="mb-0 mx-2">$ {drinksData.price}</p>
-                  </li>
-                );
-              })}
+            {/* Comments */}
+            <h6 className="text-left mt-1">Comments</h6>
+            <div className="">
+              <textarea
+                className="form-control"
+                rows="4"
+                cols="50"
+                onChange={(e) => setComments(e.target.value)}
+              />
             </div>
           </div>
-        </div>
-
-        {/* Comments */}
-        <h6 className="text-left mt-1">Comments</h6>
-        <div className="">
-          <textarea
-            className="form-control"
-            rows="4"
-            cols="50"
-            onChange={(e) => setComments(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* Add to Cart Button */}
-      <div className="d-flex flex-row justify-content-center align-items-center addToCartDiv mb-3">
-        <button
-          type="submit"
-          className="btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn"
-          onClick={handleAddToCart}
-        >
-          Add to Cart
-        </button>
-      </div>
+          {/* Add to Cart Button */}
+          <div className="d-flex flex-row justify-content-center align-items-center addToCartDiv mb-3">
+            <button
+              type="submit"
+              className="btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn"
+              onClick={handleAddToCart}
+            >
+              Add to Cart
+            </button>
+          </div>
+        </>
+      )}
     </>
   );
 }

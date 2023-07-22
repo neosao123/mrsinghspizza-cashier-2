@@ -13,6 +13,7 @@ import Order from "./Pages/order/Order";
 import AuthLayout from "./layout/AuthLayout";
 import { cashierDetails } from "./API/ongoingOrder";
 import { Helmet } from "react-helmet";
+import { GlobalProvider } from "./context/GlobalContext";
 
 function App() {
   const dispatch = useDispatch();
@@ -136,26 +137,28 @@ function App() {
           href="/images/logo/favicon-16x16.png"
         />
       </Helmet>
-      <Routes>
-        <Route path="/" exact element={<Login />} />
-        <Route path="/forget-password" exact element={<ForgetPass />} />
-        <Route path="/reset-password" exact element={<ResetPass />} />
+      <GlobalProvider>
+        <Routes>
+          <Route path="/" exact element={<Login />} />
+          <Route path="/forget-password" exact element={<ForgetPass />} />
+          <Route path="/reset-password" exact element={<ResetPass />} />
 
-        <Route
-          path="/ongoing-orders"
-          element={
-            <AuthLayout>
-              <OngoingOrder />
-            </AuthLayout>
-          }
-        />
-        <Route path="/orders" element={<Order />} />
-        <Route path="/invoices" element={<Invoices />} />
-        <Route path="/reports" element={<Report />} />
+          <Route
+            path="/ongoing-orders"
+            element={
+              <AuthLayout>
+                <OngoingOrder />
+              </AuthLayout>
+            }
+          />
+          <Route path="/orders" element={<Order />} />
+          <Route path="/invoices" element={<Invoices />} />
+          <Route path="/reports" element={<Report />} />
 
-        {/* Page For Restricted condition */}
-        <Route path="/restricted-page" element={<RestrictedPage />} />
-      </Routes>
+          {/* Page For Restricted condition */}
+          <Route path="/restricted-page" element={<RestrictedPage />} />
+        </Routes>
+      </GlobalProvider>
     </>
   );
 }

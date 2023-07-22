@@ -65,3 +65,7 @@ export const deleteCartItemApi = async (payload) => {
 export const orderPlaceApi = async (payload) => {
   return await privateAPi.post("/cashier/order/place", payload);
 };
+
+export const updateCartApi = async (payload) => {
+  return await privateAPi.post("/cart/update", payload);
+};
