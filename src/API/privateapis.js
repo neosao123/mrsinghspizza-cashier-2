@@ -2,7 +2,6 @@ import axios from "axios";
 
 const base_url = process.env.REACT_APP_API;
 const token = localStorage.getItem("token");
-console.log("Session Token", token);
 
 export const privateAPi = axios.create({
   baseURL: base_url,

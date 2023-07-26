@@ -4,7 +4,8 @@ import { loginApi } from "../../API/auth/login";
 import { useFormik } from "formik";
 import bgImage from "../../assets/bg-img.jpg";
 import * as Yup from "yup";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import logo from "../../assets/logo.png";
 
 // Validation Functions
 const getCharacterValidationError = (str) => {
@@ -25,28 +26,26 @@ function Login() {
     userName: "cashier",
     password: "12345678",
   });
-
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation;
 
-  const { user } = useSelector((state) => ({ ...state }));
-
-  const intended = location.state;
-  useEffect(() => {
-    console.log("intended", intended);
-    if (intended) {
-      return;
-    } else {
-      if (user?.data?.token) {
-        navigate("/ongoing-orders");
-      }
-    }
-  }, [intended, user?.data?.token, navigate]);
+  // const { user } = useSelector((state) => ({ ...state }));
+  // const intended = location.state;
+  // useEffect(() => {
+  //   if (intended) {
+  //     return;
+  //   } else {
+  //     if (user?.data?.token) {
+  //       navigate("/ongoing-orders");
+  //     }
+  //   }
+  // }, [intended, user?.data?.token, navigate]);
 
   const onSubmit = async (values) => {
-    console.log(values);
     try {
+      setLoading(true);
       await loginApi(values)
         .then(async (res) => {
           // Store res in LocalStorage
@@ -74,9 +73,11 @@ function Login() {
           }, 2000);
         })
         .catch((err) => {
+          setLoading(false);
           console.log("Error From LoginApi: ", err);
         });
     } catch (err) {
+      setLoading(false);
       console.log("Exception From LoginApi", err);
     }
   };
@@ -98,20 +99,27 @@ function Login() {
           backgroundImage: `url(${bgImage})`,
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
-          opacity: ".9",
         }}
       >
         <div
-          className="p-5"
+          className="p-4"
           style={{
             backgroundColor: "#f7f7f7",
             borderRadius: "1%",
-            width: "40%",
-            opacity: ".9",
+            width: "25%",
             zIndex: "100",
           }}
         >
-          <h4 className="mb-4 text-center">Login</h4>
+          <div className="w-100 h-25 d-flex justify-content-center">
+            <img
+              src={logo}
+              width="15%"
+              height="15%"
+              alt=""
+              className="mb-2"
+            ></img>
+          </div>
+          <h5 className="mb-4 text-center">Login</h5>
           <form onSubmit={formik.handleSubmit}>
             <label className="form-label">Username</label>
             <input
@@ -147,8 +155,9 @@ function Login() {
                 type="submit"
                 className="btn px-4 mt-1 w-100 text-center btn-rounded"
                 style={{ backgroundColor: "#ff8c00", color: "#f4f4f4" }}
+                disabled={loading}
               >
-                <strong>Login</strong>
+                <strong>{loading ? "Please wait..." : "Login"}</strong>
               </button>
             </div>
           </form>

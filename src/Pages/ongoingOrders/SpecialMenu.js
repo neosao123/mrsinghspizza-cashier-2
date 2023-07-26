@@ -43,7 +43,7 @@ function SpecialMenu() {
   }
 
   const handleAddToCart = () => {
-    console.log(crust);
+    //
   };
 
   // Customize Details
@@ -112,7 +112,8 @@ function SpecialMenu() {
                   src={`${backBtn}`}
                   width="35px"
                   height="35px"
-                ></img>
+                  alt=""
+                />
               </div>
 
               <div className="customizablePizza px-3">
@@ -168,6 +169,8 @@ function SpecialMenu() {
                                   <input
                                     type="checkbox"
                                     className="mx-3 d-inline-block"
+                                    defaultChecked={false}
+                                    key={sidesData.code}
                                   />
                                   {sidesData.sideName}
                                 </label>
@@ -176,7 +179,10 @@ function SpecialMenu() {
                                     {sidesData?.lineEntries?.map(
                                       (lineEntriesData) => {
                                         return (
-                                          <option key={lineEntriesData.code}>
+                                          <option
+                                            key={lineEntriesData.code}
+                                            defaultValue={lineEntriesData.code}
+                                          >
                                             <span>
                                               {lineEntriesData.size} -{" "}
                                             </span>
@@ -208,7 +214,7 @@ function SpecialMenu() {
                       <ul className="list-group">
                         {dipsData?.map((data) => {
                           return (
-                            <li className="list-group-item">
+                            <li className="list-group-item" key={data.dipsCode}>
                               <div className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex align-items-center">
                                   <label className="d-flex align-items-center">
@@ -255,6 +261,8 @@ function SpecialMenu() {
                                 <input
                                   type="checkbox"
                                   className="mx-3 d-inline-block"
+                                  defaultChecked={false}
+                                  key={getSpecialData.pops.code}
                                 />
                                 {getSpecialData?.pops?.softDrinkName}
                               </label>
@@ -276,6 +284,8 @@ function SpecialMenu() {
                                 <input
                                   type="checkbox"
                                   className="mx-3 d-inline-block"
+                                  defaultChecked={false}
+                                  key={getSpecialData.bottle.code}
                                 />
                                 {getSpecialData?.bottle?.softDrinkName}
                               </label>
@@ -299,7 +309,7 @@ function SpecialMenu() {
                 {/* Add to Cart Button */}
                 <div className="d-flex flex-row justify-content-center align-items-center addToCartDiv mt-3 mb-3">
                   <button
-                    type="submit"
+                    type="button"
                     className="btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn"
                     onClick={handleAddToCart}
                   >
@@ -315,7 +325,7 @@ function SpecialMenu() {
             >
               {specialData?.map((speicalPizza) => {
                 return (
-                  <li className="list-group-item">
+                  <li className="list-group-item" key={speicalPizza.code}>
                     <div className="d-flex justify-content-between align-items-end py-2 px-1">
                       <div className="d-flex align-items-center">
                         <img

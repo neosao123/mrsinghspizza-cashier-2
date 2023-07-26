@@ -4,16 +4,7 @@ import specialImg1 from "../../assets/bg-img.jpg";
 import $ from "jquery";
 import { toast } from "react-toastify";
 
-function SidesMenu({
-  getCartList,
-  customerName,
-  mobileNumber,
-  deliveryType,
-  address,
-  storeLocation,
-  discount,
-  taxPer,
-}) {
+function SidesMenu({ getCartList, discount, taxPer }) {
   const [sidesData, setSidesData] = useState();
   const [quantity, setQuantity] = useState(1);
 
@@ -58,42 +49,42 @@ function SidesMenu({
     }
     let price = selectedCombination[0].price;
     let totalAmount = 0;
-    totalAmount = Number(price) * Number(quantity);
-    console.log(price);
-    console.log(totalAmount);
-    const payload = {
-      cartCode: cartCode ? cartCode : "#NA",
-      customerCode: customerCode ? customerCode : "#NA",
-      customerName: customerName,
-      mobileNumber: mobileNumber,
-      address: address,
-      deliveryType: "pickup",
-      storeLocation: storeLocation,
-      productCode: selectedSide[0].sideCode,
-      productName: selectedSide[0].sideName,
-      productType: "side",
-      config: {
-        lineCode: selectedCombination[0].lineCode,
-        sidesSize: selectedCombination[0].size,
-      },
-      quantity: quantity,
-      price: selectedCombination[0].price,
-      amount: totalAmount.toFixed(2),
-      discountAmount: discount,
-      taxPer: taxPer,
-    };
-    await addToCartApi(payload)
-      .then((res) => {
-        localStorage.setItem("CartData", JSON.stringify(res.data.data));
-        //clear fields from create your own
-        getCartList();
-        toast.success(
-          `${selectedSide[0].sideName} - ${selectedCombination[0].size} Added Successfully...`
-        );
-      })
-      .catch((err) => {
-        console.log("ERROR From Add To Cart Sides API", err);
-      });
+    if (quantity) {
+      totalAmount = Number(price) * Number(quantity);
+      const payload = {
+        cartCode: cartCode ? cartCode : "#NA",
+        customerCode: customerCode ? customerCode : "#NA",
+        cashierCode: localStorage.getItem("cashierCode"),
+        productCode: selectedSide[0].sideCode,
+        productName: selectedSide[0].sideName,
+        productType: "side",
+        config: {
+          lineCode: selectedCombination[0].lineCode,
+          sidesSize: selectedCombination[0].size,
+        },
+        quantity: quantity,
+        price: selectedCombination[0].price,
+        amount: totalAmount.toFixed(2),
+        discountAmount: discount,
+        taxPer: taxPer,
+      };
+      await addToCartApi(payload)
+        .then((res) => {
+          localStorage.setItem("CartData", JSON.stringify(res.data.data));
+          //clear fields from create your own
+          getCartList();
+          toast.success(
+            `${selectedSide[0].sideName} - ${selectedCombination[0].size} Added Successfully...`
+          );
+        })
+        .catch((err) => {
+          if (err.response.status === 400 || err.response.status === 500) {
+            toast.error(err.response.data.message);
+          }
+        });
+    } else {
+      toast.error("Quantity is required");
+    }
   };
 
   //API - Sides

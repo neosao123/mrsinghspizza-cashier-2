@@ -3,16 +3,7 @@ import { addToCartApi, softDrinksApi } from "../../API/ongoingOrder";
 import specialImg1 from "../../assets/bg-img.jpg";
 import { toast } from "react-toastify";
 
-function DrinksMenu({
-  getCartList,
-  customerName,
-  mobileNumber,
-  address,
-  deliveryType,
-  storeLocation,
-  discount,
-  taxPer,
-}) {
+function DrinksMenu({ getCartList, discount, taxPer }) {
   const [softDrinksData, setSoftDrinksData] = useState();
   const [quantity, setQuantity] = useState(1);
 
@@ -65,11 +56,7 @@ function DrinksMenu({
       const payload = {
         cartCode: cartCode ? cartCode : "#NA",
         customerCode: customerCode ? customerCode : "#NA",
-        customerName: customerName,
-        mobileNumber: mobileNumber,
-        address: address,
-        deliveryType: "pickup",
-        storeLocation: storeLocation,
+        cashierCode: localStorage.getItem("cashierCode"),
         productCode: selectedDrinks[0].softdrinkCode,
         productName: selectedDrinks[0].softDrinksName,
         productType: "dips",
@@ -89,10 +76,12 @@ function DrinksMenu({
           );
         })
         .catch((err) => {
-          console.log("ERROR From Add To Cart Sides API", err);
+          if (err.response.status === 400 || err.response.status === 500) {
+            toast.error(err.response.data.message);
+          }
         });
     } else {
-      console.log("Plz Enter Quantity");
+      toast.error("Quantity is required");
     }
   };
 

@@ -1,15 +1,15 @@
 import "./App.css";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import Login from "./Pages/auth/Login";
-import ForgetPass from "./Pages/auth/ForgetPass";
-import ResetPass from "./Pages/auth/ResetPass";
-import Invoices from "./Pages/invoices/Invoices";
-import Report from "./Pages/report/Report";
-import RestrictedPage from "./Pages/RestrictedPage";
 import { useEffect, useState } from "react";
-import OngoingOrder from "./Pages/ongoingOrders/OngoingOrder";
+import { Route, Routes } from "react-router-dom";
+import ForgetPass from "./Pages/Auth/ForgetPass";
+import Login from "./Pages/Auth/Login";
+import ResetPass from "./Pages/Auth/ResetPass";
+import Invoices from "./Pages/Invoices/Invoices";
+import Report from "./Pages/Report/Report";
+import RestrictedPage from "./Pages/RestrictedPage";
+import OngoingOrder from "./Pages/OngoingOrders/NewOrder";
 import { useDispatch } from "react-redux";
-import Order from "./Pages/order/Order";
+import Order from "./Pages/Order/Order";
 import AuthLayout from "./layout/AuthLayout";
 import { cashierDetails } from "./API/ongoingOrder";
 import { Helmet } from "react-helmet";
@@ -19,35 +19,35 @@ function App() {
   const dispatch = useDispatch();
 
   const [hasToken, setHasToken] = useState(false);
-  useEffect(() => {
-    // window.addEventListener("resize", restrictedPage);
-    // Redux Data ReStore After Page Relaod using Token(localstorage)
-    // let token = localStorage.getItem("token");
-    // if (token !== null && token !== "") {
-    //   setHasToken(true);
-    //   cashierDetails(token)
-    //     .then((res) => {
-    //       dispatch({
-    //         type: "LOGGD_IN_USER",
-    //         payload: {
-    //           token: token,
-    //           code: res.data.data.code,
-    //           userName: res.data.data.userName,
-    //           firstName: res.data.data.firstName,
-    //           lastName: res.data.data.lastName,
-    //           mobileNumber: res.data.data.mobileNumber,
-    //           email: res.data.data.email,
-    //           isActive: res.data.data.isActive,
-    //           firebaseId: res.data.data.firebaseId,
-    //           profilePhoto: res.data.data.profilePhoto,
-    //         },
-    //       });
-    //     })
-    //     .catch((err) => {
-    //       console.log("Cashier Details Error", err);
-    //     });
-    // }
-  }, []);
+  // useEffect(() => {
+  //   // window.addEventListener("resize", restrictedPage);
+  //   // Redux Data ReStore After Page Relaod using Token(localstorage)
+  //   // let token = localStorage.getItem("token");
+  //   // if (token !== null && token !== "") {
+  //   //   setHasToken(true);
+  //   //   cashierDetails(token)
+  //   //     .then((res) => {
+  //   //       dispatch({
+  //   //         type: "LOGGD_IN_USER",
+  //   //         payload: {
+  //   //           token: token,
+  //   //           code: res.data.data.code,
+  //   //           userName: res.data.data.userName,
+  //   //           firstName: res.data.data.firstName,
+  //   //           lastName: res.data.data.lastName,
+  //   //           mobileNumber: res.data.data.mobileNumber,
+  //   //           email: res.data.data.email,
+  //   //           isActive: res.data.data.isActive,
+  //   //           firebaseId: res.data.data.firebaseId,
+  //   //           profilePhoto: res.data.data.profilePhoto,
+  //   //         },
+  //   //       });
+  //   //     })
+  //   //     .catch((err) => {
+  //   //       console.log("Cashier Details Error", err);
+  //   //     });
+  //   // }
+  // }, []);
 
   // Restricted Page Funtion
   // const restrictedPage = () => {

@@ -9,11 +9,6 @@ import EditCartProduct from "./EditCartProduct";
 function CreateYourOwn({
   allIngredients,
   sidesData,
-  customerName,
-  mobileNumber,
-  address,
-  deliveryType,
-  storeLocation,
   discount,
   taxPer,
   getCartList,
@@ -35,9 +30,11 @@ function CreateYourOwn({
   const [price, setPrice] = useState(0);
   const [count, setCount] = useState(0);
   const [allCheckBoxes, setAllCheckBoxes] = useState([]);
+
   // Calculate Price
   const calculatePrice = () => {
     let calculatePrice = 0;
+
     let crust_price = $("#crust").find(":selected").attr("data-price") || 0;
     let cheese_price = $("#cheese").find(":selected").attr("data-price") || 0;
     let specialbase_price =
@@ -52,10 +49,13 @@ function CreateYourOwn({
     countTwoToppingsArr.map(
       (two) => (totalTwoToppings += Number(two.toppingsPrice))
     );
+    console.log("countTwoToppingsArr : ", countTwoToppingsArr);
+    console.log("totalTwoToppings :", totalTwoToppings);
     countOneToppingsArr.map(
       (one) => (totalOneToppings += Number(one.toppingsPrice))
     );
     freeToppingsArr.map((free) => (totalFreeToppings += 0));
+    console.log("sidesArray inside calculated function :", sidesArr);
     sidesArr.map((side) => (totalSidesPrice += Number(side.sidesPrice)));
     dips.map((dips) => (totalDips += Number(dips.dipsPrice)));
     drinks.map((drinks) => (totalDrinks += Number(drinks.drinksPrice)));
@@ -70,57 +70,52 @@ function CreateYourOwn({
     calculatePrice += totalDips;
     calculatePrice += totalDrinks;
 
+    console.log("calculatePrice after : ", calculatePrice);
     setPrice(calculatePrice);
-  };
-
-  // Add To Cart - API Payload
-  const payload = {
-    cartCode: "#NA",
-    customerCode: "#NA",
-    customerName: customerName,
-    mobileNumber: mobileNumber,
-    address: address,
-    deliveryType: "pickup",
-    storeLocation: storeLocation,
-    productCode: "#NA",
-    productName: "Custom Pizza",
-    productType: "Pizza",
-    config: {
-      pizza: [
-        {
-          crust: crust,
-          cheese: cheese,
-          specialBases: specialBases,
-          toppings: {
-            countAsTwoToppings: countTwoToppingsArr,
-            countAsOneToppings: countOneToppingsArr,
-            freeToppings: freeToppingsArr,
-          },
-        },
-      ],
-      sides: sidesArr,
-      dips: dips,
-      drinks: drinks,
-    },
-    quantity: "1",
-    price: price,
-    amount: price,
-    comment: comments,
-    pizzaSize: pizzaSize,
-    discountAmount: discount,
-    taxPer: taxPer,
   };
 
   // Onclick Add To Cart Button
   const handleAddToCart = async (e) => {
     e.preventDefault();
+    const lsCartCode = localStorage.getItem("cartCode");
+    const cashierCode = localStorage.getItem("cashierCode");
+
+    const payload = {
+      cartCode: lsCartCode !== "" && lsCartCode !== null ? lsCartCode : "#NA",
+      cashierCode: cashierCode,
+      productCode: "#NA",
+      productName: "Custom Pizza",
+      productType: "custom_pizza",
+      config: {
+        pizza: [
+          {
+            crust: crust,
+            cheese: cheese,
+            specialBases: specialBases,
+            toppings: {
+              countAsTwoToppings: countTwoToppingsArr,
+              countAsOneToppings: countOneToppingsArr,
+              freeToppings: freeToppingsArr,
+            },
+          },
+        ],
+        sides: sidesArr,
+        dips: dips,
+        drinks: drinks,
+      },
+      quantity: "1",
+      price: price,
+      amount: price,
+      comments: comments,
+      pizzaSize: pizzaSize,
+      discountAmount: discount,
+      taxPer: taxPer,
+    };
     await addToCartApi(payload)
       .then((res) => {
         const resData = res.data.data;
         localStorage.setItem("CartData", JSON.stringify(res.data.data));
         localStorage.setItem("cartCode", resData.cartCode);
-        localStorage.setItem("customerCode", resData.customerCode);
-        // setCartRes(res.data.data);
         //clear fields from create your own
 
         //reset all states
@@ -141,9 +136,12 @@ function CreateYourOwn({
         toast.success(`Custom Pizza Added Successfully...`);
       })
       .catch((err) => {
-        console.log("Error From All Ingredient API: ", err);
+        if (err.response.status === 400 || err.response.status === 500) {
+          toast.error(err.response.data.message);
+        }
       });
-    console.log("Data Succefully Store in Add To Cart.....", payload);
+
+    console.log(payload);
   };
 
   // handle Pizza Size
@@ -153,16 +151,17 @@ function CreateYourOwn({
 
   // handle Crust
   const handleCrust = async (e) => {
+    console.log("target value crust : ", e.target.value);
     allIngredients?.crust?.map((crustData) => {
-      if (e.target.value.split(" -")[0] === crustData.crustName) {
+      if (e.target.value === crustData.crustCode) {
         setCrust({
           crustCode: crustData.crustCode,
           crustName: crustData.crustName,
           crustPrice: crustData.price ? crustData.price : "0",
         });
-        calculatePrice();
       }
     });
+    calculatePrice();
   };
   // handle Cheese
   const handleCheese = (e) => {
@@ -173,14 +172,15 @@ function CreateYourOwn({
           cheeseName: cheeseData.cheeseName,
           cheesePrice: cheeseData.price ? cheeseData.price : "0",
         });
-        calculatePrice();
       }
     });
+    calculatePrice();
   };
-  // handle SpecialBases
+  // handle SpecialBasess
   const handleSpecialBases = (e) => {
+    console.log(e.target.value);
     allIngredients?.specialbases?.map((specialBasesData) => {
-      if (e.target.value.split(" -")[0] === specialBasesData.specialbaseName) {
+      if (e.target.value === specialBasesData.specialbaseCode) {
         setSpecialBases({
           specialbaseCode: specialBasesData.specialbaseCode,
           specialbaseName: specialBasesData.specialbaseName,
@@ -188,9 +188,9 @@ function CreateYourOwn({
             ? specialBasesData.price
             : "0",
         });
-        calculatePrice();
       }
     });
+    calculatePrice();
   };
 
   // handle Two Toppings
@@ -215,6 +215,7 @@ function CreateYourOwn({
       };
 
       setCountTwoToppingsArr((prevToppings) => [...prevToppings, toppingObj]);
+      console.log("countTwoToppingsArr", countTwoToppingsArr);
     } else {
       setCountTwoToppingsArr((prevToppings) =>
         prevToppings.filter(
@@ -235,6 +236,8 @@ function CreateYourOwn({
     const filteredToppings = countTwoToppingsArr.filter(
       (topping) => topping.toppingsCode === toppingCode
     );
+    console.log("placement : ", countTwoToppingsArr);
+
     if (filteredToppings.length > 0) {
       let filteredTopping = filteredToppings[0];
       filteredTopping.toppingsPlacement = placement;
@@ -362,10 +365,12 @@ function CreateYourOwn({
         sidesSize: size,
       };
       setSideArr((prevSides) => [...prevSides, sidesObj]);
+      console.log("sidesArr checked : ", sidesArr);
     } else {
       setSideArr((prevSides) =>
         prevSides.filter((sidesObj) => sidesObj.sidesCode !== sideCode)
       );
+      console.log("sidesArr unchecked : ", sidesArr);
     }
     setAllCheckBoxes((prevCheckboxes) =>
       prevCheckboxes.map((checkbox) =>
@@ -396,33 +401,62 @@ function CreateYourOwn({
     setCount((prevCount) => prevCount + 1);
   };
 
+  // // handle Dips
+  // const handleDips = (e, code) => {
+  //   const { checked } = e.target;
+  //   const selectedDips = allIngredients?.dips.filter(
+  //     (dips) => dips.dipsCode === code
+  //   );
+  //   console.log("selectedDips : ", selectedDips);
+  //   if (selectedDips.length > 0) {
+  //     let dipsObj = {
+  //       dipsCode: selectedDips[0].dipsCode,
+  //       dipsName: selectedDips[0].dipsName,
+  //       dipsPrice: selectedDips[0].price ? selectedDips[0].price : "0",
+  //     };
+  //     if (e.target.checked === true) {
+  //       setDips([...dips, dipsObj]);
+  //     } else {
+  //       const newDips = dips.filter(
+  //         (newDips) => newDips.dipsCode !== dipsObj.dipsCode
+  //       );
+  //       setDips(newDips);
+  //     }
+  //     setAllCheckBoxes((prevCheckboxes) =>
+  //       prevCheckboxes.map((checkbox) =>
+  //         checkbox.id === code ? { ...checkbox, checked } : checkbox
+  //       )
+  //     );
+  //   }
+  // };
+
   // handle Dips
   const handleDips = (e, code) => {
     const { checked } = e.target;
-    const selectedDips = allIngredients?.dips.filter(
-      (dips) => dips.dipsCode === code
-    );
-    if (selectedDips.length > 0) {
-      let dipsObj = {
-        dipsCode: selectedDips[0].dipsCode,
-        dipsName: selectedDips[0].dipsName,
-        dipsPrice: selectedDips[0].price ? selectedDips[0].price : "0",
-      };
-      if (e.target.checked === true) {
-        setDips([...dips, dipsObj]);
-        calculatePrice();
-      } else {
-        const newDips = dips.filter(
-          (newDips) => newDips.dipsCode !== dipsObj.dipsCode
-        );
-        setDips(newDips);
-      }
-      setAllCheckBoxes((prevCheckboxes) =>
-        prevCheckboxes.map((checkbox) =>
-          checkbox.id === code ? { ...checkbox, checked } : checkbox
-        )
+
+    if (checked) {
+      const selectedDips = allIngredients?.dips.filter(
+        (dips) => dips.dipsCode === code
       );
+      console.log("selectedDips : ", selectedDips);
+      if (selectedDips.length > 0) {
+        let dipsObj = {
+          dipsCode: selectedDips[0].dipsCode,
+          dipsName: selectedDips[0].dipsName,
+          dipsPrice: selectedDips[0].price ? selectedDips[0].price : "0",
+        };
+        setDips([...dips, dipsObj]);
+      }
+    } else {
+      const newDips = dips.filter((newDips) => newDips.dipsCode !== code);
+      setDips(newDips);
     }
+
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) =>
+        checkbox.id === code ? { ...checkbox, checked } : checkbox
+      )
+    );
   };
 
   // handle Drinks
@@ -445,12 +479,12 @@ function CreateYourOwn({
         );
         setDrinks(newDrinks);
       }
-      setAllCheckBoxes((prevCheckboxes) =>
-        prevCheckboxes.map((checkbox) =>
-          checkbox.id === code ? { ...checkbox, checked } : checkbox
-        )
-      );
     }
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) =>
+        checkbox.id === code ? { ...checkbox, checked } : checkbox
+      )
+    );
   };
 
   const uncheckAllCheckboxes = () => {
@@ -460,46 +494,34 @@ function CreateYourOwn({
   };
 
   useEffect(() => {
-    const toppingtwo = allIngredients?.toppings?.countAsTwo?.map((d, index) => {
-      setAllCheckBoxes((prevCheckboxes) => [
-        ...prevCheckboxes,
-        { id: d.toppingsCode, checked: false },
-      ]);
-    });
-    const t2 = allIngredients?.toppings?.countAsOne?.map((d, index) => {
-      setAllCheckBoxes((prevCheckboxes) => [
-        ...prevCheckboxes,
-        { id: d.toppingsCode, checked: false },
-      ]);
-    });
-    const t3 = allIngredients?.toppings?.freeToppings?.map((d, index) => {
-      setAllCheckBoxes((prevCheckboxes) => [
-        ...prevCheckboxes,
-        { id: d.toppingsCode, checked: false },
-      ]);
-    });
-    const dps = allIngredients?.toppings?.dips?.map((d, index) => {
-      setAllCheckBoxes((prevCheckboxes) => [
-        ...prevCheckboxes,
-        { id: d.dipsCode, checked: false },
-      ]);
-    });
-    const sds = sidesData?.map((d) => {
-      setAllCheckBoxes((prevCheckboxes) => [
-        ...prevCheckboxes,
-        { id: d.sideCode, checked: false },
-      ]);
+    let ckbx = [];
+
+    allIngredients?.toppings?.countAsTwo?.map((d) => {
+      ckbx.push({ id: d.toppingsCode, checked: false });
     });
 
-    const dnks = allIngredients?.toppings?.softdrinks?.map((d, index) => {
-      setAllCheckBoxes((prevCheckboxes) => [
-        ...prevCheckboxes,
-        { id: d.softdrinkCode, checked: false },
-      ]);
+    allIngredients?.toppings?.countAsOne?.map((d) => {
+      ckbx.push({ id: d.toppingsCode, checked: false });
     });
 
-    console.log("all checkboxes", allCheckBoxes);
-  }, [allIngredients]);
+    allIngredients?.toppings?.freeToppings?.map((d) => {
+      ckbx.push({ id: d.toppingsCode, checked: false });
+    });
+
+    allIngredients?.dips?.map((d) => {
+      ckbx.push({ id: d.dipsCode, checked: false });
+    });
+
+    sidesData?.map((d) => {
+      ckbx.push({ id: d.sideCode, checked: false });
+    });
+
+    allIngredients?.softdrinks?.map((d) => {
+      ckbx.push({ id: d.softdrinkCode, checked: false });
+    });
+
+    setAllCheckBoxes(ckbx);
+  }, [allIngredients, sidesData]);
 
   useEffect(() => {
     calculatePrice();
@@ -520,11 +542,6 @@ function CreateYourOwn({
           <EditCartProduct
             allIngredients={allIngredients}
             sidesData={sidesData}
-            customerName={customerName}
-            mobileNumber={mobileNumber}
-            address={address}
-            deliveryType={deliveryType}
-            storeLocation={storeLocation}
             discount={discount}
             taxPer={taxPer}
             getCartList={getCartList}
@@ -538,9 +555,13 @@ function CreateYourOwn({
           <div className="d-flex justify-content-between">
             <div className="d-flex justify-content-center align-items-center">
               <span>Size: </span>
-              <select className="form-select mx-2" onChange={handlePizzaSize}>
-                <option>Large</option>
-                <option>Extra Large</option>
+              <select
+                className="form-select mx-2"
+                defaultValue="large"
+                onChange={handlePizzaSize}
+              >
+                <option value="Large">Large</option>
+                <option value="Extra Large">Extra Large</option>
               </select>
             </div>
             <h6 className="">
@@ -551,12 +572,21 @@ function CreateYourOwn({
             {/* Crust, Cheese, SpecialBases */}
             <div className="col-lg-4 col-md-4">
               <label className="mt-2 mb-1">Crust</label>
-              <select className="form-select" id="crust" onChange={handleCrust}>
+              <select
+                className="form-select"
+                id="crust"
+                defaultValue={"CR_5"}
+                onChange={handleCrust}
+              >
                 {allIngredients?.crust?.map((crustData) => {
                   let crustCode = crustData.crustCode;
                   return (
                     <>
-                      <option key={crustCode} data-price={crustData.price}>
+                      <option
+                        key={crustCode}
+                        value={crustData.crustCode}
+                        data-price={crustData.price}
+                      >
                         {crustData.crustName} - $ {crustData.price}
                       </option>
                     </>
@@ -570,6 +600,7 @@ function CreateYourOwn({
                 className="form-select"
                 id="cheese"
                 onChange={handleCheese}
+                defaultValue={"CHE_5"}
               >
                 {allIngredients?.cheese?.map((cheeseData) => {
                   let cheeseCode = cheeseData.cheeseCode;
@@ -589,6 +620,7 @@ function CreateYourOwn({
                 className="form-select"
                 id="specialbase"
                 onChange={handleSpecialBases}
+                defaultValue={""}
               >
                 <option value="" selected>
                   -- Choose from below--
@@ -599,6 +631,7 @@ function CreateYourOwn({
                       <option
                         key={specialbasesData.specialbaseCode}
                         data-price={specialbasesData.price}
+                        value={specialbasesData.specialbaseCode}
                       >
                         {specialbasesData.specialbaseName} - $
                         {specialbasesData.price}
@@ -608,9 +641,19 @@ function CreateYourOwn({
                 })}
               </select>
             </div>
-
+            <div className="col-lg-4 col-md-4 d-flex align-items-center mt-2">
+              <input
+                className="my-2 form-check-input"
+                type="checkbox"
+                value=""
+                id="allIndianTps"
+              />
+              <label className="m-2" htmlFor="allIndianTps">
+                All Indians Toppings
+              </label>
+            </div>
             {/* Tabs */}
-            <div className="mt-3 mb-3">
+            <div className="mt-1 mb-3">
               {/* Tabs Headings */}
               <ul className="nav nav-tabs mt-2" role="tablist">
                 <li className="nav-item">
@@ -893,11 +936,9 @@ function CreateYourOwn({
                                     data-key={combination.lineCode}
                                     data-price={combination.price}
                                     data-size={combination.size}
+                                    value={combination.lineCode}
                                   >
-                                    <span>{combination.size} - </span>
-                                    <span className="mb-0 mx-2">
-                                      $ {combination.price}
-                                    </span>
+                                    {combination.size} - $ {combination.price}
                                   </option>
                                 );
                               })}
@@ -916,7 +957,9 @@ function CreateYourOwn({
                 >
                   {allIngredients?.dips?.map((dipsData) => {
                     const dipCode = dipsData.dipsCode;
-                    const st = allCheckBoxes.find((te) => te.id == dipCode) ?? {
+                    const dip = allCheckBoxes.find(
+                      (te) => te.id == dipCode
+                    ) ?? {
                       id: dipCode,
                       checked: false,
                     };
@@ -929,7 +972,7 @@ function CreateYourOwn({
                           <input
                             type="checkbox"
                             className="mx-3 d-inline-block dipsChk"
-                            checked={st.checked}
+                            checked={dip.checked}
                             onChange={(e) => {
                               handleDips(e, dipCode);
                             }}
@@ -979,7 +1022,7 @@ function CreateYourOwn({
             <div className="">
               <textarea
                 className="form-control"
-                rows="4"
+                rows="2"
                 cols="50"
                 onChange={(e) => setComments(e.target.value)}
               />
@@ -988,7 +1031,7 @@ function CreateYourOwn({
           {/* Add to Cart Button */}
           <div className="d-flex flex-row justify-content-center align-items-center addToCartDiv mb-3">
             <button
-              type="submit"
+              type="button"
               className="btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn"
               onClick={handleAddToCart}
             >

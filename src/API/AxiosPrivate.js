@@ -3,7 +3,6 @@ const base_url = process.env.REACT_APP_API;
 export default {
   async sendPostApi(url, data) {
     const token = localStorage.getItem("token");
-    console.log("Session Token", token);
     const uri = base_url + url;
     const result = await axios.post(uri, data, {
       headers: {
@@ -17,7 +16,6 @@ export default {
 
   async sendGetApi(url, data) {
     const token = localStorage.getItem("token");
-    console.log("Session Token", token);
     const uri = base_url + url;
     const result = await axios.get(uri, data, {
       headers: {

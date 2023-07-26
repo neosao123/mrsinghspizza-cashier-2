@@ -3,16 +3,7 @@ import { addToCartApi, dipsApi } from "../../API/ongoingOrder";
 import specialImg1 from "../../assets/bg-img.jpg";
 import { toast } from "react-toastify";
 
-function DipsMenu({
-  customerName,
-  mobileNumber,
-  address,
-  deliveryType,
-  storeLocation,
-  discount,
-  taxPer,
-  getCartList,
-}) {
+function DipsMenu({ discount, taxPer, getCartList }) {
   const [dipsData, setDipsData] = useState();
   const [quantity, setQuantity] = useState(1);
 
@@ -58,16 +49,10 @@ function DipsMenu({
     let totalAmount = 0;
     if (quantity) {
       totalAmount = Number(price) * Number(quantity);
-      console.log(price);
-      console.log(totalAmount);
       const payload = {
         cartCode: cartCode ? cartCode : "#NA",
         customerCode: customerCode ? customerCode : "#NA",
-        customerName: customerName,
-        mobileNumber: mobileNumber,
-        address: address,
-        deliveryType: "pickup",
-        storeLocation: storeLocation,
+        cashierCode: localStorage.getItem("cashierCode"),
         productCode: selectedDips[0].dipsCode,
         productName: selectedDips[0].dipsName,
         productType: "dips",
@@ -87,10 +72,12 @@ function DipsMenu({
           getCartList();
         })
         .catch((err) => {
-          console.log("ERROR From Add To Cart Sides API", err);
+          if (err.response.status === 400 || err.response.status === 500) {
+            toast.error(err.response.data.message);
+          }
         });
     } else {
-      console.log("Plz Enter Quantity");
+      toast.error("Quantity is required");
     }
   };
 

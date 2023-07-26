@@ -9,7 +9,6 @@ function AuthLayout({ children }) {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    console.log("My Token", token);
     if (token !== undefined && token !== "") {
       if (!user?.data?.token && user === null) {
         setOk(false);

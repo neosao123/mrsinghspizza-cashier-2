@@ -1,18 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import GlobalContext from "../../context/GlobalContext";
-import $ from "jquery";
+import $, { data } from "jquery";
 import { updateCartApi } from "../../API/ongoingOrder";
 import { toast } from "react-toastify";
+import { FastField } from "formik";
 
 function EditCartProduct({
   allIngredients,
   sidesData,
-  customerName,
-  mobileNumber,
-  address,
-  deliveryType,
-  storeLocation,
   discount,
   taxPer,
   getCartList,
@@ -22,9 +18,9 @@ function EditCartProduct({
   // Selected State
   const [selectedSize, setSelectedSize] = useState();
   const [selectedPrice, setSelectedPrice] = useState();
-  const [selectedCrust, setSelectedCrust] = useState();
-  const [selectedCheese, setSelectedCheese] = useState();
-  const [selectedSB, setSelectedSB] = useState();
+  const [selectedCrust, setSelectedCrust] = useState({});
+  const [selectedCheese, setSelectedCheese] = useState({});
+  const [selectedSB, setSelectedSB] = useState({});
   const [selectedDips, setSelectedDips] = useState([]);
   const [selectedDrinks, setSelectedDrinks] = useState([]);
   const [selectedSides, setSelectedSides] = useState([]);
@@ -41,6 +37,7 @@ function EditCartProduct({
   const [crust, setCrust] = useState({});
   const [cheese, setCheese] = useState({});
   const [specialBases, setSpecialBases] = useState({});
+
   const [dips, setDips] = useState([]);
   const [drinks, setDrinks] = useState([]);
   const [pizzaSize, setPizzaSize] = useState();
@@ -51,70 +48,86 @@ function EditCartProduct({
   const [sidesArr, setSideArr] = useState([]);
   const [price, setPrice] = useState(0);
   const [count, setCount] = useState(0);
+  const navigate = useNavigate();
+  const [allCheckBoxes, setAllCheckBoxes] = useState([]);
 
-  const CartData = localStorage.getItem("CartData"); 
-  const customerCode = localStorage.getItem("customerCode");
-
-  // Add To Cart - API Payload
-  const payload = {
-    cartCode: cartCode,
-    cartLineCode: cartLineCode,
-    customerCode: customerCode,
-    customerName: customerName,
-    mobileNumber: mobileNumber,
-    address: address,
-    deliveryType: "pickup",
-    storeLocation: storeLocation,
-    productCode: cartItemDetails?.productCode
-      ? cartItemDetails?.productCode
-      : "#NA",
-    productName: cartItemDetails?.productName
-      ? cartItemDetails?.productName
-      : "#NA",
-    productType: "Pizza",
-    config: {
-      pizza: [
-        {
-          crust: crust ? crust : selectedCrust,
-          cheese: cheese ? cheese : selectedCheese,
-          specialBases: specialBases ? specialBases : selectedSB,
-          toppings: {
-            countAsTwoToppings: countTwoToppingsArr
-              ? countTwoToppingsArr
-              : selectedTwoTps,
-            countAsOneToppings: countOneToppingsArr
-              ? countOneToppingsArr
-              : selectedOneTps,
-            freeToppings: freeToppingsArr ? freeToppingsArr : selectedFreeTps,
-          },
-        },
-      ],
-      sides: sidesArr ? sidesArr : selectedSides,
-      dips: dips ? dips : selectedDips,
-      drinks: drinks ? drinks : selectedDrinks,
-    },
-    quantity: "1",
-    price: price,
-    amount: price,
-    pizzaSize: pizzaSize,
-    discountAmount: discount,
-    taxPer: taxPer,
-  };
+  // Check Empty Object
+  function isObjectEmpty(obj) {
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   // Onclick Add To Cart Button
   const handleAddToCart = async (e) => {
     e.preventDefault();
+    const customerCode = localStorage.getItem("customerCode");
+    console.log("count two handle change : ", countTwoToppingsArr);
+    console.log("selected two tps : ", selectedTwoTps);
+    const updatedPrice = (Number(selectedPrice) + Number(price)).toFixed(2);
+    const payload = {
+      cartCode: cartCode,
+      cartLineCode: cartLineCode,
+      customerCode: customerCode,
+      productCode: cartItemDetails?.productCode
+        ? cartItemDetails?.productCode
+        : "#NA",
+      productName: cartItemDetails?.productName
+        ? cartItemDetails?.productName
+        : "#NA",
+      productType: "Pizza",
+      config: {
+        pizza: [
+          {
+            crust: isObjectEmpty(crust) === false ? crust : selectedCrust,
+            cheese: isObjectEmpty(cheese) === false ? cheese : selectedCheese,
+            specialBases:
+              isObjectEmpty(specialBases) === false ? specialBases : selectedSB,
+            toppings: {
+              countAsTwoToppings:
+                countTwoToppingsArr.length === 0
+                  ? selectedTwoTps
+                  : countTwoToppingsArr,
+              countAsOneToppings: countOneToppingsArr
+                ? countOneToppingsArr
+                : selectedOneTps,
+              freeToppings: freeToppingsArr ? freeToppingsArr : selectedFreeTps,
+            },
+          },
+        ],
+        sides: sidesArr ? sidesArr : selectedSides,
+        dips: dips ? dips : selectedDips,
+        drinks: drinks ? drinks : selectedDrinks,
+      },
+      quantity: "1",
+      price: updatedPrice,
+      amount: price,
+      pizzaSize: pizzaSize ? pizzaSize : selectedSize,
+      discountAmount: discount,
+      taxPer: taxPer,
+      comments: comments,
+    };
     await updateCartApi(payload)
       .then((res) => {
+        console.log(res);
         localStorage.setItem("CartData", JSON.stringify(res.data.data));
         //clear fields from create your own
         getCartList();
-        toast.success(`Custom Pizza Added Successfully...`);
+        toast.success(`Custom Pizza Updated Successfully...`);
+        if (res.status === 200) {
+          console.log("res");
+          navigate("/ongoing-orders");
+        }
       })
       .catch((err) => {
-        console.log("Error From All Ingredient API: ", err);
+        if (err.response.status === 400 || err.response.status === 500) {
+          toast.error(err.response.data.message);
+        }
       });
-    console.log("Data Succefully Store in Add To Cart.....", payload);
+    console.log("Data Succefully Updated in Add To Cart.....", payload);
   };
 
   // handle Selected State
@@ -128,110 +141,144 @@ function EditCartProduct({
     setSelectedSize(cartItemDetails?.pizzaSize); //Selected Pizza Size
     // Selected Crust Code
     pizzaSelected?.map((items) => {
-      const crustCode = items?.crust?.crustCode;
-      if (crustCode !== undefined && crustCode !== "") {
-        setSelectedCrust(crustCode);
+      const crustData = items?.crust;
+      if (crustData !== undefined && crustData !== "") {
+        setSelectedCrust({
+          crustCode: crustData.crustCode,
+          crustName: crustData.crustName,
+          crustPrice: crustData.crustPrice,
+        });
       }
     });
     // Selected Cheese Code
     pizzaSelected?.map((items) => {
-      const cheeseCode = items?.cheese?.cheeseCode;
-      if (cheeseCode !== undefined && cheeseCode !== "") {
-        setSelectedCheese(cheeseCode);
+      const cheeseData = items?.cheese;
+      if (cheeseData !== undefined && cheeseData !== "") {
+        setSelectedCheese({
+          cheeseCode: cheeseData.cheeseCode,
+          cheeseName: cheeseData.cheeseName,
+          cheesePrice: cheeseData.cheesePrice,
+        });
       }
     });
     // Selected SpecialBases Code
     pizzaSelected?.map((items) => {
-      const SBcode = items?.specialBases?.specialbaseCode;
-      if (SBcode !== undefined && SBcode !== "") {
-        setSelectedSB(SBcode);
+      const SBData = items?.specialBases;
+      console.log("outside SB Data", items);
+      if (SBData.length !== 0) {
+        console.log("inside SB Data");
+        setSelectedSB({
+          specialbaseCode: SBData.specialbaseCode,
+          specialbaseName: SBData.specialbaseName,
+          specialbasePrice: SBData.specialbasePrice,
+        });
       }
     });
     // Selected Dips Code
     if (dipsSelected && dipsSelected.length > 0) {
-      const dipsCode = dipsSelected.map((dip) => dip.dipsCode);
-      setSelectedDips(dipsCode);
+      const dipsArray = [];
+      dipsSelected.map((dips) => {
+        let dipsObj = {
+          dipsCode: dips.dipsCode,
+          dipsName: dips.dipsName,
+          dipsPrice: dips.dipsPrice,
+        };
+        dipsArray.push(dipsObj);
+      });
+      setSelectedDips(dipsArray);
     }
     // Selected Drinks Code
     if (drinksSelected && drinksSelected.length > 0) {
-      const drinkCode = drinksSelected.map((drinks) => drinks.drinksCode);
-      setSelectedDrinks(drinkCode);
+      const drinksArray = [];
+      drinksSelected.map((drinks) => {
+        let drinksObj = {
+          drinksCode: drinks.drinksCode,
+          drinksName: drinks.drinksName,
+          drinksPrice: drinks.drinksPrice,
+        };
+        drinksArray.push(drinksObj);
+      });
+      setSelectedDrinks(drinksArray);
     }
     // Selected Sides Code
     if (sidesSelected && sidesSelected.length > 0) {
-      const sidesCode = sidesSelected.map((sides) => sides.sidesCode);
-      const lineCode = sidesSelected.map((combination) => combination.lineCode);
-      // console.log(lineCode);
-      setSelectedSides(sidesCode);
-      setSelectedLineCode(lineCode);
+      const sidesArray = [];
+      sidesSelected.map((sides) => {
+        let sidesObj = {
+          sidesCode: sides.sidesCode,
+          sidesName: sides.sidesName,
+          sidesType: sides.sidesType,
+          lineCode: sides.lineCode,
+          sidesSize: sides.sidesSize,
+          sidesPrice: sides.sidesPrice,
+        };
+        sidesArray.push(sidesObj);
+      });
+      setSelectedSides(sidesArray);
     }
     // Selected Count As Two Toppings Code
     pizzaSelected.map((items) => {
       const countTwoTpsSelected = items.toppings.countAsTwoToppings;
-      console.log("countTwoTpsSelected : ", countTwoTpsSelected);
       if (countTwoTpsSelected && countTwoTpsSelected.length > 0) {
-        let toppingsObj;
-        const toppingData = countTwoTpsSelected.map((toppings) => {
-          const toppingCode = toppings.toppingsCode;
-          const placement = toppings.toppingsPlacement;
-          toppingsObj = {
-            selectedCode: toppingCode,
-            selectedPlacement: placement,
+        const twoTpsArray = [];
+        countTwoTpsSelected.map((toppings) => {
+          let toppingsObj = {
+            toppingsCode: toppings.toppingsCode,
+            toppingsName: toppings.toppingsName,
+            toppingsPlacement: toppings.toppingsPlacement,
+            toppingsPrice: toppings.toppingsPrice,
           };
-          return toppingsObj;
+          twoTpsArray.push(toppingsObj);
         });
-        setSelectedTwoTps(toppingData);
+        setSelectedTwoTps(twoTpsArray);
       }
     });
     // Selected Count As One Toppings Code
     pizzaSelected.map((items) => {
       const countOneTpsSelected = items.toppings.countAsOneToppings;
-      console.log("countTwoTpsSelected : ", countOneTpsSelected);
       if (countOneTpsSelected && countOneTpsSelected.length > 0) {
-        let toppingsObj;
-        const toppingData = countOneTpsSelected.map((toppings) => {
-          const toppingCode = toppings.toppingsCode;
-          const placement = toppings.toppingsPlacement;
-          toppingsObj = {
-            selectedCode: toppingCode,
-            selectedPlacement: placement,
+        const oneTpsArray = [];
+        countOneTpsSelected.map((toppings) => {
+          let toppingsObj = {
+            toppingsCode: toppings.toppingsCode,
+            toppingsName: toppings.toppingsName,
+            toppingsPlacement: toppings.toppingsPlacement,
+            toppingsPrice: toppings.toppingsPrice,
           };
-          return toppingsObj;
+          oneTpsArray.push(toppingsObj);
         });
-        setSelectedOneTps(toppingData);
+        setSelectedOneTps(oneTpsArray);
       }
     });
     // Selected Free Toppings Code
     pizzaSelected.map((items) => {
       const freeTpsSelected = items.toppings.freeToppings;
-      console.log("countTwoTpsSelected : ", freeTpsSelected);
       if (freeTpsSelected && freeTpsSelected.length > 0) {
-        let toppingsObj;
-        const toppingData = freeTpsSelected.map((toppings) => {
-          const toppingCode = toppings.toppingsCode;
-          const placement = toppings.toppingsPlacement;
-          toppingsObj = {
-            selectedCode: toppingCode,
-            selectedPlacement: placement,
+        const freeTpsArray = [];
+        freeTpsSelected.map((toppings) => {
+          let toppingsObj = {
+            toppingsCode: toppings.toppingsCode,
+            toppingsName: toppings.toppingsName,
+            toppingsPlacement: toppings.toppingsPlacement,
+            toppingsPrice: toppings.toppingsPrice,
           };
-          return toppingsObj;
+          freeTpsArray.push(toppingsObj);
         });
-        setSelectedFreeTps(toppingData);
+        console.log("freeTpsArray : ", freeTpsArray);
+        setSelectedFreeTps(freeTpsArray);
       }
     });
   };
 
   // Calculate Price
+
   const calculatePrice = () => {
-    let calculatePrice = 0;
-    let crust_price = $("#crust").find(":selected").attr("data-price") || 0;
-    let cheese_price = $("#cheese").find(":selected").attr("data-price") || 0;
-    let specialbase_price =
-      $("#specialbase").find(":selected").attr("data-price") || 0;
-    let totalSidesPrice = Number(0);
+    let calculatePrices = 0;
+    console.log("calculatePrices before : ", calculatePrices);
     let totalTwoToppings = Number(0);
     let totalOneToppings = Number(0);
     let totalFreeToppings = Number(0);
+    let totalSidesPrice = Number(0);
     let totalDips = Number(0);
     let totalDrinks = Number(0);
 
@@ -239,24 +286,21 @@ function EditCartProduct({
       (two) => (totalTwoToppings += Number(two.toppingsPrice))
     );
     countOneToppingsArr.map(
-      (one) => (totalOneToppings += Number(one.toppingsPrice))
+      (two) => (totalOneToppings += Number(two.toppingsPrice))
     );
     freeToppingsArr.map((free) => (totalFreeToppings += 0));
+    console.log("Sides Array Inside Calculated Function : ", sidesArr);
     sidesArr.map((side) => (totalSidesPrice += Number(side.sidesPrice)));
     dips.map((dips) => (totalDips += Number(dips.dipsPrice)));
     drinks.map((drinks) => (totalDrinks += Number(drinks.drinksPrice)));
 
-    calculatePrice += Number(crust_price);
-    calculatePrice += Number(cheese_price);
-    calculatePrice += Number(specialbase_price);
-    calculatePrice += totalSidesPrice;
-    calculatePrice += totalTwoToppings;
-    calculatePrice += totalOneToppings;
-    calculatePrice += totalFreeToppings;
-    calculatePrice += totalDips;
-    calculatePrice += totalDrinks;
-
-    setPrice(calculatePrice);
+    calculatePrices += totalTwoToppings;
+    calculatePrices += totalOneToppings;
+    calculatePrices += totalFreeToppings;
+    calculatePrices += totalSidesPrice;
+    calculatePrices += totalDips;
+    calculatePrices += totalDrinks;
+    setPrice(calculatePrices.toFixed(2));
   };
 
   // handle Pizza Size
@@ -266,9 +310,8 @@ function EditCartProduct({
 
   // handle Crust
   const handleCrust = async (e) => {
-    console.log("crust onchange : ", e.target.value);
     allIngredients?.crust?.map((crustData) => {
-      if (e.target.value.split(" -")[0] === crustData.crustName) {
+      if (e.target.value === crustData.crustCode) {
         setCrust({
           crustCode: crustData.crustCode,
           crustName: crustData.crustName,
@@ -278,6 +321,7 @@ function EditCartProduct({
       }
     });
   };
+
   // handle Cheese
   const handleCheese = (e) => {
     allIngredients?.cheese?.map((cheeseData) => {
@@ -291,6 +335,7 @@ function EditCartProduct({
       }
     });
   };
+
   // handle SpecialBases
   const handleSpecialBases = (e) => {
     allIngredients?.specialbases?.map((specialBasesData) => {
@@ -308,8 +353,10 @@ function EditCartProduct({
   };
 
   // handle Two Toppings
-  const handleTwoToppings = (e, index, toppingCode) => {
+  const handleTwoToppings = (e, toppingCode) => {
     const { checked } = e.target;
+    console.log(checked, toppingCode);
+
     if (checked) {
       const selectedTopping = allIngredients?.toppings?.countAsTwo.filter(
         (topping) => topping.toppingsCode === toppingCode
@@ -327,8 +374,9 @@ function EditCartProduct({
           : "0",
         toppingsPlacement: placement,
       };
-
       setCountTwoToppingsArr((prevToppings) => [...prevToppings, toppingObj]);
+
+      console.log("countTwoToppingsArr", countTwoToppingsArr);
     } else {
       setCountTwoToppingsArr((prevToppings) =>
         prevToppings.filter(
@@ -336,17 +384,31 @@ function EditCartProduct({
         )
       );
     }
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) =>
+        checkbox.id === toppingCode ? { ...checkbox, checked } : checkbox
+      )
+    );
   };
   // handle Two Toppings Placement
   const handleCountTwoPlacementChange = (e, toppingCode) => {
-    const placement = e.target.value;
+    const placementVal = e.target.value;
+    alert(toppingCode + " " + placementVal);
     const filteredToppings = countTwoToppingsArr.filter(
       (topping) => topping.toppingsCode === toppingCode
     );
     if (filteredToppings.length > 0) {
       let filteredTopping = filteredToppings[0];
-      filteredTopping.toppingsPlacement = placement;
+      filteredTopping.toppingsPlacement = placementVal;
     }
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) =>
+        checkbox.id === toppingCode
+          ? { ...checkbox, placement: placementVal }
+          : checkbox
+      )
+    );
+    console.log(allCheckBoxes);
   };
 
   // handle One Toppings
@@ -379,6 +441,12 @@ function EditCartProduct({
         )
       );
     }
+
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) =>
+        checkbox.id === toppingCode ? { ...checkbox, checked } : checkbox
+      )
+    );
   };
   // handle One Toppings Placement
   const handleCountOnePlacementChange = (e, toppingCode) => {
@@ -422,6 +490,11 @@ function EditCartProduct({
         )
       );
     }
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) =>
+        checkbox.id === toppingCode ? { ...checkbox, checked } : checkbox
+      )
+    );
   };
   // handle Free Toppings Placement
   const handleFreePlacementChange = (e, toppingCode) => {
@@ -460,23 +533,32 @@ function EditCartProduct({
         sidesSize: size,
       };
       setSideArr((prevSides) => [...prevSides, sidesObj]);
+      console.log("sidesArr : ", sidesArr);
     } else {
       setSideArr((prevSides) =>
         prevSides.filter((sidesObj) => sidesObj.sidesCode !== sideCode)
       );
     }
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) =>
+        checkbox.id === sideCode ? { ...checkbox, checked } : checkbox
+      )
+    );
   };
   // handle Sides Placement
   const handleSidePlacementChange = (e, sideCode) => {
-    const lineCode = $("#placement-" + sideCode)
+    const lineCode = $("#sidesPlace-" + sideCode)
       .find(":selected")
       .attr("data-key");
-    let size = $("#placement-" + sideCode)
+    let size = $("#sidesPlace-" + sideCode)
       .find(":selected")
       .attr("data-size");
-    let price = $("#placement-" + sideCode)
+    let price = $("#sidesPlace-" + sideCode)
       .find(":selected")
       .attr("data-price");
+    console.log("sides price : ", price);
+    console.log("sides price : ", sideCode);
+
     const filteredSides = sidesArr.filter(
       (sides) => sides.sidesCode === sideCode
     );
@@ -491,56 +573,145 @@ function EditCartProduct({
 
   // handle Dips
   const handleDips = (e, code) => {
-    const selectedDips = allIngredients?.dips.filter(
-      (dips) => dips.dipsCode === code
-    );
-    if (selectedDips.length > 0) {
-      let dipsObj = {
-        dipsCode: selectedDips[0].dipsCode,
-        dipsName: selectedDips[0].dipsName,
-        dipsPrice: selectedDips[0].price ? selectedDips[0].price : "0",
-      };
-      if (e.target.checked === true) {
+    const { checked } = e.target;
+    if (checked) {
+      const selectedDips = allIngredients?.dips.filter(
+        (dips) => dips.dipsCode === code
+      );
+      if (selectedDips.length > 0) {
+        let dipsObj = {
+          dipsCode: selectedDips[0].dipsCode,
+          dipsName: selectedDips[0].dipsName,
+          dipsPrice: selectedDips[0].price ? selectedDips[0].price : "0",
+        };
         setDips([...dips, dipsObj]);
-        calculatePrice();
-      } else {
-        const newDips = dips.filter(
-          (newDips) => newDips.dipsCode !== dipsObj.dipsCode
-        );
-        setDips(newDips);
       }
+    } else {
+      const newDips = dips.filter((newDips) => newDips.dipsCode !== code);
+      setDips(newDips);
     }
+
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) =>
+        checkbox.id === code ? { ...checkbox, checked } : checkbox
+      )
+    );
+    calculatePrice();
   };
 
   // handle Drinks
   const handleDrinks = (e, code) => {
-    const selectedDrinks = allIngredients?.softdrinks.filter(
-      (drinks) => drinks.softdrinkCode === code
-    );
-    if (selectedDrinks.length > 0) {
-      let drinksObj = {
-        drinksCode: selectedDrinks[0].softdrinkCode,
-        drinksName: selectedDrinks[0].softDrinksName,
-        drinksPrice: selectedDrinks[0].price ? selectedDrinks[0].price : "0",
-      };
-      if (e.target.checked === true) {
+    const { checked } = e.target;
+
+    if (checked) {
+      const selectedDrinks = allIngredients?.softdrinks.filter(
+        (drinks) => drinks.softdrinkCode === code
+      );
+      if (selectedDrinks.length > 0) {
+        let drinksObj = {
+          drinksCode: selectedDrinks[0].softdrinkCode,
+          drinksName: selectedDrinks[0].softDrinksName,
+          drinksPrice: selectedDrinks[0].price ? selectedDrinks[0].price : "0",
+        };
         setDrinks([...drinks, drinksObj]);
-      } else {
-        const newDrinks = drinks.filter(
-          (updatedDrinks) => updatedDrinks.drinksCode !== drinksObj.drinksCode
-        );
-        setDrinks(newDrinks);
       }
+    } else {
+      const newDrinks = drinks.filter(
+        (updatedDrinks) => updatedDrinks.drinksCode !== code
+      );
+      setDrinks(newDrinks);
     }
+
+    setAllCheckBoxes((prevCheckboxes) =>
+      prevCheckboxes.map((checkbox) =>
+        checkbox.id === code ? { ...checkbox, checked } : checkbox
+      )
+    );
   };
 
   useEffect(() => {
     handleSelectedState();
-  }, [crust]);
+    let ckbx = [];
+
+    allIngredients?.toppings?.countAsTwo?.map((d) => {
+      ckbx.push({ id: d.toppingsCode, checked: false, placement: "whole" });
+    });
+    allIngredients?.toppings?.countAsOne?.map((d) => {
+      ckbx.push({ id: d.toppingsCode, checked: false });
+    });
+    allIngredients?.toppings?.freeToppings?.map((d) => {
+      ckbx.push({ id: d.toppingsCode, checked: false });
+    });
+    sidesData.map((d) => {
+      ckbx.push({ id: d.sideCode, checked: false });
+    });
+    allIngredients?.dips?.map((d) => {
+      ckbx.push({ id: d.dipsCode, checked: false });
+    });
+    allIngredients?.softdrinks?.map((d) => {
+      ckbx.push({ id: d.softdrinkCode, checked: false });
+    });
+
+    console.log("Checkboxes before", ckbx);
+
+    console.log(cartItemDetails?.config?.pizza);
+    cartItemDetails?.config?.pizza[0].toppings?.countAsTwoToppings.map(
+      (top) => {
+        const chkIndex = ckbx.findIndex((ck) => ck.id === top.toppingsCode);
+        if (chkIndex !== -1) {
+          console.log("chkIndex :", top.toppingsPlacement);
+          ckbx[chkIndex].checked = true;
+          ckbx[chkIndex].placement = top.toppingsPlacement;
+        }
+        //setCountTwoToppingsArr((prevToppings) => [...prevToppings, top]);
+        console.log("selected topping", top);
+      }
+    );
+
+    console.log("countTwoArrAfterReload", countTwoToppingsArr);
+
+    cartItemDetails?.config?.pizza[0].toppings?.countAsOneToppings.map(
+      (top) => {
+        const chkIndex = ckbx.findIndex((ck) => ck.id === top.toppingsCode);
+        if (chkIndex !== -1) {
+          ckbx[chkIndex].checked = true;
+        }
+      }
+    );
+    cartItemDetails?.config?.pizza[0].toppings?.freeToppings.map((top) => {
+      const chkIndex = ckbx.findIndex((ck) => ck.id === top.toppingsCode);
+      if (chkIndex !== -1) {
+        ckbx[chkIndex].checked = true;
+      }
+    });
+    cartItemDetails?.config?.sides.map((sides) => {
+      const chkIndex = ckbx.findIndex((ck) => ck.id === sides.sidesCode);
+      if (chkIndex !== -1) {
+        ckbx[chkIndex].checked = true;
+      }
+    });
+    cartItemDetails?.config?.dips.map((dips) => {
+      const chkIndex = ckbx.findIndex((ck) => ck.id === dips.dipsCode);
+      if (chkIndex !== -1) {
+        ckbx[chkIndex].checked = true;
+      }
+    });
+    cartItemDetails?.config?.drinks.map((drinks) => {
+      const chkIndex = ckbx.findIndex((ck) => ck.id === drinks.drinksCode);
+      if (chkIndex !== -1) {
+        ckbx[chkIndex].checked = true;
+      }
+    });
+
+    console.log("check boxes after", ckbx);
+    setAllCheckBoxes(ckbx);
+  }, [allIngredients, cartItemDetails]);
 
   useEffect(() => {
     calculatePrice();
   }, [
+    allIngredients,
+    cartItemDetails,
     sidesArr,
     countTwoToppingsArr,
     countOneToppingsArr,
@@ -572,7 +743,9 @@ function EditCartProduct({
           </select>
         </div>
         <h6 className="">
-          <span className="mx-2">${selectedPrice}</span>
+          <span className="mx-2">
+            ${(Number(selectedPrice) + Number(price)).toFixed(2)}
+          </span>
         </h6>
       </div>
       <div className="row my-2">
@@ -582,6 +755,7 @@ function EditCartProduct({
           <select
             className="form-select"
             id="crust"
+            defaultValue={"CR_5"}
             onChange={(e) => handleCrust(e)}
           >
             {allIngredients?.crust?.map((crustData) => {
@@ -589,10 +763,12 @@ function EditCartProduct({
               return (
                 <>
                   <option
-                    selected={selectedCrust === crustCode ? true : false}
+                    selected={
+                      selectedCrust.crustCode === crustCode ? true : false
+                    }
                     key={crustCode}
-                    // value={selectedCrust}
                     data-price={crustData.price}
+                    value={crustCode}
                   >
                     {crustData.crustName} - $ {crustData.price}
                   </option>
@@ -613,7 +789,9 @@ function EditCartProduct({
               return (
                 <>
                   <option
-                    selected={selectedCheese === cheeseCode ? true : false}
+                    selected={
+                      selectedCheese.cheeseCode === cheeseCode ? true : false
+                    }
                     key={cheeseCode}
                     data-price={cheeseData.price}
                   >
@@ -722,13 +900,13 @@ function EditCartProduct({
               {allIngredients?.toppings?.countAsTwo?.map(
                 (countAsTwoToppings, index) => {
                   const toppingCode = countAsTwoToppings.toppingsCode;
-                  const isSelected =
-                    selectedTwoTps.find(
-                      (data) => data.selectedCode === toppingCode
-                    ) ?? false;
-                  const toppingPlacement = isSelected
-                    ? isSelected.selectedPlacement
-                    : "whole";
+                  // const toppingPlacement = isSelected
+                  //   ? isSelected.selectedPlacement
+                  //   : "whole";
+
+                  const st = allCheckBoxes.find(
+                    (ck) => ck.id === toppingCode
+                  ) ?? { id: toppingCode, checked: false, placement: "whole" };
                   return (
                     <>
                       <li
@@ -739,7 +917,7 @@ function EditCartProduct({
                           <input
                             type="checkbox"
                             className="mx-3 d-inline-block"
-                            checked={isSelected ? true : false}
+                            checked={st.checked}
                             onChange={(e) => handleTwoToppings(e, toppingCode)}
                           />
                           {countAsTwoToppings.toppingsName}
@@ -763,16 +941,14 @@ function EditCartProduct({
                             }
                           >
                             <option
-                              selected={
-                                toppingPlacement === "whole" ? true : false
-                              }
+                              selected={st.placement === "whole" ? true : false}
                               value="whole"
                             >
                               Whole
                             </option>
                             <option
                               selected={
-                                toppingPlacement === "lefthalf" ? true : false
+                                st.placement === "lefthalf" ? true : false
                               }
                               value="lefthalf"
                             >
@@ -780,7 +956,7 @@ function EditCartProduct({
                             </option>
                             <option
                               selected={
-                                toppingPlacement === "righthalf" ? true : false
+                                st.placement === "righthalf" ? true : false
                               }
                               value="righthalf"
                             >
@@ -794,6 +970,7 @@ function EditCartProduct({
                 }
               )}
             </div>
+
             {/* Count 1 Toppings */}
             <div
               id="toppings-count-1-tab"
@@ -802,13 +979,12 @@ function EditCartProduct({
               {allIngredients?.toppings?.countAsOne?.map(
                 (countAsOneToppings, index) => {
                   const toppingCode = countAsOneToppings.toppingsCode;
-                  const isSelected =
-                    selectedOneTps.find(
-                      (data) => data.selectedCode === toppingCode
-                    ) ?? false;
-                  const toppingPlacement = isSelected
-                    ? isSelected.selectedPlacement
-                    : "whole";
+                  // const toppingPlacement = isSelected
+                  //   ? isSelected.selectedPlacement
+                  //   : "whole";
+                  const st = allCheckBoxes.find(
+                    (ck) => ck.id === toppingCode
+                  ) ?? { id: toppingCode, checked: false };
                   return (
                     <>
                       <li
@@ -819,7 +995,7 @@ function EditCartProduct({
                           <input
                             type="checkbox"
                             className="mx-3 d-inline-block"
-                            checked={isSelected ? true : false}
+                            checked={st.checked}
                             onChange={(e) => handleOneToppings(e, toppingCode)}
                           />
                           {countAsOneToppings.toppingsName}
@@ -844,25 +1020,25 @@ function EditCartProduct({
                           >
                             <option
                               value="whole"
-                              selected={
-                                toppingPlacement === "whole" ? true : false
-                              }
+                              // selected={
+                              //   toppingPlacement === "whole" ? true : false
+                              // }
                             >
                               Whole
                             </option>
                             <option
                               value="lefthalf"
-                              selected={
-                                toppingPlacement === "lefthalf" ? true : false
-                              }
+                              // selected={
+                              //   toppingPlacement === "lefthalf" ? true : false
+                              // }
                             >
                               Left Half
                             </option>
                             <option
                               value="righthalf"
-                              selected={
-                                toppingPlacement === "righthalf" ? true : false
-                              }
+                              // selected={
+                              //   toppingPlacement === "righthalf" ? true : false
+                              // }
                             >
                               Right Half
                             </option>
@@ -874,6 +1050,7 @@ function EditCartProduct({
                 }
               )}
             </div>
+
             {/* Free Toppings */}
             <div
               id="toppings-free-tab"
@@ -882,13 +1059,17 @@ function EditCartProduct({
               {allIngredients?.toppings?.freeToppings?.map(
                 (freeToppings, index) => {
                   const toppingCode = freeToppings.toppingsCode;
-                  const isSelected =
-                    selectedFreeTps.find(
-                      (data) => data.selectedCode === toppingCode
-                    ) ?? false;
-                  const toppingPlacement = isSelected
-                    ? isSelected.selectedPlacement
-                    : "whole";
+                  // const isSelected =
+                  //   selectedFreeTps.find(
+                  //     (data) => data.selectedCode === toppingCode
+                  //   ) ?? false;
+                  // const toppingPlacement = isSelected
+                  //   ? isSelected.selectedPlacement
+                  //   : "whole";
+
+                  const st = allCheckBoxes.find(
+                    (ck) => ck.id === toppingCode
+                  ) ?? { id: toppingCode, checked: false };
                   return (
                     <>
                       <li
@@ -899,7 +1080,7 @@ function EditCartProduct({
                           <input
                             type="checkbox"
                             className="mx-3 d-inline-block"
-                            checked={isSelected ? true : false}
+                            checked={st.checked}
                             onChange={(e) => handleFreeToppings(e, toppingCode)}
                           />
                           {freeToppings.toppingsName}
@@ -925,25 +1106,25 @@ function EditCartProduct({
                           >
                             <option
                               value="whole"
-                              selected={
-                                toppingPlacement === "whole" ? true : false
-                              }
+                              // selected={
+                              //   toppingPlacement === "whole" ? true : false
+                              // }
                             >
                               Whole
                             </option>
                             <option
                               value="lefthalf"
-                              selected={
-                                toppingPlacement === "lefthalf" ? true : false
-                              }
+                              // selected={
+                              //   toppingPlacement === "lefthalf" ? true : false
+                              // }
                             >
                               Left Half
                             </option>
                             <option
                               value="righthalf"
-                              selected={
-                                toppingPlacement === "righthalf" ? true : false
-                              }
+                              // selected={
+                              //   toppingPlacement === "righthalf" ? true : false
+                              // }
                             >
                               Right Half
                             </option>
@@ -960,6 +1141,11 @@ function EditCartProduct({
             <div id="sides" className="container tab-pane m-0 p-0 topping-list">
               {sidesData?.map((sidesData) => {
                 const sidesCode = sidesData.sideCode;
+                const st = allCheckBoxes.find((ck) => ck.id === sidesCode) ?? {
+                  id: sidesCode,
+                  checked: false,
+                };
+
                 return (
                   <>
                     <li
@@ -970,9 +1156,7 @@ function EditCartProduct({
                         <input
                           type="checkbox"
                           className="mx-3 d-inline-block"
-                          checked={
-                            selectedSides.includes(sidesCode) ? true : false
-                          }
+                          checked={st.checked}
                           onChange={(e) => handleSides(e, sidesCode)}
                         />
                         {sidesData.sideName}
@@ -980,7 +1164,7 @@ function EditCartProduct({
                       <div style={{ width: "12rem" }}>
                         <select
                           className="form-select w-100 d-inline-block"
-                          id={"placement-" + sidesCode}
+                          id={"sidesPlace-" + sidesCode}
                         >
                           {sidesData.combination.map((combination) => {
                             const lineCode = combination.lineCode;
@@ -990,11 +1174,7 @@ function EditCartProduct({
                                 data-key={combination.lineCode}
                                 data-price={combination.price}
                                 data-size={combination.size}
-                                selected={
-                                  selectedLineCode.includes(lineCode)
-                                    ? true
-                                    : false
-                                }
+                                // selected={                            }
                                 onChange={(e) =>
                                   handleSidePlacementChange(e, sidesCode)
                                 }
@@ -1017,6 +1197,12 @@ function EditCartProduct({
             {/* Dips */}
             <div id="dips" className="container tab-pane m-0 p-0 topping-list">
               {allIngredients?.dips?.map((dipsData) => {
+                const st = allCheckBoxes.find(
+                  (ck) => ck.id === dipsData.dipsCode
+                ) ?? {
+                  id: dipsData.dipsCode,
+                  checked: false,
+                };
                 return (
                   <li
                     className="list-group-item d-flex justify-content-between align-items-center"
@@ -1026,11 +1212,7 @@ function EditCartProduct({
                       <input
                         type="checkbox"
                         className="mx-3 d-inline-block"
-                        checked={
-                          selectedDips.includes(dipsData.dipsCode)
-                            ? true
-                            : false
-                        }
+                        checked={st.checked}
                         onChange={(e) => handleDips(e, dipsData.dipsCode)}
                       />
                       {dipsData.dipsName}
@@ -1047,6 +1229,12 @@ function EditCartProduct({
               className="container tab-pane m-0 p-0 topping-list"
             >
               {allIngredients?.softdrinks?.map((drinksData) => {
+                const st = allCheckBoxes.find(
+                  (ck) => ck.id === drinksData.softdrinkCode
+                ) ?? {
+                  id: drinksData.softdrinkCode,
+                  checked: false,
+                };
                 return (
                   <li
                     className="list-group-item d-flex justify-content-between align-items-center"
@@ -1056,11 +1244,7 @@ function EditCartProduct({
                       <input
                         type="checkbox"
                         className="mx-3 d-inline-block"
-                        checked={
-                          selectedDrinks.includes(drinksData.softdrinkCode)
-                            ? true
-                            : false
-                        }
+                        checked={st.checked}
                         onChange={(e) =>
                           handleDrinks(e, drinksData.softdrinkCode)
                         }
@@ -1074,12 +1258,25 @@ function EditCartProduct({
             </div>
           </div>
         </div>
+
+        {/* Comments */}
+        <h6 className="text-left mt-1">Comments</h6>
+        <div className="">
+          <textarea
+            className="form-control"
+            rows="2"
+            cols="50"
+            onChange={(e) => setComments(e.target.value)}
+          />
+        </div>
       </div>
+
       {/* Add to Cart Button */}
       <div className="d-flex flex-row justify-content-center align-items-center addToCartDiv mb-3">
         <button
-          type="submit"
+          type="button"
           className="btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn"
+          onClick={(e) => handleAddToCart(e)}
         >
           Add to Cart
         </button>
