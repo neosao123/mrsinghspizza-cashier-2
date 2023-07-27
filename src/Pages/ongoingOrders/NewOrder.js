@@ -556,7 +556,7 @@ function NewOrder() {
                     <label className="form-label w-25">Price</label>
                     <div className="input-group w-75">
                       <div className="input-group-prepend">
-                        <span className="input-group-text inputGroupTxt">
+                        <span className="input-group-text inputGroupTxt px-2">
                           $
                         </span>
                       </div>
@@ -581,7 +581,7 @@ function NewOrder() {
                     <label className="form-label w-25">Discount</label>
                     <div className="input-group w-75">
                       <div className="input-group-prepend">
-                        <span className="input-group-text inputGroupTxt">
+                        <span className="input-group-text inputGroupTxt px-2">
                           $
                         </span>
                       </div>
@@ -606,7 +606,7 @@ function NewOrder() {
                     <label className="form-label w-25">Tax</label>
                     <div className="input-group w-75">
                       <div className="input-group-prepend">
-                        <span className="input-group-text inputGroupTxt">
+                        <span className="input-group-text inputGroupTxt px-2">
                           %
                         </span>
                       </div>
@@ -631,7 +631,7 @@ function NewOrder() {
                     <label className="form-label w-25">Total Price</label>
                     <div className="input-group w-75">
                       <div className="input-group-prepend">
-                        <span className="input-group-text inputGroupTxt">
+                        <span className="input-group-text inputGroupTxt px-2">
                           $
                         </span>
                       </div>
