@@ -629,6 +629,7 @@ function EditCartProduct({
     );
   };
 
+  //page load
   useEffect(() => {
     handleSelectedState();
     let ckbx = [];
@@ -707,6 +708,7 @@ function EditCartProduct({
     setAllCheckBoxes(ckbx);
   }, [allIngredients, cartItemDetails]);
 
+  //calculate price
   useEffect(() => {
     calculatePrice();
   }, [

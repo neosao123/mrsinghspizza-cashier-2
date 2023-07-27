@@ -241,60 +241,53 @@ function SpecialMenu() {
                 )}
 
                 {/* Drinks */}
-                {getSpecialData?.pops.length === 0 &&
-                getSpecialData?.bottle.length === 0 ? (
-                  ""
-                ) : (
+                {getSpecialData?.pops && getSpecialData?.bottle && (
                   <>
-                    <h6 className="text-left mt-1 mb-2">Drinks</h6>
+                    {(getSpecialData?.pops.length > 0 ||
+                      getSpecialData.bottle.length > 0) && (
+                      <h6 className="text-left mt-1 mb-2">Drinks</h6>
+                    )}
+
                     <div id="drinks" className="mb-3">
                       <ul className="list-group">
-                        {getSpecialData?.pops.length === 0 ? (
-                          ""
-                        ) : (
-                          <>
+                        {getSpecialData?.pops.map((pop) => {
+                          return (
                             <li
                               className="list-group-item d-flex justify-content-between align-items-center"
-                              key={getSpecialData?.pops?.code}
+                              key={pop.code}
                             >
                               <label className="d-flex align-items-center">
                                 <input
                                   type="checkbox"
                                   className="mx-3 d-inline-block"
                                   defaultChecked={false}
-                                  key={getSpecialData.pops.code}
+                                  key={pop.code}
                                 />
-                                {getSpecialData?.pops?.softDrinkName}
+                                {pop.softDrinkName}
                               </label>
-                              <p className="mb-0 mx-2">
-                                $ {getSpecialData?.pops?.price}
-                              </p>
+                              <p className="mb-0 mx-2">$ {pop.price}</p>
                             </li>
-                          </>
-                        )}
-                        {getSpecialData?.bottle.length === 0 ? (
-                          ""
-                        ) : (
-                          <>
+                          );
+                        })}
+                        {getSpecialData?.bottle.map((pop) => {
+                          return (
                             <li
                               className="list-group-item d-flex justify-content-between align-items-center"
-                              key={getSpecialData?.bottle?.code}
+                              key={pop.code}
                             >
                               <label className="d-flex align-items-center">
                                 <input
                                   type="checkbox"
                                   className="mx-3 d-inline-block"
                                   defaultChecked={false}
-                                  key={getSpecialData.bottle.code}
+                                  key={pop.code}
                                 />
-                                {getSpecialData?.bottle?.softDrinkName}
+                                {pop.softDrinkName}
                               </label>
-                              <p className="mb-0 mx-2">
-                                $ {getSpecialData?.bottle?.price}
-                              </p>
+                              <p className="mb-0 mx-2">$ {pop.price}</p>
                             </li>
-                          </>
-                        )}
+                          );
+                        })}
                       </ul>
                     </div>
                   </>
