@@ -24,6 +24,36 @@ function SpecialMenu() {
   const [getSpecialData, setGetSpecialData] = useState();
   const [toppingsData, setToppingsData] = useState();
   const [dipsData, setDipsData] = useState();
+  // console.log();
+  // const payload = {
+  //   productCode: "#NA",
+  //   productName: "Custom Pizza",
+  //   productType: "custom_pizza",
+  //   config: {
+  //     pizza: [
+  //       {
+  //         crust: crustSelected,
+  //         cheese: cheeseSelected,
+  //         specialBases: specialBasesSelected,
+  //         toppings: {
+  //           countAsTwoToppings: countTwoToppingsArr,
+  //           countAsOneToppings: countOneToppingsArr,
+  //           freeToppings: freeToppingsArr,
+  //         },
+  //       },
+  //     ],
+  //     sides: sidesArr,
+  //     dips: dips,
+  //     drinks: drinks,
+  //   },
+  //   quantity: "1",
+  //   price: price,
+  //   amount: price,
+  //   comments: comments,
+  //   pizzaSize: pizzaSize,
+  //   discountAmount: discount,
+  //   taxPer: taxPer,
+  // };
 
   useEffect(() => {
     specialIngredients();
@@ -31,6 +61,7 @@ function SpecialMenu() {
 
   //Component - Special Pizza Selection
   const elements = [];
+  console.log(getSpecialData, "getSpecialData");
   for (let i = 1; i <= getSpecialData?.noofPizzas; i++) {
     elements.push(
       <SpecialPizzaSelection
@@ -58,6 +89,7 @@ function SpecialMenu() {
   const specialIngredients = () => {
     specialPizzaApi()
       .then((res) => {
+        console.log(res.data.data, "");
         setSpecialData(res.data.data);
       })
       .catch((err) => {
@@ -97,39 +129,39 @@ function SpecialMenu() {
 
   return (
     <>
-      <div className="d-flex flex-wrap justify-content-center">
-        <div className="w-100">
+      <div className='d-flex flex-wrap justify-content-center'>
+        <div className='w-100'>
           {show === true ? (
             <>
               {/* Back Button */}
               <div
-                className="m-0 p-0 mx-2"
+                className='m-0 p-0 mx-2'
                 onClick={() => setShow(false)}
                 style={{ cursor: "pointer" }}
               >
                 <img
-                  className="mb-2 p-0"
+                  className='mb-2 p-0'
                   src={`${backBtn}`}
-                  width="35px"
-                  height="35px"
-                  alt=""
+                  width='35px'
+                  height='35px'
+                  alt=''
                 />
               </div>
 
-              <div className="customizablePizza px-3">
-                <div className="d-flex justify-content-between">
+              <div className='customizablePizza px-3'>
+                <div className='d-flex justify-content-between'>
                   <h6>{getSpecialData?.name}</h6>
-                  <h6 className="mx-2">
+                  <h6 className='mx-2'>
                     ${" "}
                     {pizzaSize === "L"
                       ? getSpecialData?.largePizzaPrice
                       : getSpecialData?.extraLargePizzaPrice}
                   </h6>
                 </div>
-                <div className="mb-4">
-                  <p className="mb-1">
+                <div className='mb-4'>
+                  <p className='mb-1'>
                     Toppings :{" "}
-                    <span className="mx-2">
+                    <span className='mx-2'>
                       {getSpecialData?.noofToppings} /{" "}
                       {getSpecialData?.noofToppings}
                     </span>
@@ -138,13 +170,13 @@ function SpecialMenu() {
                     Additional Toppings Used :
                     <span className="mx-2">0 ($2.00)</span>
                   </p> */}
-                  <p className="mb-1 d-inline">Size : </p>
+                  <p className='mb-1 d-inline'>Size : </p>
                   <select
                     onChange={(e) => setPizzaSize(e.target.value)}
-                    className="form-select mx-2 my-2 w-25 d-inline"
+                    className='form-select mx-2 my-2 w-25 d-inline'
                   >
-                    <option value="L">Large</option>
-                    <option value="XL">Extra Large</option>
+                    <option value='L'>Large</option>
+                    <option value='XL'>Extra Large</option>
                   </select>
                 </div>
 
@@ -155,27 +187,27 @@ function SpecialMenu() {
                   ""
                 ) : (
                   <>
-                    <h6 className="text-left mt-1 mb-2">Sides</h6>
-                    <div id="sides" className="mb-3">
-                      <ul className="list-group">
+                    <h6 className='text-left mt-1 mb-2'>Sides</h6>
+                    <div id='sides' className='mb-3'>
+                      <ul className='list-group'>
                         {getSpecialData?.sides?.map((sidesData) => {
                           return (
                             <>
                               <li
-                                className="list-group-item d-flex justify-content-between align-items-center"
+                                className='list-group-item d-flex justify-content-between align-items-center'
                                 key={sidesData.code}
                               >
-                                <label className="d-flex align-items-center">
+                                <label className='d-flex align-items-center'>
                                   <input
-                                    type="checkbox"
-                                    className="mx-3 d-inline-block"
+                                    type='checkbox'
+                                    className='mx-3 d-inline-block'
                                     defaultChecked={false}
                                     key={sidesData.code}
                                   />
                                   {sidesData.sideName}
                                 </label>
                                 <div style={{ width: "12rem" }}>
-                                  <select className="form-select w-100 d-inline-block">
+                                  <select className='form-select w-100 d-inline-block'>
                                     {sidesData?.lineEntries?.map(
                                       (lineEntriesData) => {
                                         return (
@@ -186,7 +218,7 @@ function SpecialMenu() {
                                             <span>
                                               {lineEntriesData.size} -{" "}
                                             </span>
-                                            <span className="mb-0 mx-2">
+                                            <span className='mb-0 mx-2'>
                                               $ {lineEntriesData.price}
                                             </span>
                                           </option>
@@ -209,26 +241,26 @@ function SpecialMenu() {
                   ""
                 ) : (
                   <>
-                    <h6 className="text-left mt-1 mb-2">Dips</h6>
-                    <div id="dips" className="mb-3">
-                      <ul className="list-group">
+                    <h6 className='text-left mt-1 mb-2'>Dips</h6>
+                    <div id='dips' className='mb-3'>
+                      <ul className='list-group'>
                         {dipsData?.map((data) => {
                           return (
-                            <li className="list-group-item" key={data.dipsCode}>
-                              <div className="d-flex justify-content-between align-items-center">
-                                <div className="d-flex align-items-center">
-                                  <label className="d-flex align-items-center">
+                            <li className='list-group-item' key={data.dipsCode}>
+                              <div className='d-flex justify-content-between align-items-center'>
+                                <div className='d-flex align-items-center'>
+                                  <label className='d-flex align-items-center'>
                                     <input
-                                      type="checkbox"
-                                      className="mx-3 d-inline-block"
+                                      type='checkbox'
+                                      className='mx-3 d-inline-block'
                                     />
                                     {data.dipsName}
                                   </label>
                                 </div>
                                 <input
-                                  type="number"
+                                  type='number'
                                   defaultValue={0}
-                                  className="form-control mx-2"
+                                  className='form-control mx-2'
                                   style={{ width: "75px" }}
                                 />
                               </div>
@@ -245,46 +277,46 @@ function SpecialMenu() {
                   <>
                     {(getSpecialData?.pops.length > 0 ||
                       getSpecialData.bottle.length > 0) && (
-                      <h6 className="text-left mt-1 mb-2">Drinks</h6>
+                      <h6 className='text-left mt-1 mb-2'>Drinks</h6>
                     )}
 
-                    <div id="drinks" className="mb-3">
-                      <ul className="list-group">
+                    <div id='drinks' className='mb-3'>
+                      <ul className='list-group'>
                         {getSpecialData?.pops.map((pop) => {
                           return (
                             <li
-                              className="list-group-item d-flex justify-content-between align-items-center"
+                              className='list-group-item d-flex justify-content-between align-items-center'
                               key={pop.code}
                             >
-                              <label className="d-flex align-items-center">
+                              <label className='d-flex align-items-center'>
                                 <input
-                                  type="checkbox"
-                                  className="mx-3 d-inline-block"
+                                  type='checkbox'
+                                  className='mx-3 d-inline-block'
                                   defaultChecked={false}
                                   key={pop.code}
                                 />
                                 {pop.softDrinkName}
                               </label>
-                              <p className="mb-0 mx-2">$ {pop.price}</p>
+                              <p className='mb-0 mx-2'>$ {pop.price}</p>
                             </li>
                           );
                         })}
                         {getSpecialData?.bottle.map((pop) => {
                           return (
                             <li
-                              className="list-group-item d-flex justify-content-between align-items-center"
+                              className='list-group-item d-flex justify-content-between align-items-center'
                               key={pop.code}
                             >
-                              <label className="d-flex align-items-center">
+                              <label className='d-flex align-items-center'>
                                 <input
-                                  type="checkbox"
-                                  className="mx-3 d-inline-block"
+                                  type='checkbox'
+                                  className='mx-3 d-inline-block'
                                   defaultChecked={false}
                                   key={pop.code}
                                 />
                                 {pop.softDrinkName}
                               </label>
-                              <p className="mb-0 mx-2">$ {pop.price}</p>
+                              <p className='mb-0 mx-2'>$ {pop.price}</p>
                             </li>
                           );
                         })}
@@ -294,16 +326,16 @@ function SpecialMenu() {
                 )}
 
                 {/* Comments */}
-                <h6 className="text-left mt-1 mb-2">Comments</h6>
-                <div className="">
-                  <textarea className="form-control" rows="4" cols="50" />
+                <h6 className='text-left mt-1 mb-2'>Comments</h6>
+                <div className=''>
+                  <textarea className='form-control' rows='4' cols='50' />
                 </div>
 
                 {/* Add to Cart Button */}
-                <div className="d-flex flex-row justify-content-center align-items-center addToCartDiv mt-3 mb-3">
+                <div className='d-flex flex-row justify-content-center align-items-center addToCartDiv mt-3 mb-3'>
                   <button
-                    type="button"
-                    className="btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn"
+                    type='button'
+                    className='btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn'
                     onClick={handleAddToCart}
                   >
                     Add to Cart
@@ -313,38 +345,38 @@ function SpecialMenu() {
             </>
           ) : (
             <ul
-              className="list-group"
+              className='list-group'
               style={{ overflowY: "scroll", height: "30rem" }}
             >
               {specialData?.map((speicalPizza) => {
                 return (
-                  <li className="list-group-item" key={speicalPizza.code}>
-                    <div className="d-flex justify-content-between align-items-end py-2 px-1">
-                      <div className="d-flex align-items-center">
+                  <li className='list-group-item' key={speicalPizza.code}>
+                    <div className='d-flex justify-content-between align-items-end py-2 px-1'>
+                      <div className='d-flex align-items-center'>
                         <img
-                          className="rounded"
+                          className='rounded'
                           src={
                             speicalPizza.image === ""
                               ? `${specialImg1}`
                               : speicalPizza.image
                           }
-                          width="50px"
-                          height="50px"
-                          alt=""
+                          width='50px'
+                          height='50px'
+                          alt=''
                         ></img>
-                        <div className="d-flex flex-column mx-4">
-                          <h6 className="mb-1">{speicalPizza.name}</h6>
+                        <div className='d-flex flex-column mx-4'>
+                          <h6 className='mb-1'>{speicalPizza.name}</h6>
                           <span>{speicalPizza.noofToppings} Toppings</span>
                           <span>{speicalPizza.noofPizzas} Pizzas</span>
                         </div>
                       </div>
-                      <div className="d-flex flex-column align-items-end">
-                        <h6 className="mb-3">
+                      <div className='d-flex flex-column align-items-end'>
+                        <h6 className='mb-3'>
                           $ {speicalPizza.largePizzaPrice}
                         </h6>
                         <button
-                          type="button"
-                          className="btn btn-sm customize py-1 px-2"
+                          type='button'
+                          className='btn btn-sm customize py-1 px-2'
                           onClick={() => {
                             handleGetSpecial(speicalPizza);
                           }}

@@ -725,12 +725,12 @@ function EditCartProduct({
 
   return (
     <>
-      <h6 className="text-center">Edit Pizza</h6>
-      <div className="d-flex justify-content-between">
-        <div className="d-flex justify-content-center align-items-center">
+      <h6 className='text-center'>Edit Pizza</h6>
+      <div className='d-flex justify-content-between'>
+        <div className='d-flex justify-content-center align-items-center'>
           <span>Size: </span>
           <select
-            className="form-select mx-2"
+            className='form-select mx-2'
             value={pizzaSize}
             onChange={(e) => handlePizzaSize(e)}
           >
@@ -744,19 +744,19 @@ function EditCartProduct({
             </>
           </select>
         </div>
-        <h6 className="">
-          <span className="mx-2">
+        <h6 className=''>
+          <span className='mx-2'>
             ${(Number(selectedPrice) + Number(price)).toFixed(2)}
           </span>
         </h6>
       </div>
-      <div className="row my-2">
+      <div className='row my-2'>
         {/* Crust, Cheese, SpecialBases */}
-        <div className="col-lg-4 col-md-4">
-          <label className="mt-2 mb-1">Crust</label>
+        <div className='col-lg-4 col-md-4'>
+          <label className='mt-2 mb-1'>Crust</label>
           <select
-            className="form-select"
-            id="crust"
+            className='form-select'
+            id='crust'
             defaultValue={"CR_5"}
             onChange={(e) => handleCrust(e)}
           >
@@ -779,11 +779,11 @@ function EditCartProduct({
             })}
           </select>
         </div>
-        <div className="col-lg-4 col-md-4">
-          <label className="mt-2 mb-1">Cheese</label>
+        <div className='col-lg-4 col-md-4'>
+          <label className='mt-2 mb-1'>Cheese</label>
           <select
-            className="form-select"
-            id="cheese"
+            className='form-select'
+            id='cheese'
             onChange={(e) => handleCheese(e)}
           >
             {allIngredients?.cheese?.map((cheeseData) => {
@@ -804,11 +804,11 @@ function EditCartProduct({
             })}
           </select>
         </div>
-        <div className="col-lg-4 col-md-4">
-          <label className="mt-2 mb-1">Special Bases</label>
+        <div className='col-lg-4 col-md-4'>
+          <label className='mt-2 mb-1'>Special Bases</label>
           <select
-            className="form-select"
-            id="specialbase"
+            className='form-select'
+            id='specialbase'
             onChange={(e) => handleSpecialBases(e)}
           >
             {allIngredients?.specialbases?.map((specialbasesData) => {
@@ -833,59 +833,59 @@ function EditCartProduct({
         </div>
 
         {/* Tabs */}
-        <div className="mt-3 mb-3">
+        <div className='mt-3 mb-3'>
           {/* Tabs Headings */}
-          <ul className="nav nav-tabs mt-2" role="tablist">
-            <li className="nav-item">
+          <ul className='nav nav-tabs mt-2' role='tablist'>
+            <li className='nav-item'>
               <Link
-                className="nav-link active py-2 px-4"
-                data-bs-toggle="tab"
-                to="#toppings-count-2-tab"
+                className='nav-link active py-2 px-4'
+                data-bs-toggle='tab'
+                to='#toppings-count-2-tab'
               >
                 Toppings (2)
               </Link>
             </li>
-            <li className="nav-item">
+            <li className='nav-item'>
               <Link
-                className="nav-link py-2 px-4"
-                data-bs-toggle="tab"
-                to="#toppings-count-1-tab"
+                className='nav-link py-2 px-4'
+                data-bs-toggle='tab'
+                to='#toppings-count-1-tab'
               >
                 Toppings (1)
               </Link>
             </li>
-            <li className="nav-item">
+            <li className='nav-item'>
               <Link
-                className="nav-link py-2 px-4"
-                data-bs-toggle="tab"
-                to="#toppings-free-tab"
+                className='nav-link py-2 px-4'
+                data-bs-toggle='tab'
+                to='#toppings-free-tab'
               >
                 Indian Toppings (Free)
               </Link>
             </li>
-            <li className="nav-item">
+            <li className='nav-item'>
               <Link
-                className="nav-link py-2 px-4"
-                data-bs-toggle="tab"
-                to="#sides"
+                className='nav-link py-2 px-4'
+                data-bs-toggle='tab'
+                to='#sides'
               >
                 Sides
               </Link>
             </li>
-            <li className="nav-item">
+            <li className='nav-item'>
               <Link
-                className="nav-link py-2 px-4"
-                data-bs-toggle="tab"
-                to="#dips"
+                className='nav-link py-2 px-4'
+                data-bs-toggle='tab'
+                to='#dips'
               >
                 Dips
               </Link>
             </li>
-            <li className="nav-item">
+            <li className='nav-item'>
               <Link
-                className="nav-link py-2 px-4"
-                data-bs-toggle="tab"
-                to="#drinks"
+                className='nav-link py-2 px-4'
+                data-bs-toggle='tab'
+                to='#drinks'
               >
                 Drinks
               </Link>
@@ -893,11 +893,11 @@ function EditCartProduct({
           </ul>
 
           {/* Tab Content */}
-          <div className="tab-content m-0 p-0 w-100">
+          <div className='tab-content m-0 p-0 w-100'>
             {/* Count 2 Toppings */}
             <div
-              id="toppings-count-2-tab"
-              className="container tab-pane active m-0 p-0 topping-list"
+              id='toppings-count-2-tab'
+              className='container tab-pane active m-0 p-0 topping-list'
             >
               {allIngredients?.toppings?.countAsTwo?.map(
                 (countAsTwoToppings, index) => {
@@ -912,30 +912,30 @@ function EditCartProduct({
                   return (
                     <>
                       <li
-                        className="list-group-item d-flex justify-content-between align-items-center"
+                        className='list-group-item d-flex justify-content-between align-items-center'
                         key={countAsTwoToppings.toppingsCode}
                       >
-                        <label className="">
+                        <label className=''>
                           <input
-                            type="checkbox"
-                            className="mx-3 d-inline-block"
+                            type='checkbox'
+                            className='mx-3 d-inline-block'
                             checked={st.checked}
                             onChange={(e) => handleTwoToppings(e, toppingCode)}
                           />
                           {countAsTwoToppings.toppingsName}
                         </label>
                         <div
-                          className="d-flex justify-content-between align-items-center"
+                          className='d-flex justify-content-between align-items-center'
                           style={{ width: "12rem" }}
                         >
                           <p
-                            className="mx-2 mb-0 text-end"
+                            className='mx-2 mb-0 text-end'
                             style={{ width: "35%" }}
                           >
                             $ {countAsTwoToppings.price}
                           </p>
                           <select
-                            className="form-select d-inline-block"
+                            className='form-select d-inline-block'
                             style={{ width: "65%" }}
                             id={"placement-" + toppingCode}
                             onChange={(e) =>
@@ -944,7 +944,7 @@ function EditCartProduct({
                           >
                             <option
                               selected={st.placement === "whole" ? true : false}
-                              value="whole"
+                              value='whole'
                             >
                               Whole
                             </option>
@@ -952,7 +952,7 @@ function EditCartProduct({
                               selected={
                                 st.placement === "lefthalf" ? true : false
                               }
-                              value="lefthalf"
+                              value='lefthalf'
                             >
                               Left Half
                             </option>
@@ -960,7 +960,7 @@ function EditCartProduct({
                               selected={
                                 st.placement === "righthalf" ? true : false
                               }
-                              value="righthalf"
+                              value='righthalf'
                             >
                               Right Half
                             </option>
@@ -975,8 +975,8 @@ function EditCartProduct({
 
             {/* Count 1 Toppings */}
             <div
-              id="toppings-count-1-tab"
-              className="container tab-pane m-0 p-0 topping-list"
+              id='toppings-count-1-tab'
+              className='container tab-pane m-0 p-0 topping-list'
             >
               {allIngredients?.toppings?.countAsOne?.map(
                 (countAsOneToppings, index) => {
@@ -990,30 +990,30 @@ function EditCartProduct({
                   return (
                     <>
                       <li
-                        className="list-group-item d-flex justify-content-between align-items-center"
+                        className='list-group-item d-flex justify-content-between align-items-center'
                         key={toppingCode}
                       >
-                        <label className="">
+                        <label className=''>
                           <input
-                            type="checkbox"
-                            className="mx-3 d-inline-block"
+                            type='checkbox'
+                            className='mx-3 d-inline-block'
                             checked={st.checked}
                             onChange={(e) => handleOneToppings(e, toppingCode)}
                           />
                           {countAsOneToppings.toppingsName}
                         </label>
                         <div
-                          className="d-flex justify-content-between align-items-center"
+                          className='d-flex justify-content-between align-items-center'
                           style={{ width: "12rem" }}
                         >
                           <p
-                            className="mx-2 mb-0 text-end"
+                            className='mx-2 mb-0 text-end'
                             style={{ width: "35%" }}
                           >
                             $ {countAsOneToppings.price}
                           </p>
                           <select
-                            className="form-select d-inline-block"
+                            className='form-select d-inline-block'
                             style={{ width: "65%" }}
                             id={"placement-" + toppingCode}
                             onChange={(e) =>
@@ -1021,7 +1021,7 @@ function EditCartProduct({
                             }
                           >
                             <option
-                              value="whole"
+                              value='whole'
                               // selected={
                               //   toppingPlacement === "whole" ? true : false
                               // }
@@ -1029,7 +1029,7 @@ function EditCartProduct({
                               Whole
                             </option>
                             <option
-                              value="lefthalf"
+                              value='lefthalf'
                               // selected={
                               //   toppingPlacement === "lefthalf" ? true : false
                               // }
@@ -1037,7 +1037,7 @@ function EditCartProduct({
                               Left Half
                             </option>
                             <option
-                              value="righthalf"
+                              value='righthalf'
                               // selected={
                               //   toppingPlacement === "righthalf" ? true : false
                               // }
@@ -1055,8 +1055,8 @@ function EditCartProduct({
 
             {/* Free Toppings */}
             <div
-              id="toppings-free-tab"
-              className="container tab-pane m-0 p-0 topping-list"
+              id='toppings-free-tab'
+              className='container tab-pane m-0 p-0 topping-list'
             >
               {allIngredients?.toppings?.freeToppings?.map(
                 (freeToppings, index) => {
@@ -1075,31 +1075,31 @@ function EditCartProduct({
                   return (
                     <>
                       <li
-                        className="list-group-item d-flex justify-content-between align-items-center"
+                        className='list-group-item d-flex justify-content-between align-items-center'
                         key={toppingCode}
                       >
-                        <label className="d-flex align-items-center">
+                        <label className='d-flex align-items-center'>
                           <input
-                            type="checkbox"
-                            className="mx-3 d-inline-block"
+                            type='checkbox'
+                            className='mx-3 d-inline-block'
                             checked={st.checked}
                             onChange={(e) => handleFreeToppings(e, toppingCode)}
                           />
                           {freeToppings.toppingsName}
                         </label>
                         <div
-                          className="d-flex justify-content-between align-items-center"
+                          className='d-flex justify-content-between align-items-center'
                           style={{ width: "12rem" }}
                         >
                           <p
-                            className="mx-2 mb-0 text-end"
+                            className='mx-2 mb-0 text-end'
                             style={{ width: "35%" }}
                           >
                             $ 0
                           </p>
                           <select
                             data-topping-area={toppingCode}
-                            className="form-select d-inline-block"
+                            className='form-select d-inline-block'
                             style={{ width: "65%" }}
                             id={"placement-" + toppingCode}
                             onChange={(e) =>
@@ -1107,7 +1107,7 @@ function EditCartProduct({
                             }
                           >
                             <option
-                              value="whole"
+                              value='whole'
                               // selected={
                               //   toppingPlacement === "whole" ? true : false
                               // }
@@ -1115,7 +1115,7 @@ function EditCartProduct({
                               Whole
                             </option>
                             <option
-                              value="lefthalf"
+                              value='lefthalf'
                               // selected={
                               //   toppingPlacement === "lefthalf" ? true : false
                               // }
@@ -1123,7 +1123,7 @@ function EditCartProduct({
                               Left Half
                             </option>
                             <option
-                              value="righthalf"
+                              value='righthalf'
                               // selected={
                               //   toppingPlacement === "righthalf" ? true : false
                               // }
@@ -1140,7 +1140,7 @@ function EditCartProduct({
             </div>
 
             {/* Sides */}
-            <div id="sides" className="container tab-pane m-0 p-0 topping-list">
+            <div id='sides' className='container tab-pane m-0 p-0 topping-list'>
               {sidesData?.map((sidesData) => {
                 const sidesCode = sidesData.sideCode;
                 const st = allCheckBoxes.find((ck) => ck.id === sidesCode) ?? {
@@ -1151,13 +1151,13 @@ function EditCartProduct({
                 return (
                   <>
                     <li
-                      className="list-group-item d-flex justify-content-between align-items-center"
+                      className='list-group-item d-flex justify-content-between align-items-center'
                       key={sidesData.sideCode}
                     >
-                      <label className="d-flex align-items-center">
+                      <label className='d-flex align-items-center'>
                         <input
-                          type="checkbox"
-                          className="mx-3 d-inline-block"
+                          type='checkbox'
+                          className='mx-3 d-inline-block'
                           checked={st.checked}
                           onChange={(e) => handleSides(e, sidesCode)}
                         />
@@ -1165,7 +1165,7 @@ function EditCartProduct({
                       </label>
                       <div style={{ width: "12rem" }}>
                         <select
-                          className="form-select w-100 d-inline-block"
+                          className='form-select w-100 d-inline-block'
                           id={"sidesPlace-" + sidesCode}
                         >
                           {sidesData.combination.map((combination) => {
@@ -1182,7 +1182,7 @@ function EditCartProduct({
                                 }
                               >
                                 <span>{combination.size} - </span>
-                                <span className="mb-0 mx-2">
+                                <span className='mb-0 mx-2'>
                                   $ {combination.price}
                                 </span>
                               </option>
@@ -1197,7 +1197,7 @@ function EditCartProduct({
             </div>
 
             {/* Dips */}
-            <div id="dips" className="container tab-pane m-0 p-0 topping-list">
+            <div id='dips' className='container tab-pane m-0 p-0 topping-list'>
               {allIngredients?.dips?.map((dipsData) => {
                 const st = allCheckBoxes.find(
                   (ck) => ck.id === dipsData.dipsCode
@@ -1207,19 +1207,19 @@ function EditCartProduct({
                 };
                 return (
                   <li
-                    className="list-group-item d-flex justify-content-between align-items-center"
+                    className='list-group-item d-flex justify-content-between align-items-center'
                     key={dipsData.dipsCode}
                   >
-                    <label className="d-flex align-items-center">
+                    <label className='d-flex align-items-center'>
                       <input
-                        type="checkbox"
-                        className="mx-3 d-inline-block"
+                        type='checkbox'
+                        className='mx-3 d-inline-block'
                         checked={st.checked}
                         onChange={(e) => handleDips(e, dipsData.dipsCode)}
                       />
                       {dipsData.dipsName}
                     </label>
-                    <p className="mb-0 mx-2">$ {dipsData.price}</p>
+                    <p className='mb-0 mx-2'>$ {dipsData.price}</p>
                   </li>
                 );
               })}
@@ -1227,8 +1227,8 @@ function EditCartProduct({
 
             {/* Drinks */}
             <div
-              id="drinks"
-              className="container tab-pane m-0 p-0 topping-list"
+              id='drinks'
+              className='container tab-pane m-0 p-0 topping-list'
             >
               {allIngredients?.softdrinks?.map((drinksData) => {
                 const st = allCheckBoxes.find(
@@ -1239,13 +1239,13 @@ function EditCartProduct({
                 };
                 return (
                   <li
-                    className="list-group-item d-flex justify-content-between align-items-center"
+                    className='list-group-item d-flex justify-content-between align-items-center'
                     key={drinksData.softdrinkCode}
                   >
-                    <label className="d-flex align-items-center">
+                    <label className='d-flex align-items-center'>
                       <input
-                        type="checkbox"
-                        className="mx-3 d-inline-block"
+                        type='checkbox'
+                        className='mx-3 d-inline-block'
                         checked={st.checked}
                         onChange={(e) =>
                           handleDrinks(e, drinksData.softdrinkCode)
@@ -1253,7 +1253,7 @@ function EditCartProduct({
                       />
                       {drinksData.softDrinksName}
                     </label>
-                    <p className="mb-0 mx-2">$ {drinksData.price}</p>
+                    <p className='mb-0 mx-2'>$ {drinksData.price}</p>
                   </li>
                 );
               })}
@@ -1262,22 +1262,22 @@ function EditCartProduct({
         </div>
 
         {/* Comments */}
-        <h6 className="text-left mt-1">Comments</h6>
-        <div className="">
+        <h6 className='text-left mt-1'>Comments</h6>
+        <div className=''>
           <textarea
-            className="form-control"
-            rows="2"
-            cols="50"
+            className='form-control'
+            rows='2'
+            cols='50'
             onChange={(e) => setComments(e.target.value)}
           />
         </div>
       </div>
 
       {/* Add to Cart Button */}
-      <div className="d-flex flex-row justify-content-center align-items-center addToCartDiv mb-3">
+      <div className='d-flex flex-row justify-content-center align-items-center addToCartDiv mb-3'>
         <button
-          type="button"
-          className="btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn"
+          type='button'
+          className='btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn'
           onClick={(e) => handleAddToCart(e)}
         >
           Add to Cart

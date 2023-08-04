@@ -3,14 +3,27 @@ import { addToCartApi, sidesApi } from "../../API/ongoingOrder";
 import specialImg1 from "../../assets/bg-img.jpg";
 import $ from "jquery";
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../../reducer/cartReducer";
 
-function SidesMenu({ getCartList, discount, taxPer }) {
+function SidesMenu({
+  getCartList,
+  discount,
+  taxPer,
+  payloadEdit,
+  setPayloadEdit,
+}) {
   const [sidesData, setSidesData] = useState();
   const [quantity, setQuantity] = useState(1);
+  let cartdata = useSelector((state) => state.cart.cart);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     sides();
   }, []);
+  useEffect(() => {
+    console.log(payloadEdit, "payloadEditpayloadEdit");
+  }, [payloadEdit, quantity]);
 
   // handle Quantity
   const handleQuantity = (e) => {
@@ -49,12 +62,12 @@ function SidesMenu({ getCartList, discount, taxPer }) {
     }
     let price = selectedCombination[0].price;
     let totalAmount = 0;
-    if (quantity) {
-      totalAmount = Number(price) * Number(quantity);
-      const payload = {
-        cartCode: cartCode ? cartCode : "#NA",
+
+    totalAmount = Number(price) * Number(quantity);
+    if (payloadEdit !== undefined && payloadEdit.productType === "side") {
+      console.log("editt", payloadEdit);
+      const payloadForEdit = {
         customerCode: customerCode ? customerCode : "#NA",
-        cashierCode: localStorage.getItem("cashierCode"),
         productCode: selectedSide[0].sideCode,
         productName: selectedSide[0].sideName,
         productType: "side",
@@ -68,29 +81,60 @@ function SidesMenu({ getCartList, discount, taxPer }) {
         discountAmount: discount,
         taxPer: taxPer,
       };
-      await addToCartApi(payload)
-        .then((res) => {
-          localStorage.setItem("CartData", JSON.stringify(res.data.data));
-          //clear fields from create your own
-          getCartList();
-          toast.success(
-            `${selectedSide[0].sideName} - ${selectedCombination[0].size} Added Successfully...`
-          );
-        })
-        .catch((err) => {
-          if (err.response.status === 400 || err.response.status === 500) {
-            toast.error(err.response.data.message);
-          }
-        });
+      const updatedCart = cartdata.findIndex(
+        (item) => item.id === payloadEdit.id
+      );
+      console.log(payloadEdit, payloadForEdit, "pppp");
+      let tempPayload = [...cartdata];
+      tempPayload[updatedCart] = payloadForEdit;
+      dispatch(addToCart([...tempPayload]));
+      setPayloadEdit();
+      setQuantity(1);
     } else {
-      toast.error("Quantity is required");
+      const payload = {
+        customerCode: customerCode ? customerCode : "#NA",
+        productCode: selectedSide[0].sideCode,
+        productName: selectedSide[0].sideName,
+        productType: "side",
+        config: {
+          lineCode: selectedCombination[0].lineCode,
+          sidesSize: selectedCombination[0].size,
+        },
+        quantity: quantity,
+        price: selectedCombination[0].price,
+        amount: totalAmount.toFixed(2),
+        discountAmount: discount,
+        taxPer: taxPer,
+      };
+      dispatch(addToCart([...cartdata, payload]));
+      toast.success(`${selectedSide[0].sideName} ` + "Added Successfully");
+      setQuantity(1);
     }
+
+    // await addToCartApi(payload)
+    //   .then((res) => {
+    //     localStorage.setItem("CartData", JSON.stringify(res.data.data));
+    //     //clear fields from create your own
+    //     getCartList();
+    //     toast.success(
+    //       `${selectedSide[0].sideName} - ${selectedCombination[0].size} Added Successfully...`
+    //     );
+    //   })
+    //   .catch((err) => {
+    //     if (err.response.status === 400 || err.response.status === 500) {
+    //       toast.error(err.response.data.message);
+    //     }
+    //   });
+    // } else {
+    //   toast.error("Quantity is required");
+    // }
   };
 
   //API - Sides
   const sides = () => {
     sidesApi()
       .then((res) => {
+        console.log(res.data.data, "res.data.data");
         setSidesData(res.data.data);
       })
       .catch((err) => {
@@ -101,29 +145,29 @@ function SidesMenu({ getCartList, discount, taxPer }) {
   return (
     <>
       <ul
-        className="list-group"
+        className='list-group'
         style={{ overflowY: "scroll", height: "30rem" }}
       >
         {sidesData?.map((data) => {
           return (
-            <li className="list-group-item" key={data.sideCode}>
-              <div className="d-flex justify-content-between align-items-end py-2 px-1">
-                <div className="d-flex justify-content-center w-auto">
+            <li className='list-group-item' key={data.sideCode}>
+              <div className='d-flex justify-content-between align-items-end py-2 px-1'>
+                <div className='d-flex justify-content-center w-auto'>
                   <img
-                    className="rounded"
+                    className='rounded'
                     src={data.image === "" ? `${specialImg1}` : data.image}
-                    width="50px"
-                    height="50px"
-                    alt=""
+                    width='50px'
+                    height='50px'
+                    alt=''
                   ></img>
                 </div>
-                <div className="d-flex justify-content-center flex-column mx-2 px-2 py-1 w-100">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <h6 className="mb-2">{data.sideName}</h6>
+                <div className='d-flex justify-content-center flex-column mx-2 px-2 py-1 w-100'>
+                  <div className='d-flex justify-content-between align-items-center'>
+                    <h6 className='mb-2'>{data.sideName}</h6>
                   </div>
-                  <div className="d-flex justify-content-between align-items-center">
+                  <div className='d-flex justify-content-between align-items-center'>
                     <select
-                      className="form-select"
+                      className='form-select'
                       style={{ width: "35%" }}
                       id={"combination-" + data.sideCode}
                     >
@@ -142,22 +186,26 @@ function SidesMenu({ getCartList, discount, taxPer }) {
                       })}
                     </select>
                     <input
-                      type="number"
+                      type='number'
                       defaultValue={1}
-                      className="form-control"
+                      className='form-control'
                       style={{ width: "20%" }}
                       onChange={(e) => handleQuantity(e)}
                       step={1}
                       min={1}
                       max={100}
+                      // value={quantity}
                     />
                     <button
-                      type="button"
-                      className="btn btn-sm customize py-1 px-2"
+                      type='button'
+                      className='btn btn-sm customize py-1 px-2'
                       style={{ width: "auto" }}
                       onClick={(e) => handleAddToCart(e, data.sideCode)}
                     >
-                      Add To Cart
+                      {payloadEdit !== undefined &&
+                      payloadEdit.productType === "side"
+                        ? "Edit Side"
+                        : "Add To Cart"}
                     </button>
                   </div>
                 </div>

@@ -2,17 +2,22 @@ import React, { useEffect, useState } from "react";
 import { addToCartApi, dipsApi } from "../../API/ongoingOrder";
 import specialImg1 from "../../assets/bg-img.jpg";
 import { toast } from "react-toastify";
+import { addToCart } from "../../reducer/cartReducer";
+import { useDispatch, useSelector } from "react-redux";
 
 function DipsMenu({ discount, taxPer, getCartList }) {
   const [dipsData, setDipsData] = useState();
   const [quantity, setQuantity] = useState(1);
+  const [dipsArray, setDipsArray] = useState([]);
+  let cartdata = useSelector((state) => state.cart.cart);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     dips();
   }, []);
 
   // handle Quantity
-  const handleQuantity = (e) => {
+  const handleQuantity = (e, dipsCode, data) => {
     const inputValue = e.target.value;
     if (parseInt(inputValue) < 1) {
       e.target.value = 1;
@@ -21,12 +26,28 @@ function DipsMenu({ discount, taxPer, getCartList }) {
     } else {
       setQuantity(inputValue);
     }
+    console.log(dipsData, "dipsDatadipsData");
+    let itemToUpdate = dipsArray.findIndex(
+      (item) => item.dipsCode === dipsCode
+    );
+    console.log(itemToUpdate, "itemToUpdate");
+    let updatedObject = {
+      ...data,
+      price: quantity * dipsData[0]?.price,
+    };
+    if (itemToUpdate !== -1) {
+      setDipsArray([...dipsArray, updatedObject]);
+    } else {
+      let tempArr = [...dipsArray];
+      tempArr[itemToUpdate] = updatedObject;
+    }
   };
 
   //API - Dips Data
   const dips = () => {
     dipsApi()
       .then((res) => {
+        console.log(res.data.data, "api res dips");
         setDipsData(res.data.data);
       })
       .catch((err) => {
@@ -47,72 +68,76 @@ function DipsMenu({ discount, taxPer, getCartList }) {
     }
     let price = selectedDips[0].price;
     let totalAmount = 0;
-    if (quantity) {
-      totalAmount = Number(price) * Number(quantity);
-      const payload = {
-        cartCode: cartCode ? cartCode : "#NA",
-        customerCode: customerCode ? customerCode : "#NA",
-        cashierCode: localStorage.getItem("cashierCode"),
-        productCode: selectedDips[0].dipsCode,
-        productName: selectedDips[0].dipsName,
-        productType: "dips",
-        quantity: quantity,
-        price: selectedDips[0].price,
-        amount: totalAmount.toFixed(2),
-        discountAmount: discount,
-        taxPer: taxPer,
-      };
-      await addToCartApi(payload)
-        .then((res) => {
-          localStorage.setItem("CartData", JSON.stringify(res.data.data));
-          //clear fields from create your own
-          toast.success(
-            `${quantity} - ${selectedDips[0].dipsName} Added Succesfully...`
-          );
-          getCartList();
-        })
-        .catch((err) => {
-          if (err.response.status === 400 || err.response.status === 500) {
-            toast.error(err.response.data.message);
-          }
-        });
-    } else {
-      toast.error("Quantity is required");
-    }
+    // if (quantity) {
+    totalAmount = Number(price) * Number(quantity);
+    console.log(totalAmount, "totalAmount");
+    const payload = {
+      cartCode: cartCode ? cartCode : "#NA",
+      customerCode: customerCode ? customerCode : "#NA",
+      cashierCode: localStorage.getItem("cashierCode"),
+      productCode: selectedDips[0].dipsCode,
+      productName: selectedDips[0].dipsName,
+      productType: "dips",
+      quantity: quantity,
+      price: selectedDips[0].price,
+      amount: totalAmount.toFixed(2),
+      discountAmount: discount,
+      taxPer: taxPer,
+    };
+    dispatch(addToCart([...cartdata, payload]));
+    setQuantity(1);
+    toast.success(`${selectedDips[0].dipsName} ` + "Added Successfully");
+    // await addToCartApi(payload)
+    //   .then((res) => {
+    //     localStorage.setItem("CartData", JSON.stringify(res.data.data));
+    //     //clear fields from create your own
+    //     toast.success(
+    //       `${quantity} - ${selectedDips[0].dipsName} Added Succesfully...`
+    //     );
+    //     getCartList();
+    //   })
+    //   .catch((err) => {
+    //     if (err.response.status === 400 || err.response.status === 500) {
+    //       toast.error(err.response.data.message);
+    //     }
+    //   });
+    // } else {
+    //   toast.error("Quantity is required");
+    // }
   };
 
   return (
     <>
-      <ul className="list-group">
+      <ul className='list-group'>
         {dipsData?.map((data) => {
           return (
-            <li className="list-group-item" key={data.dipsCode}>
-              <div className="d-flex justify-content-between align-items-end py-2 px-1">
-                <div className="d-flex justify-content-center w-auto">
+            <li className='list-group-item' key={data.dipsCode}>
+              <div className='d-flex justify-content-between align-items-end py-2 px-1'>
+                <div className='d-flex justify-content-center w-auto'>
                   <img
-                    className="rounded"
+                    className='rounded'
                     src={data.image === "" ? `${specialImg1}` : data.image}
-                    width="50px"
-                    height="50px"
-                    alt=""
+                    width='50px'
+                    height='50px'
+                    alt=''
                   ></img>
                 </div>
-                <div className="d-flex justify-content-center flex-column mx-2 px-2 py-1 w-100">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <h6 className="mb-2">{data.dipsName}</h6>
-                    <h6 className="mb-2">$ {data.price}</h6>
+                <div className='d-flex justify-content-center flex-column mx-2 px-2 py-1 w-100'>
+                  <div className='d-flex justify-content-between align-items-center'>
+                    <h6 className='mb-2'>{data.dipsName}</h6>
+                    <h6 className='mb-2'>$ {data.price}</h6>
                   </div>
-                  <div className="d-flex justify-content-between align-items-center">
+                  <div className='d-flex justify-content-between align-items-center'>
                     <input
-                      type="number"
+                      type='number'
                       defaultValue={1}
-                      className="form-control"
+                      className='form-control'
                       style={{ width: "20%" }}
-                      onChange={handleQuantity}
+                      onChange={(e) => handleQuantity(e, data.dipsCode, data)}
                     />
                     <button
-                      type="button"
-                      className="btn btn-sm customize py-1 px-2"
+                      type='button'
+                      className='btn btn-sm customize py-1 px-2'
                       style={{ width: "auto" }}
                       onClick={(e) => handleAddToCart(e, data.dipsCode)}
                     >

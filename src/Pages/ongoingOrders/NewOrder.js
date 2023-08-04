@@ -1,14 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "../../css/ongoingOrder.css";
 import Nav from "../../layout/Nav";
 import SpecialMenu from "./SpecialMenu";
 import CreateYourOwn from "../../components/order/CreateYourOwn";
 import {
-  allIngredientsApi,
   deleteCartItemApi,
   getCartListApi,
   orderPlaceApi,
-  sidesApi,
   storeLocationApi,
 } from "../../API/ongoingOrder";
 import SidesMenu from "./SidesMenu";
@@ -24,20 +22,13 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import IntlTelInput from "react-intl-tel-input";
 import "react-intl-tel-input/dist/main.css";
-
-const canadianPhoneNumberRegExp = /^\d{3}\d{3}\d{4}$/;
-
-const validateSchema = Yup.object({
-  phoneno: Yup.string()
-    .required("Phone number is required")
-    .matches(
-      canadianPhoneNumberRegExp,
-      "Invalid Canadian phone number format. Use (XXX) XXX-XXXX."
-    ),
-  customername: Yup.string().required("Customer Name is Required."),
-  address: Yup.string().required("Address is Required"),
-  stores: Yup.string().required("Store Location is Required."),
-});
+import { allIngredientsApi, sidesApi } from "./newOrder/newOrderApi";
+import {
+  pizzaIngredients,
+  sidesIngredient,
+} from "./newOrder/newOrderCustomApiHandler";
+import Cart from "./cart";
+import { useSelector } from "react-redux";
 
 function NewOrder() {
   const [allIngredients, setAllIngredients] = useState();
@@ -45,7 +36,7 @@ function NewOrder() {
   const [customerName, setCustomerName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [address, setAddress] = useState("");
-  const [deliveryType, setDeliveryType] = useState("");
+  const [deliveryType, setDeliveryType] = useState("pickup");
   const [storesLocationData, setStoreLocationData] = useState();
   const [storesCode, setStoresCode] = useState();
   const [discount, setDiscount] = useState(0);
@@ -56,6 +47,45 @@ function NewOrder() {
   const [cartLineCode, setCartLineCode] = useState();
   const globalCtx = useContext(GlobalContext);
   const [cartItemDetails, setCartItemDetails] = globalCtx.cartItem;
+  const [orderData, setOrderData] = useState();
+  const canadianPhoneNumberRegExp = /^\d{3}\d{3}\d{4}$/;
+  const createYourOwnRef = useRef(null);
+  const specialTabRef = useRef(null);
+  const dipsRef = useRef(null);
+  const sidesRef = useRef(null);
+  const drinksRef = useRef(null);
+  const handleProductClick = (productType) => {
+    console.log("productType", productType);
+    switch (productType) {
+      case "custom_pizza":
+        createYourOwnRef.current.click();
+        break;
+      case "side":
+        sidesRef.current.click();
+        break;
+      case "dips":
+        dipsRef.current.click();
+        break;
+      case "drinks":
+        drinksRef.current.click();
+        break;
+      default:
+        break;
+    }
+  };
+
+  let cartdata = useSelector((state) => state.cart.cart);
+  let totalPrice = 0;
+
+  console.log(cartdata, "cartdatacartdata");
+  cartdata.forEach((item) => {
+    totalPrice += Number(item.amount);
+  });
+  const discountedTotalPrice = totalPrice - discount;
+  const taxAmount = (discountedTotalPrice * taxPer) / 100;
+  const grandTotal = discountedTotalPrice + taxAmount;
+
+  console.log(totalPrice, "cartdatacartdata");
 
   const initialValues = {
     phoneno: "",
@@ -63,34 +93,11 @@ function NewOrder() {
     customername: "",
     address: "",
     stores: "",
-  };
-
-  const onSubmit = async (values) => {
-    console.log("");
+    pincode: "",
   };
 
   //API - Pizza All Ingredients
-  const pizzaIngredients = async () => {
-    await allIngredientsApi()
-      .then((res) => {
-        setAllIngredients(res.data.data);
-      })
-      .catch((err) => {
-        console.log("Error From All Ingredient API: ", err);
-      });
-  };
-
   //API - Sides Ingredients
-  const sidesIngredient = async () => {
-    await sidesApi()
-      .then((res) => {
-        setSidesData(res.data.data);
-      })
-      .catch((err) => {
-        console.log("Error From All Ingredient API: ", err);
-      });
-  };
-
   //API - Store Location
   const storeLocation = async () => {
     await storeLocationApi()
@@ -129,46 +136,63 @@ function NewOrder() {
   };
 
   //API - Delete Item
-  const deleteCartItem = async (e, cartLineCode) => {
-    e.preventDefault();
-    swal({
-      title: "Are you sure you want to delete?",
-      text: "You will not be able to recover this item!",
-      icon: "warning",
-      buttons: ["Cancel", "Delete"],
-      dangerMode: true,
-    }).then(async (willDelete) => {
-      if (willDelete) {
-        let cart = JSON.parse(localStorage.getItem("CartData"));
-        let payload = {
-          cartLineCode: cartLineCode,
-          discountAmount: "0",
-          taxPer: "0",
-        };
-        await deleteCartItemApi(payload)
-          .then((res) => {
-            toast.success("Product Deleted Successfully..");
-            getCartList();
-          })
-          .catch((err) => {
-            console.log("Error From Delete Cart Item API: ", err);
-          });
-      }
-    });
-  };
+  // const deleteCartItem = async (e, cartLineCode) => {
+  //   e.preventDefault();
+  //   swal({
+  //     title: "Are you sure you want to delete?",
+  //     text: "You will not be able to recover this item!",
+  //     icon: "warning",
+  //     buttons: ["Cancel", "Delete"],
+  //     dangerMode: true,
+  //   }).then(async (willDelete) => {
+  //     if (willDelete) {
+  //       let cart = JSON.parse(localStorage.getItem("CartData"));
+  //       let payload = {
+  //         cartLineCode: cartLineCode,
+  //         discountAmount: "0",
+  //         taxPer: "0",
+  //       };
+  //       await deleteCartItemApi(payload)
+  //         .then((res) => {
+  //           toast.success("Product Deleted Successfully..");
+  //           getCartList();
+  //         })
+  //         .catch((err) => {
+  //           console.log("Error From Delete Cart Item API: ", err);
+  //         });
+  //     }
+  //   });
+  // };
 
   // Edit Cart Item
-  const handleEditCartItem = (e, cartLineCode, cartCode) => {
-    e.preventDefault();
-    setIsEdit(true);
-    setCartCode(cartCode);
-    setCartLineCode(cartLineCode);
-    const filteredCart = cartListData?.cartItems?.filter(
-      (cartItem) => cartItem.code === cartLineCode
-    );
-    setCartItemDetails(filteredCart[0]);
-  };
-
+  // const handleEditCartItem = (e, cartLineCode, cartCode) => {
+  //   e.preventDefault();
+  //   setIsEdit(true);
+  //   setCartCode(cartCode);
+  //   setCartLineCode(cartLineCode);
+  //   const filteredCart = cartListData?.cartItems?.filter(
+  //     (cartItem) => cartItem.code === cartLineCode
+  //   );
+  //   setCartItemDetails(filteredCart[0]);
+  // };
+  const validateSchema = Yup.object({
+    phoneno: Yup.string()
+      .required("Phone number is required")
+      .matches(
+        canadianPhoneNumberRegExp,
+        "Invalid Canadian phone number format. Use (XXX) XXX-XXXX."
+      ),
+    customername: Yup.string().required("Customer Name is Required."),
+    address:
+      deliveryType === "pickup"
+        ? null
+        : Yup.string().required("Address is Required"),
+    pincode:
+      deliveryType === "pickup"
+        ? null
+        : Yup.string().required("Pincode is Required"), //,
+    stores: Yup.string().required("Store Location is Required."),
+  });
   const formik = useFormik({
     initialValues: initialValues,
     validateOnBlur: true,
@@ -184,40 +208,14 @@ function NewOrder() {
       );
       resetForm();
       return false;
-      const payload = {
-        cartCode: localStorage.getItem("cartCode"),
-        customerName: values.customername,
-        mobileNumber: values.phoneno,
-        address: values.address,
-        deliveryType: "pickup",
-        storeLocation: values.stores,
-      };
-
-      await orderPlaceApi(payload)
-        .then((res) => {
-          console.log(res);
-          toast.success(res.data.message);
-          localStorage.removeItem("customerCode");
-          localStorage.setItem("cartCode", "");
-          // setSubmitting(false);
-          getCartList();
-          // resetForm()
-
-          console.log(
-            "After : ",
-            values.customername,
-            values.phoneno,
-            values.address,
-            values.deliveryType,
-            values.stores
-          );
-        })
-        .catch((err) => {
-          if (err.response.status === 400 || err.response.status === 500) {
-            toast.error(err.response.data.message);
-          }
-          // setSubmitting(false);
-        });
+      // const payload = {
+      //   cartCode: localStorage.getItem("cartCode"),
+      //   customerName: values.customername,
+      //   mobileNumber: values.phoneno,
+      //   address: values.address,
+      //   deliveryType: "pickup",
+      //   storeLocation: values.stores,
+      // };
     },
   });
 
@@ -225,9 +223,10 @@ function NewOrder() {
     setDeliveryType(e.target.value);
   };
 
+  const [payloadEdit, setPayloadEdit] = useState();
   useEffect(() => {
-    pizzaIngredients();
-    sidesIngredient();
+    pizzaIngredients(allIngredientsApi, setAllIngredients);
+    sidesIngredient(sidesApi, setSidesData);
     storeLocation();
     getCartList();
   }, []);
@@ -235,23 +234,24 @@ function NewOrder() {
   return (
     <>
       <Nav />
-      <div className="container-fluid">
+      <div className='container-fluid orderContainer'>
         <form onSubmit={formik.handleSubmit}>
-          <div className="row gx-4">
+          <div className='row gx-4 orderContainer'>
             {/* Section 1 */}
-            <div className="col-lg-2">
-              <label className="form-label mt-2 mb-1">
-                Phone <small className="text-danger">*</small>{" "}
+            <div className='col-lg-2'>
+              <label className='form-label mt-2 mb-1'>
+                Phone <small className='text-danger'>*</small>{" "}
               </label>
               <IntlTelInput
-                containerClassName="intl-tel-input"
-                type="tel"
-                name="phoneno"
-                inputClassName="form-control"
-                placeholder="(XXX) XXX-XXXX"
-                value={formik.values.phoneno}
+                containerClassName='intl-tel-input mt-2 w-100'
+                type='tel'
+                name='phoneno'
+                inputClassName='form-control'
+                // type='number'
+                placeholder='(XXX) XXX-XXXX'
+                value={formik.values.phoneno.replace(/\D/g, "")}
                 onBlur={formik.handleBlur}
-                defaultCountry="CA"
+                defaultCountry='CA'
                 onlyCountries={["CA"]}
                 preferredCountries={["CA"]}
                 onPhoneNumberChange={(
@@ -261,81 +261,105 @@ function NewOrder() {
                   number,
                   id
                 ) => {
-                  formik.setFieldValue("phoneno", value);
+                  if (value.length <= 10) {
+                    // e.target.value = formattedValue;
+                    formik.setFieldValue("phoneno", value);
+                  }
                 }}
               />
               {formik.touched.phoneno && formik.errors.phoneno ? (
-                <div className="text-danger">{formik.errors.phoneno}</div>
+                <div className='text-danger'>{formik.errors.phoneno}</div>
               ) : null}
-              <div className="my-3 m-0 p-0 d-flex justify-content-between">
-                <label className="radio d-flex align-items-center my-1 w-50">
+              <div className='my-3 m-0 p-0 d-flex justify-content-between'>
+                <label className='radio d-flex align-items-center my-1 w-50'>
                   <input
-                    className="mx-2"
-                    type="radio"
+                    className='mx-2'
+                    type='radio'
                     checked={formik.values.category === "pickup" ? true : false}
-                    onChange={formik.handleChange}
-                    name="category[]"
-                    value="pickup"
+                    onChange={(e) => {
+                      formik.handleChange(e);
+                      handleRadiobtn(e);
+                    }}
+                    name='category'
+                    value='pickup'
                   />
                   Pickup
                 </label>
-                <label className="radio d-flex align-items-center my-1 mx-2 w-50">
+                <label className='radio d-flex align-items-center my-1 mx-2 w-50'>
                   <input
-                    className="mx-2"
-                    type="radio"
-                    name="category"
+                    className='mx-2'
+                    type='radio'
+                    name='category'
                     checked={
                       formik.values.category === "delivery" ? true : false
                     }
-                    onChange={formik.handleChange}
-                    value="delivery"
+                    onChange={(e) => {
+                      formik.handleChange(e);
+                      handleRadiobtn(e);
+                    }}
+                    value='delivery'
                   />
                   Delivery
                 </label>
               </div>
-              <label className="form-label">
-                Customer Name <small className="text-danger">*</small>
+              <label className='form-label'>
+                Customer Name <small className='text-danger'>*</small>
               </label>
               <input
-                className="form-control"
-                type="text"
-                name="customername"
-                id="customername"
+                className='form-control'
+                type='text'
+                name='customername'
+                id='customername'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.customername}
               />
               {formik.touched.customername && formik.errors.customername ? (
-                <div className="text-danger my-1">
+                <div className='text-danger my-1'>
                   {formik.errors.customername}
                 </div>
               ) : null}
-              <label className="form-label mt-2 mb-1">
-                Address <small className="text-danger">*</small>
+              <label className='form-label mt-2 mb-1'>
+                Address <small className='text-danger'>*</small>
               </label>
               <textarea
-                className="form-control"
-                rows="4"
-                cols="50"
-                name="address"
+                className='form-control'
+                rows='4'
+                cols='50'
+                name='address'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.address}
               />
               {formik.touched.address && formik.errors.address ? (
-                <div className="text-danger my-1">{formik.errors.address}</div>
+                <div className='text-danger my-1'>{formik.errors.address}</div>
               ) : null}
-              <label className="form-label mt-2 mb-1">Store Location</label>
+              <label className='form-label'>
+                Pin Code <small className='text-danger'>*</small>
+              </label>
+              <input
+                className='form-control'
+                type='number'
+                name='pincode'
+                id='pincode'
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.pincode}
+              />
+              {formik.touched.pincode && formik.errors.pincode ? (
+                <div className='text-danger my-1'>{formik.errors.pincode}</div>
+              ) : null}
+              <label className='form-label mt-2 mb-1'>Store Location</label>
               <select
-                className="form-select"
-                id="storesID"
-                name="stores"
+                className='form-select'
+                id='storesID'
+                name='stores'
                 defaultValue={formik.values.stores ?? "STR_1"}
                 value={formik.values.stores ?? ""}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               >
-                <option value="">Choose Stores Location</option>
+                <option value=''>Choose Stores Location</option>
                 {storesLocationData?.map((stores) => {
                   return (
                     <option
@@ -349,15 +373,15 @@ function NewOrder() {
                 })}
               </select>
               {formik.touched.stores && formik.errors.stores ? (
-                <div className="text-danger my-1">{formik.errors.stores}</div>
+                <div className='text-danger my-1'>{formik.errors.stores}</div>
               ) : null}
-              <h6 className="my-3">Previous Order</h6>
+              <h6 className='my-3'>Previous Order</h6>
               <div>
-                <table className="table text-center border-none">
+                <table className='table text-center border-none'>
                   <thead>
                     <tr>
-                      <th scope="col">Date</th>
-                      <th scope="col">Order</th>
+                      <th scope='col'>Date</th>
+                      <th scope='col'>Order</th>
                     </tr>
                   </thead>
                   {/* <tbody>
@@ -381,64 +405,69 @@ function NewOrder() {
             </div>
 
             {/* Section 2 */}
-            <div className="col-lg-6 my-1 section2">
+            <div className='col-lg-6 my-1 sectionTwo'>
               {/* Tabs Headings */}
               <ul
-                className="nav nav-tabs psTabsUl mt-2 d-flex justify-content-between mb-3"
-                role="tablist"
+                className='nav nav-tabs psTabsUl mt-2 d-flex justify-content-between mb-3'
+                role='tablist'
               >
-                <li className="nav-item">
+                <li className='nav-item'>
                   <Link
-                    className="nav-link active py-2 px-auto psTabs"
-                    data-bs-toggle="tab"
-                    to="#createByOwn"
+                    ref={createYourOwnRef}
+                    className='nav-link active py-2 px-auto psTabs'
+                    data-bs-toggle='tab'
+                    to='#createByOwn'
                   >
                     Create Your Own
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className='nav-item'>
                   <Link
-                    className="nav-link py-2 px-auto psTabs"
-                    data-bs-toggle="tab"
-                    to="#special"
+                    ref={specialTabRef}
+                    className='nav-link py-2 px-auto psTabs'
+                    data-bs-toggle='tab'
+                    to='#special'
                   >
                     Special
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className='nav-item'>
                   <Link
-                    className="nav-link py-2 px-auto psTabs"
-                    data-bs-toggle="tab"
-                    to="#sidesMenu"
+                    ref={sidesRef}
+                    className='nav-link py-2 px-auto psTabs'
+                    data-bs-toggle='tab'
+                    to='#sidesMenu'
                   >
                     Sides
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className='nav-item'>
                   <Link
-                    className="nav-link py-2 px-auto psTabs"
-                    data-bs-toggle="tab"
-                    to="#dipsMenu"
+                    ref={dipsRef}
+                    className='nav-link py-2 px-auto psTabs'
+                    data-bs-toggle='tab'
+                    to='#dipsMenu'
                   >
                     Dips
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className='nav-item'>
                   <Link
-                    className="nav-link py-2 px-auto psTabs"
-                    data-bs-toggle="tab"
-                    to="#drinksMenu"
+                    ref={drinksRef}
+                    className='nav-link py-2 px-auto psTabs'
+                    data-bs-toggle='tab'
+                    to='#drinksMenu'
                   >
                     Drinks
                   </Link>
                 </li>
               </ul>
               {/* Tab Content */}
-              <div className="tab-content m-0 p-0 w-100">
+              <div className='tab-content m-0 p-0 w-100'>
                 {/* Create Your Own */}
                 <div
-                  id="createByOwn"
-                  className="container tab-pane active m-0 p-0"
+                  id='createByOwn'
+                  className='container tab-pane active m-0 p-0 '
                 >
                   <CreateYourOwn
                     allIngredients={allIngredients}
@@ -450,27 +479,33 @@ function NewOrder() {
                     cartListData={cartListData}
                     cartCode={cartCode}
                     cartLineCode={cartLineCode}
+                    payloadEdit={payloadEdit}
+                    setPayloadEdit={setPayloadEdit}
+                    setAllIngredients={setAllIngredients}
+                    setOrderData={setOrderData}
                   />
                 </div>
 
                 {/* SpecialMenu */}
-                <div id="special" className="container tab-pane m-0 p-0">
+                <div id='special' className='container tab-pane m-0 p-0'>
                   <SpecialMenu />
                 </div>
 
                 {/* All SIdes */}
-                <div id="sidesMenu" className="container tab-pane m-0 p-0">
+                <div id='sidesMenu' className='container tab-pane m-0 p-0'>
                   <SidesMenu
                     getCartList={getCartList}
                     discount={discount}
                     taxPer={taxPer}
+                    payloadEdit={payloadEdit}
+                    setPayloadEdit={setPayloadEdit}
                   />
                 </div>
 
                 {/* All Dips */}
                 <div
-                  id="dipsMenu"
-                  className="container tab-pane m-0 p-0 topping-list"
+                  id='dipsMenu'
+                  className='container tab-pane m-0 p-0 topping-list'
                 >
                   <DipsMenu
                     getCartList={getCartList}
@@ -480,7 +515,7 @@ function NewOrder() {
                 </div>
 
                 {/* All Drinks */}
-                <div id="drinksMenu" className="container tab-pane m-0 p-0">
+                <div id='drinksMenu' className='container tab-pane m-0 p-0'>
                   <DrinksMenu
                     getCartList={getCartList}
                     discount={discount}
@@ -491,184 +526,146 @@ function NewOrder() {
             </div>
 
             {/* Section 3 */}
-            <div className="col-lg-4 my-1">
-              <h6 className="text-center">Order</h6>
+            <div className='col-lg-4 mt-1 '>
+              <h6 className='text-center'>Order</h6>
               {/* Add to Cart */}
-              <div className="p-3 rounded mb-3 addToCartList">
-                {cartListData?.cartItems?.map((data) => {
-                  return (
-                    <div>
-                      <div className="d-flex justify-content-between">
-                        <h6>{data.productName}</h6>
-                        <span className="mx-0">${data.price}</span>
-                      </div>
-                      <div className="d-flex justify-content-between">
-                        <div className="d-flex justify-content-left">
-                          <h6>Size : </h6>
-                          <span className="mx-1">
-                            {data.productType === "side"
-                              ? data.config.sidesSize
-                              : data.pizzaSize}
+              <div className='d-flex flex-column cart'>
+                <div className='p-3 rounded mb-3 overflow-auto'>
+                  <Cart
+                    // cartRef={cartRef}
+                    onProductClick={handleProductClick}
+                    payloadEdit={payloadEdit}
+                    setPayloadEdit={setPayloadEdit}
+                  />
+                </div>
+                {/* Order Submit */}
+                <div className=''>
+                  <form>
+                    {/* Price / Sub Total */}
+                    <div className='d-flex flex-wrap my-2 justify-content-end align-items-center OrderAmount'>
+                      <label className='form-label w-25'>Price</label>
+                      <div className='input-group w-75'>
+                        <div className='input-group-prepend'>
+                          <span className='input-group-text inputGroupTxt px-2'>
+                            $
                           </span>
                         </div>
-                        <div className="d-flex justify-content-right mx-0 mb-1">
-                          <h6 className="mx-2">Quantity : </h6>
-                          <span className="">{data.quantity}</span>
+                        <input
+                          className='form-control w-25 text-end'
+                          type='number'
+                          placeholder='0.00'
+                          step='0.01'
+                          readOnly
+                          value={Number(totalPrice).toFixed(2)}
+                        ></input>
+                        <div className='input-group-append'>
+                          <span className='input-group-text inputGroupTxt'>
+                            CAD
+                          </span>
                         </div>
                       </div>
-                      <div className="d-flex align-items-center">
-                        <button
-                          className="btn m-0 p-0"
-                          onClick={(e) => deleteCartItem(e, data.code)}
-                          type="button"
-                        >
-                          <i
-                            className="fa fa-trash-o"
-                            aria-hidden="true"
-                            style={{ fontSize: "1.1rem", color: "#ff5555" }}
-                          ></i>
-                        </button>
-                        <button type="button" className="btn m-0 p-0 mx-3">
-                          <i
-                            className="fa fa-pencil-square-o"
-                            aria-hidden="true"
-                            style={{ fontSize: "1.1rem", color: "#7a3ee7" }}
-                            onClick={(e) =>
-                              handleEditCartItem(
-                                e,
-                                data.code,
-                                cartListData?.code
-                              )
-                            }
-                          ></i>
-                        </button>
-                      </div>
-                      <hr className="border border-2 my-2 divider"></hr>
                     </div>
-                  );
-                })}
-              </div>
-              {/* Order Submit */}
-              <div className="my-1">
-                <form>
-                  {/* Price / Sub Total */}
-                  <div className="d-flex flex-wrap my-2 justify-content-end align-items-center OrderAmount">
-                    <label className="form-label w-25">Price</label>
-                    <div className="input-group w-75">
-                      <div className="input-group-prepend">
-                        <span className="input-group-text inputGroupTxt px-2">
-                          $
-                        </span>
-                      </div>
-                      <input
-                        className="form-control w-25 text-end"
-                        type="number"
-                        placeholder="0.00"
-                        step="0.01"
-                        readOnly
-                        value={cartListData?.subTotal}
-                      ></input>
-                      <div className="input-group-append">
-                        <span className="input-group-text inputGroupTxt">
-                          CAD
-                        </span>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Discount */}
-                  <div className="d-flex flex-wrap my-2 my-2 justify-content-end align-items-center">
-                    <label className="form-label w-25">Discount</label>
-                    <div className="input-group w-75">
-                      <div className="input-group-prepend">
-                        <span className="input-group-text inputGroupTxt px-2">
-                          $
-                        </span>
-                      </div>
-                      <input
-                        className="form-control w-25 text-end"
-                        type="number"
-                        placeholder="0.00"
-                        step="0.01"
-                        defaultValue={0}
-                        onChange={(e) => setDiscount(e.target.value)}
-                      ></input>
-                      <div className="input-group-append">
-                        <span className="input-group-text inputGroupTxt">
-                          CAD
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Tax Percentage */}
-                  <div className="d-flex flex-wrap my-2 justify-content-end align-items-center">
-                    <label className="form-label w-25">Tax</label>
-                    <div className="input-group w-75">
-                      <div className="input-group-prepend">
-                        <span className="input-group-text inputGroupTxt px-2">
-                          %
-                        </span>
-                      </div>
-                      <input
-                        className="form-control w-25 text-end"
-                        type="number"
-                        placeholder="0.00"
-                        step="0.01"
-                        defaultValue={0}
-                        onChange={(e) => setTaxPer(e.target.value)}
-                      ></input>
-                      <div className="input-group-append">
-                        <span className="input-group-text inputGroupTxt">
-                          CAD
-                        </span>
+                    {/* Discount */}
+                    <div className='d-flex flex-wrap my-2 my-2 justify-content-end align-items-center'>
+                      <label className='form-label w-25'>Discount</label>
+                      <div className='input-group w-75'>
+                        <div className='input-group-prepend'>
+                          <span className='input-group-text inputGroupTxt px-2'>
+                            $
+                          </span>
+                        </div>
+                        <input
+                          className='form-control w-25 text-end'
+                          type='number'
+                          placeholder='0.00'
+                          min='0'
+                          step='1'
+                          defaultValue={0}
+                          value={discount}
+                          onChange={(e) => setDiscount(e.target.value)}
+                        ></input>
+                        <div className='input-group-append'>
+                          <span className='input-group-text inputGroupTxt'>
+                            CAD
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Grand Total / Total Price */}
-                  <div className="d-flex flex-wrap my-2 justify-content-end align-items-center">
-                    <label className="form-label w-25">Total Price</label>
-                    <div className="input-group w-75">
-                      <div className="input-group-prepend">
-                        <span className="input-group-text inputGroupTxt px-2">
-                          $
-                        </span>
-                      </div>
-                      <input
-                        className="form-control w-25 text-end"
-                        type="number"
-                        placeholder="0.00"
-                        step="0.01"
-                        value={cartListData?.grandTotal}
-                        readOnly
-                      ></input>
-                      <div className="input-group-append">
-                        <span className="input-group-text inputGroupTxt">
-                          CAD
-                        </span>
+                    {/* Tax Percentage */}
+                    <div className='d-flex flex-wrap my-2 justify-content-end align-items-center'>
+                      <label className='form-label w-25'>Tax</label>
+                      <div className='input-group w-75'>
+                        <div className='input-group-prepend'>
+                          <span className='input-group-text inputGroupTxt px-2'>
+                            %
+                          </span>
+                        </div>
+                        <input
+                          className='form-control w-25 text-end'
+                          type='number'
+                          placeholder='0.00'
+                          min='0'
+                          step='1'
+                          defaultValue={0}
+                          onChange={(e) => setTaxPer(e.target.value)}
+                        ></input>
+                        <div className='input-group-append'>
+                          <span className='input-group-text inputGroupTxt'>
+                            CAD
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Submit Order */}
-                  <div className="d-flex flex-row justify-content-end align-items-center">
-                    <button
-                      type="button"
-                      onClick={formik.handleSubmit}
-                      disabled={formik.isSubmitting}
-                      className="submitOrderbtn btn btn-sm my-3 px-4 py-2"
-                    >
-                      {formik.isSubmitting ? "Please wait..." : "Submit Order"}
-                    </button>
-                  </div>
-                </form>
+                    {/* Grand Total / Total Price */}
+                    <div className='d-flex flex-wrap my-2 justify-content-end align-items-center'>
+                      <label className='form-label w-25'>Total Price</label>
+                      <div className='input-group w-75'>
+                        <div className='input-group-prepend'>
+                          <span className='input-group-text inputGroupTxt px-2'>
+                            $
+                          </span>
+                        </div>
+                        <input
+                          className='form-control w-25 text-end'
+                          type='number'
+                          placeholder='0.00'
+                          min='0'
+                          step='0.01'
+                          value={Number(grandTotal).toFixed(2)}
+                          readOnly
+                        ></input>
+                        <div className='input-group-append'>
+                          <span className='input-group-text inputGroupTxt'>
+                            CAD
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Submit Order */}
+                    <div className='d-flex flex-row justify-content-end align-items-center'>
+                      <button
+                        type='button'
+                        onClick={formik.handleSubmit}
+                        disabled={formik.isSubmitting}
+                        className='submitOrderbtn btn btn-sm my-3 px-4 py-2'
+                      >
+                        {formik.isSubmitting
+                          ? "Please wait..."
+                          : "Submit Order"}
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
         </form>
       </div>
-      <ToastContainer position="top-center" />
+      <ToastContainer position='top-center' />
     </>
   );
 }
