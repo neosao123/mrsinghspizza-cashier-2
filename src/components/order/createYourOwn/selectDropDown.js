@@ -16,12 +16,14 @@ export const SelectDropDownCrust = ({
         onChange={handleCrustChange}
         required
       >
-        <option value={""} selected={crustSelected ? false : true}>
-          --- choose any one ---
-        </option>
+        <option value={""}>--- choose any one ---</option>
         {allIngredients?.crust?.map((crustData, index) => {
           return (
-            <option key={"crustDropDown" + index} value={crustData?.crustCode}>
+            <option
+              selected={crustData.crustName === "Regular"}
+              key={"crustDropDown" + index}
+              value={crustData?.crustCode}
+            >
               {crustData.crustName} - $ {crustData.price}
             </option>
           );
@@ -45,13 +47,15 @@ export const SelectDropDownCheese = ({
       onChange={handleCheeseChange}
       required
     >
-      <option value={""} selected={cheeseSelected ? false : true}>
-        --- choose any one ---
-      </option>
+      <option value={""}>--- choose any one ---</option>
 
       {allIngredients?.cheese?.map((item, index) => {
         return (
-          <option key={"crustDropDown" + index} value={item?.cheeseCode}>
+          <option
+            selected={item.cheeseName === "Mozzarella"}
+            key={"crustDropDown" + index}
+            value={item?.cheeseCode}
+          >
             {item.cheeseName} - $ {item.price}
           </option>
         );

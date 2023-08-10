@@ -4,8 +4,15 @@ import specialImg1 from "../../assets/bg-img.jpg";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../reducer/cartReducer";
+import { v4 as uuidv4 } from "uuid";
 
-function DrinksMenu({ getCartList, discount, taxPer }) {
+function DrinksMenu({
+  getCartList,
+  discount,
+  taxPer,
+  setPayloadEdit,
+  payloadEdit,
+}) {
   const [softDrinksData, setSoftDrinksData] = useState();
   const [quantity, setQuantity] = useState(1);
   let cartdata = useSelector((state) => state.cart.cart);
@@ -15,7 +22,7 @@ function DrinksMenu({ getCartList, discount, taxPer }) {
   }, []);
 
   // handle Quantity
-  const handleQuantity = (e) => {
+  const handleQuantity = (e, data) => {
     const inputValue = e.target.value;
     if (parseInt(inputValue) < 1) {
       e.target.value = 1;
@@ -23,6 +30,19 @@ function DrinksMenu({ getCartList, discount, taxPer }) {
       e.target.value = 100;
     } else {
       setQuantity(inputValue);
+    }
+    console.log(softDrinksData, "softDrinksData");
+    let index = softDrinksData?.findIndex(
+      (item) => item.softdrinkCode === data.softdrinkCode
+    );
+
+    if (index !== -1) {
+      let arr = [...softDrinksData];
+      arr[index] = {
+        ...data,
+        qty: inputValue,
+      };
+      setSoftDrinksData(arr);
     }
   };
 
@@ -37,6 +57,13 @@ function DrinksMenu({ getCartList, discount, taxPer }) {
         console.log("ERROR From SoftDrinksMenu API: ", err);
       });
   };
+  useEffect(() => {
+    if (payloadEdit !== undefined && payloadEdit.productType === "drinks") {
+      const index = softDrinksData.findIndex(
+        (item) => item.id === payloadEdit.id
+      );
+    }
+  }, [payloadEdit]);
 
   // Onclick Add To Cart - API Add To Cart
   const handleAddToCart = async (e, drinksCode) => {
@@ -53,18 +80,47 @@ function DrinksMenu({ getCartList, discount, taxPer }) {
     }
     let price = selectedDrinks[0].price;
     let totalAmount = 0;
-    if (quantity) {
-      totalAmount = Number(price) * Number(quantity);
-      console.log(price);
-      console.log(totalAmount);
-      const payload = {
+    totalAmount =
+      Number(price) *
+      (selectedDrinks[0]?.qty !== undefined
+        ? Number(selectedDrinks[0]?.qty)
+        : 1);
+    console.log(payloadEdit, "payloadEditDrinks");
+
+    if (payloadEdit !== undefined && payloadEdit.productType === "drinks") {
+      const payloadForEdit = {
+        id: payloadEdit?.id,
         cartCode: cartCode ? cartCode : "#NA",
         customerCode: customerCode ? customerCode : "#NA",
         cashierCode: localStorage.getItem("cashierCode"),
         productCode: selectedDrinks[0].softdrinkCode,
         productName: selectedDrinks[0].softDrinksName,
         productType: "drinks",
-        quantity: quantity,
+        quantity: selectedDrinks[0].qty ? selectedDrinks[0].qty : 1,
+        price: selectedDrinks[0].price,
+        amount: totalAmount.toFixed(2),
+        discountAmount: discount,
+        taxPer: taxPer,
+      };
+      const updatedCart = cartdata.findIndex(
+        (item) => item.id === payloadEdit.id
+      );
+      console.log(payloadEdit, payloadForEdit, "pppp");
+      let tempPayload = [...cartdata];
+      tempPayload[updatedCart] = payloadForEdit;
+      dispatch(addToCart([...tempPayload]));
+      toast.success(`${selectedDrinks[0].dipsName} ` + "Updated Successfully");
+      setPayloadEdit();
+    } else {
+      const payload = {
+        id: uuidv4(),
+        cartCode: cartCode ? cartCode : "#NA",
+        customerCode: customerCode ? customerCode : "#NA",
+        cashierCode: localStorage.getItem("cashierCode"),
+        productCode: selectedDrinks[0].softdrinkCode,
+        productName: selectedDrinks[0].softDrinksName,
+        productType: "drinks",
+        quantity: selectedDrinks[0].qty ? selectedDrinks[0].qty : 1,
         price: selectedDrinks[0].price,
         amount: totalAmount.toFixed(2),
         discountAmount: discount,
@@ -75,25 +131,44 @@ function DrinksMenu({ getCartList, discount, taxPer }) {
       toast.success(
         `${selectedDrinks[0].softDrinksName} ` + "Added Successfully"
       );
-
-      //   await addToCartApi(payload)
-      //     .then((res) => {
-      //       localStorage.setItem("CartData", JSON.stringify(res.data.data));
-      //       //clear fields from create your own
-      //       getCartList();
-      //       toast.success(
-      //         `${selectedDrinks[0].softDrinksName} Added Successfully...`
-      //       );
-      //     })
-      //     .catch((err) => {
-      //       if (err.response.status === 400 || err.response.status === 500) {
-      //         toast.error(err.response.data.message);
-      //       }
-      //     });
-      // } else {
-      //   toast.error("Quantity is required");
-      // }
+      dispatch(addToCart([...cartdata, payload]));
     }
+    // const payload = {
+    //   cartCode: cartCode ? cartCode : "#NA",
+    //   customerCode: customerCode ? customerCode : "#NA",
+    //   cashierCode: localStorage.getItem("cashierCode"),
+    //   productCode: selectedDrinks[0].softdrinkCode,
+    //   productName: selectedDrinks[0].softDrinksName,
+    //   productType: "drinks",
+    //   quantity: quantity,
+    //   price: selectedDrinks[0].price,
+    //   amount: totalAmount.toFixed(2),
+    //   discountAmount: discount,
+    //   taxPer: taxPer,
+    // };
+    // dispatch(addToCart([...cartdata, payload]));
+    // setQuantity();
+    // toast.success(
+    //   `${selectedDrinks[0].softDrinksName} ` + "Added Successfully"
+    // );
+
+    //   await addToCartApi(payload)
+    //     .then((res) => {
+    //       localStorage.setItem("CartData", JSON.stringify(res.data.data));
+    //       //clear fields from create your own
+    //       getCartList();
+    //       toast.success(
+    //         `${selectedDrinks[0].softDrinksName} Added Successfully...`
+    //       );
+    //     })
+    //     .catch((err) => {
+    //       if (err.response.status === 400 || err.response.status === 500) {
+    //         toast.error(err.response.data.message);
+    //       }
+    //     });
+    // } else {
+    //   toast.error("Quantity is required");
+    // }
   };
 
   return (
@@ -124,7 +199,7 @@ function DrinksMenu({ getCartList, discount, taxPer }) {
                       className='form-control'
                       style={{ width: "20%" }}
                       onChange={(e) => {
-                        handleQuantity(e);
+                        handleQuantity(e, data);
                       }}
                     />
                     <button

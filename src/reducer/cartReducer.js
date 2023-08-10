@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   cart: [],
+  displaySpecialForm: false,
 };
 
 const cartSlice = createSlice({
@@ -10,16 +11,14 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addToCart: (state, action) => {
-      // if (state.cart.length > 0) {
-      //   state.cart = [...state.cart, action.payload];
-      // } else {
-      //   state.cart = [action.payload];
-      // }
       console.log(state.cart, "newww");
       state.cart = action.payload;
+    },
+    setDisplaySpecialForm: (state, action) => {
+      state.displaySpecialForm = action.payload;
     },
   },
 });
 
-export const { addToCart } = cartSlice.actions;
+export const { addToCart, setDisplaySpecialForm } = cartSlice.actions;
 export default cartSlice.reducer;

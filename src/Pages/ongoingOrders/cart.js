@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { addToCart } from "../../reducer/cartReducer";
 
-const Cart = ({ payloadEdit, setPayloadEdit, cartRef, onProductClick }) => {
+const Cart = ({ payloadEdit, setPayloadEdit, onProductClick }) => {
   const dispatch = useDispatch();
 
   const [cartListData, setCartListData] = useState();
@@ -50,6 +50,38 @@ const Cart = ({ payloadEdit, setPayloadEdit, cartRef, onProductClick }) => {
                   <span className=''>{data.quantity}</span>
                 </div>
               </div>
+              <div className='row d-flex'>
+                <div className='d-flex justify-content-left'>
+                  <h6 className='me-1 col-auto'>Toppings : </h6>
+                  <span className='mx-1'>
+                    {data?.config?.pizza?.map((pizza, index) => {
+                      return (
+                        <>
+                          <p key={"pizza" + index} className='  '>
+                            Pizza {index + 1} :{" "}
+                            {[
+                              ...pizza?.toppings?.countAsOneToppings,
+                              ...pizza?.toppings?.countAsTwoToppings,
+                              ...pizza?.toppings?.freeToppings,
+                            ]
+                              .slice(0, 6)
+                              .map((pizzaItem) => {
+                                return (
+                                  <p
+                                    key={pizzaItem.toppingsCode}
+                                    className='d-inline-block'
+                                  >
+                                    {pizzaItem?.toppingsName},
+                                  </p>
+                                );
+                              })}
+                          </p>
+                        </>
+                      );
+                    })}
+                  </span>
+                </div>
+              </div>
               <div className='d-flex align-items-center'>
                 <button
                   className='btn m-0 p-0'
@@ -69,10 +101,7 @@ const Cart = ({ payloadEdit, setPayloadEdit, cartRef, onProductClick }) => {
                     style={{ fontSize: "1.1rem", color: "#7a3ee7" }}
                     onClick={
                       () => {
-                        console.log(
-                          cartdata[index].productType,
-                          "clickedProductType"
-                        );
+                        console.log(cartdata[index], "clickedProductType");
 
                         setPayloadEdit(cartdata[index]);
                         onProductClick(cartdata[index].productType);

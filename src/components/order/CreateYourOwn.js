@@ -102,16 +102,13 @@ function CreateYourOwn({
 
   // Onclick Add To Cart Button
   const handleAddToCart = async (e) => {
-    console.log(payloadEdit, "opps");
     e.preventDefault();
-    // const lsCartCode = localStorage.getItem("cartCode");
-    // const cashierCode = localStorage.getItem("cashierCode");
-
     if (
       payloadEdit !== undefined &&
       payloadEdit.productType === "custom_pizza"
     ) {
       const payloadForEdit = {
+        id: payloadEdit?.id,
         productCode: "#NA",
         productName: "Custom Pizza",
         productType: "custom_pizza",
@@ -140,6 +137,7 @@ function CreateYourOwn({
         discountAmount: discount,
         taxPer: taxPer,
       };
+      console.log(cartdata, "cartdata payload edit");
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
       );
@@ -148,9 +146,8 @@ function CreateYourOwn({
       tempPayload[updatedCart] = payloadForEdit;
       dispatch(addToCart([...tempPayload]));
       setPayloadEdit();
-      setCrustSelected();
-      setCheeseSelected();
-      // setSpecialBasesSelected({});
+      setCrustSelected(allIngredients?.crust[0]);
+      setCheeseSelected(allIngredients?.cheese[0]);
       setSpecialBasesSelected();
       setDips([]);
       setDrinks([]);
@@ -203,8 +200,8 @@ function CreateYourOwn({
         console.log(payload, "payload142");
         dispatch(addToCart([...cartdata, payload]));
         toast.success(`Custom Pizza Added Successfully...`);
-        setCrustSelected();
-        setCheeseSelected();
+        setCrustSelected(allIngredients?.crust[0]);
+        setCheeseSelected(allIngredients?.cheese[0]);
         // setSpecialBasesSelected({});
         setSpecialBasesSelected();
         setDips([]);
@@ -608,10 +605,10 @@ function CreateYourOwn({
 
   const handleCrustChange = (event) => {
     const selectedValue = event.target.value;
+
     const selectedObject = allIngredients?.crust?.find(
       (option) => option.crustCode === selectedValue
     );
-    console.log("selected Object ", selectedObject);
     setCrustSelected(selectedObject);
   };
   const handleCheeseChange = (event) => {
@@ -659,9 +656,8 @@ function CreateYourOwn({
 
   useEffect(() => {
     console.log("key ", allIngredients?.specialbases[0]);
-    setCrustSelected();
-    setCheeseSelected();
-    // setSpecialBasesSelected({});
+    setCrustSelected(allIngredients?.crust[0]);
+    setCheeseSelected(allIngredients?.cheese[0]);
     setSpecialBasesSelected();
   }, [allIngredients]);
 
@@ -741,7 +737,12 @@ function CreateYourOwn({
                 className='my-2 form-check-input'
                 type='checkbox'
                 value=''
-                checked={freeToppingsArr?.length === 0 ? false : true}
+                checked={
+                  freeToppingsArr?.length ===
+                  allIngredients?.toppings?.freeToppings?.length
+                    ? true
+                    : false
+                }
                 id='allIndianTps'
                 onChange={handleChangeAllIndianToppins}
               />
@@ -859,14 +860,18 @@ function CreateYourOwn({
                                   countTwoToppingsArr[index]?.toppingsPlacement
                                 }
                                 onChange={(e) => {
-                                  const selectedPlacement = e.target.value;
-                                  const updatedTopping = {
-                                    ...countTwoToppingsArr[index],
-                                    toppingsPlacement: selectedPlacement,
-                                  };
-                                  const updatedArray = [...countTwoToppingsArr];
-                                  updatedArray[index] = updatedTopping;
-                                  setCountTwoToppingsArr(updatedArray);
+                                  if (comm !== -1) {
+                                    const selectedPlacement = e.target.value;
+                                    const updatedTopping = {
+                                      ...countTwoToppingsArr[index],
+                                      toppingsPlacement: selectedPlacement,
+                                    };
+                                    const updatedArray = [
+                                      ...countTwoToppingsArr,
+                                    ];
+                                    updatedArray[index] = updatedTopping;
+                                    setCountTwoToppingsArr(updatedArray);
+                                  }
                                 }}
                               >
                                 <option
@@ -937,14 +942,18 @@ function CreateYourOwn({
                                   countOneToppingsArr[index]?.toppingsPlacement
                                 }
                                 onChange={(e) => {
-                                  const selectedPlacement = e.target.value;
-                                  const updatedTopping = {
-                                    ...countOneToppingsArr[index],
-                                    toppingsPlacement: selectedPlacement,
-                                  };
-                                  const updatedArray = [...countOneToppingsArr];
-                                  updatedArray[index] = updatedTopping;
-                                  setCountOneToppingsArr(updatedArray);
+                                  if (comm !== -1) {
+                                    const selectedPlacement = e.target.value;
+                                    const updatedTopping = {
+                                      ...countOneToppingsArr[index],
+                                      toppingsPlacement: selectedPlacement,
+                                    };
+                                    const updatedArray = [
+                                      ...countOneToppingsArr,
+                                    ];
+                                    updatedArray[index] = updatedTopping;
+                                    setCountOneToppingsArr(updatedArray);
+                                  }
                                 }}
                               >
                                 <option
@@ -1017,14 +1026,16 @@ function CreateYourOwn({
                                 }
                                 id={"placement-" + toppingCode}
                                 onChange={(e) => {
-                                  const selectedPlacement = e.target.value;
-                                  const updatedTopping = {
-                                    ...freeToppingsArr[index],
-                                    toppingsPlacement: selectedPlacement,
-                                  };
-                                  const updatedArray = [...freeToppingsArr];
-                                  updatedArray[index] = updatedTopping;
-                                  setFreeToppingsArr(updatedArray);
+                                  if (comm !== -1) {
+                                    const selectedPlacement = e.target.value;
+                                    const updatedTopping = {
+                                      ...freeToppingsArr[index],
+                                      toppingsPlacement: selectedPlacement,
+                                    };
+                                    const updatedArray = [...freeToppingsArr];
+                                    updatedArray[index] = updatedTopping;
+                                    setFreeToppingsArr(updatedArray);
+                                  }
                                 }}
                               >
                                 <option
@@ -1053,8 +1064,6 @@ function CreateYourOwn({
                 >
                   {sidesData?.map((sidesData) => {
                     const sideCode = sidesData.sideCode;
-                    console.log(sidesData, "sidesflag map");
-                    console.log(sidesArr, "sidesflag arr");
                     const comm = sidesArr.findIndex(
                       (item) => item.sideCode === sidesData.sideCode
                     );
@@ -1081,7 +1090,9 @@ function CreateYourOwn({
                               className='form-select w-100 d-inline-block'
                               id={"placement-" + sideCode}
                               onChange={(e) => {
-                                handleSidePlacementChange(e, sideCode);
+                                if (comm !== -1) {
+                                  handleSidePlacementChange(e, sideCode);
+                                }
                               }}
                             >
                               {sidesData.combination.map((combination) => {

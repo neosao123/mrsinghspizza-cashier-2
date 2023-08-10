@@ -4,11 +4,19 @@ import specialImg1 from "../../assets/bg-img.jpg";
 import { toast } from "react-toastify";
 import { addToCart } from "../../reducer/cartReducer";
 import { useDispatch, useSelector } from "react-redux";
+import { v4 as uuidv4 } from "uuid";
+import { addToCartAndResetQty } from "./dipsMenu/dipsMenuFunctions";
 
-function DipsMenu({ discount, taxPer, getCartList }) {
+function DipsMenu({
+  discount,
+  taxPer,
+  getCartList,
+  setPayloadEdit,
+  payloadEdit,
+}) {
   const [dipsData, setDipsData] = useState();
   const [quantity, setQuantity] = useState(1);
-  const [dipsArray, setDipsArray] = useState([]);
+  const [dipsArr, setDipsArr] = useState([]);
   let cartdata = useSelector((state) => state.cart.cart);
   const dispatch = useDispatch();
 
@@ -26,20 +34,24 @@ function DipsMenu({ discount, taxPer, getCartList }) {
     } else {
       setQuantity(inputValue);
     }
-    console.log(dipsData, "dipsDatadipsData");
-    let itemToUpdate = dipsArray.findIndex(
-      (item) => item.dipsCode === dipsCode
-    );
-    console.log(itemToUpdate, "itemToUpdate");
-    let updatedObject = {
-      ...data,
-      price: quantity * dipsData[0]?.price,
-    };
+
+    let itemToUpdate = dipsArr?.findIndex((item) => item.dipsCode === dipsCode);
+
     if (itemToUpdate !== -1) {
-      setDipsArray([...dipsArray, updatedObject]);
+      let arr = [...dipsArr];
+      arr[itemToUpdate] = {
+        ...data,
+        qty: inputValue,
+      };
+      setDipsArr(arr);
     } else {
-      let tempArr = [...dipsArray];
-      tempArr[itemToUpdate] = updatedObject;
+      setDipsArr([
+        ...dipsArr,
+        {
+          ...data,
+          qty: inputValue,
+        },
+      ]);
     }
   };
 
@@ -55,38 +67,151 @@ function DipsMenu({ discount, taxPer, getCartList }) {
       });
   };
 
+  useEffect(() => {
+    if (payloadEdit !== undefined && payloadEdit.productType === "dips") {
+      setDipsArr([
+        ...dipsArr,
+        {
+          dipsCode: payloadEdit?.productCode,
+          dipsName: payloadEdit?.productName,
+          price: payloadEdit?.price,
+          qty: payloadEdit?.quantity,
+        },
+      ]);
+    }
+  }, [payloadEdit]);
+
   // Onclick Add To Cart - API Add To Cart
-  const handleAddToCart = async (e, dipsCode) => {
+  const handleAddToCart = async (e, dipsitem) => {
     e.preventDefault();
-    const selectedDips = dipsData.filter((dips) => dips.dipsCode === dipsCode);
     let cart = JSON.parse(localStorage.getItem("CartData"));
     let cartCode;
     let customerCode;
+    const selectedDips = dipsArr?.filter(
+      (dips) => dips.dipsCode === dipsitem.dipsCode
+    );
+    if (selectedDips.length === 0) {
+      const payload = {
+        id: uuidv4(),
+        cartCode: cartCode ? cartCode : "#NA",
+        customerCode: customerCode ? customerCode : "#NA",
+        cashierCode: localStorage.getItem("cashierCode"),
+        productCode: dipsitem?.dipsCode,
+        productName: dipsitem?.dipsName,
+        productType: "dips",
+        quantity: 1,
+        price: dipsitem?.price,
+        amount: dipsitem?.price,
+        discountAmount: discount,
+        taxPer: taxPer,
+      };
+
+      addToCartAndResetQty(
+        dispatch,
+        addToCart,
+        [...cartdata, payload],
+        toast,
+        setDipsArr,
+        setDipsData,
+        dipsData,
+        [dipsitem],
+        "Added Successfully"
+      );
+      return;
+    }
+
+    console.log(selectedDips, "selectedDips");
+
     if (cart !== null && cart !== undefined) {
       cartCode = cart.cartCode;
       customerCode = cart.customerCode;
     }
-    let price = selectedDips[0].price;
+    let price = selectedDips[0]?.price;
     let totalAmount = 0;
-    // if (quantity) {
-    totalAmount = Number(price) * Number(quantity);
+
+    totalAmount =
+      Number(price) *
+      (selectedDips[0]?.qty !== undefined ? Number(selectedDips[0]?.qty) : 1);
+
     console.log(totalAmount, "totalAmount");
-    const payload = {
-      cartCode: cartCode ? cartCode : "#NA",
-      customerCode: customerCode ? customerCode : "#NA",
-      cashierCode: localStorage.getItem("cashierCode"),
-      productCode: selectedDips[0].dipsCode,
-      productName: selectedDips[0].dipsName,
-      productType: "dips",
-      quantity: quantity,
-      price: selectedDips[0].price,
-      amount: totalAmount.toFixed(2),
-      discountAmount: discount,
-      taxPer: taxPer,
-    };
-    dispatch(addToCart([...cartdata, payload]));
-    setQuantity(1);
-    toast.success(`${selectedDips[0].dipsName} ` + "Added Successfully");
+    console.log(payloadEdit, "payloadEdit");
+
+    if (payloadEdit !== undefined && payloadEdit.productType === "dips") {
+      const payloadForEdit = {
+        id: payloadEdit?.id,
+        cartCode: cartCode ? cartCode : "#NA",
+        customerCode: customerCode ? customerCode : "#NA",
+        cashierCode: localStorage.getItem("cashierCode"),
+        productCode: selectedDips[0].dipsCode,
+        productName: selectedDips[0].dipsName,
+        productType: "dips",
+        quantity: selectedDips[0].qty ? selectedDips[0].qty : 1,
+        price: selectedDips[0].price,
+        amount: totalAmount.toFixed(2),
+        discountAmount: discount,
+        taxPer: taxPer,
+      };
+      const updatedCart = cartdata.findIndex(
+        (item) => item.id === payloadEdit.id
+      );
+      console.log(payloadEdit, payloadForEdit, "pppp");
+      let tempPayload = [...cartdata];
+      tempPayload[updatedCart] = payloadForEdit;
+      addToCartAndResetQty(
+        dispatch,
+        addToCart,
+        [...tempPayload],
+        toast,
+        setDipsArr,
+        setDipsData,
+        dipsData,
+        selectedDips,
+        "Updated Successfully"
+      );
+
+      setPayloadEdit();
+    } else {
+      const payload = {
+        id: uuidv4(),
+        cartCode: cartCode ? cartCode : "#NA",
+        customerCode: customerCode ? customerCode : "#NA",
+        cashierCode: localStorage.getItem("cashierCode"),
+        productCode: selectedDips[0].dipsCode,
+        productName: selectedDips[0].dipsName,
+        productType: "dips",
+        quantity: selectedDips[0].qty ? selectedDips[0].qty : 1,
+        price: selectedDips[0].price,
+        amount: totalAmount.toFixed(2),
+        discountAmount: discount,
+        taxPer: taxPer,
+      };
+
+      addToCartAndResetQty(
+        dispatch,
+        addToCart,
+        [...cartdata, payload],
+        toast,
+        setDipsArr,
+        setDipsData,
+        dipsData,
+        selectedDips,
+        "Added Successfully"
+      );
+    }
+
+    // dispatch(addToCart([...cartdata, payload]));
+    // setQuantity(1);
+    // toast.success(`${selectedDips[0].dipsName} ` + "Added Successfully");
+    // let itemToUpdate = dipsData.findIndex((item) => item.dipsCode === dipsCode);
+
+    // if (itemToUpdate !== -1) {
+    //   let arr = [...dipsData];
+    //   arr[itemToUpdate] = {
+    //     ...selectedDips,
+    //     qty: 1,
+    //   };
+    //   setDipsData(arr);
+    // }
     // await addToCartApi(payload)
     //   .then((res) => {
     //     localStorage.setItem("CartData", JSON.stringify(res.data.data));
@@ -110,6 +235,9 @@ function DipsMenu({ discount, taxPer, getCartList }) {
     <>
       <ul className='list-group'>
         {dipsData?.map((data) => {
+          let obj = dipsArr?.find((item) => item.dipsCode === data.dipsCode);
+          console.log(obj, "dipsarr obj");
+
           return (
             <li className='list-group-item' key={data.dipsCode}>
               <div className='d-flex justify-content-between align-items-end py-2 px-1'>
@@ -132,6 +260,7 @@ function DipsMenu({ discount, taxPer, getCartList }) {
                       type='number'
                       defaultValue={1}
                       className='form-control'
+                      value={obj !== undefined ? obj.qty : data.qty}
                       style={{ width: "20%" }}
                       onChange={(e) => handleQuantity(e, data.dipsCode, data)}
                     />
@@ -139,9 +268,13 @@ function DipsMenu({ discount, taxPer, getCartList }) {
                       type='button'
                       className='btn btn-sm customize py-1 px-2'
                       style={{ width: "auto" }}
-                      onClick={(e) => handleAddToCart(e, data.dipsCode)}
+                      onClick={(e) => handleAddToCart(e, data)}
                     >
-                      Add To Cart
+                      {payloadEdit !== undefined &&
+                      payloadEdit.productType === "dips" &&
+                      obj !== undefined
+                        ? "Edit"
+                        : "Add To Cart"}
                     </button>
                   </div>
                 </div>

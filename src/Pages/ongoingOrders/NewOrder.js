@@ -6,8 +6,10 @@ import CreateYourOwn from "../../components/order/CreateYourOwn";
 import {
   deleteCartItemApi,
   getCartListApi,
+  getSpecialDetailsApi,
   orderPlaceApi,
   storeLocationApi,
+  deliveryExecutiveApi,
 } from "../../API/ongoingOrder";
 import SidesMenu from "./SidesMenu";
 import DipsMenu from "./DipsMenu";
@@ -28,9 +30,12 @@ import {
   sidesIngredient,
 } from "./newOrder/newOrderCustomApiHandler";
 import Cart from "./cart";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setDisplaySpecialForm } from "../../reducer/cartReducer";
+import { getSpecialDetails } from "./specialMenu/specialMenuCustomApiHandler";
 
 function NewOrder() {
+  // const [show, setShow] = useState(false);
   const [allIngredients, setAllIngredients] = useState();
   const [sidesData, setSidesData] = useState();
   const [customerName, setCustomerName] = useState("");
@@ -42,6 +47,7 @@ function NewOrder() {
   const [discount, setDiscount] = useState(0);
   const [taxPer, setTaxPer] = useState(0);
   const [cartListData, setCartListData] = useState();
+  const [deliverExectiveList, setDeliverExectiveList] = useState();
   const [isEdit, setIsEdit] = useState(false);
   const [cartCode, setCartCode] = useState();
   const [cartLineCode, setCartLineCode] = useState();
@@ -52,6 +58,7 @@ function NewOrder() {
   const createYourOwnRef = useRef(null);
   const specialTabRef = useRef(null);
   const dipsRef = useRef(null);
+  const dispatch = useDispatch();
   const sidesRef = useRef(null);
   const drinksRef = useRef(null);
   const handleProductClick = (productType) => {
@@ -68,6 +75,17 @@ function NewOrder() {
         break;
       case "drinks":
         drinksRef.current.click();
+        break;
+      case "Special_Pizza":
+        specialTabRef.current.click();
+
+        dispatch(setDisplaySpecialForm(true));
+        // getSpecialDetails(
+        //   { code: payloadEdit.code },
+        //   getSpecialDetailsApi,
+        //   setGetSpecialData
+        // );
+
         break;
       default:
         break;
@@ -93,11 +111,13 @@ function NewOrder() {
     customername: "",
     address: "",
     stores: "",
-    pincode: "",
+    zipcode: "",
+    deliveryExecutive: "",
   };
 
   //API - Pizza All Ingredients
   //API - Sides Ingredients
+
   //API - Store Location
   const storeLocation = async () => {
     await storeLocationApi()
@@ -107,6 +127,20 @@ function NewOrder() {
       .catch((err) => {
         console.log("ERROR From Store Location API : ", err);
       });
+  };
+  //deliver executive
+  useEffect(() => {
+    if (storesLocationData !== undefined) {
+      deliverExecutive(storesLocationData[0]?.code);
+    }
+
+    console.log(storesLocationData, "storesLocationData");
+  }, [storesLocationData]);
+
+  const deliverExecutive = async (payload) => {
+    await deliveryExecutiveApi(payload).then((res) => {
+      setDeliverExectiveList(res.data.data);
+    });
   };
 
   // handle Stores Location --> Store Code
@@ -187,10 +221,14 @@ function NewOrder() {
       deliveryType === "pickup"
         ? null
         : Yup.string().required("Address is Required"),
-    pincode:
+    zipcode:
       deliveryType === "pickup"
         ? null
-        : Yup.string().required("Pincode is Required"), //,
+        : Yup.string().required("zipcode is Required"),
+    deliveryExecutive:
+      deliveryType === "pickup"
+        ? null
+        : Yup.string().required("Delivery Executive is Required"),
     stores: Yup.string().required("Store Location is Required."),
   });
   const formik = useFormik({
@@ -204,7 +242,8 @@ function NewOrder() {
         values.phoneno,
         values.address,
         values.category,
-        values.stores
+        values.stores,
+        values.deliveryExecutive
       );
       resetForm();
       return false;
@@ -222,6 +261,7 @@ function NewOrder() {
   const handleRadiobtn = (e) => {
     setDeliveryType(e.target.value);
   };
+  useEffect(() => {}, [deliveryType]);
 
   const [payloadEdit, setPayloadEdit] = useState();
   useEffect(() => {
@@ -335,19 +375,19 @@ function NewOrder() {
                 <div className='text-danger my-1'>{formik.errors.address}</div>
               ) : null}
               <label className='form-label'>
-                Pin Code <small className='text-danger'>*</small>
+                Zip Code <small className='text-danger'>*</small>
               </label>
               <input
                 className='form-control'
                 type='number'
-                name='pincode'
-                id='pincode'
+                name='zipcode'
+                id='zipcode'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                value={formik.values.pincode}
+                value={formik.values.zipcode}
               />
-              {formik.touched.pincode && formik.errors.pincode ? (
-                <div className='text-danger my-1'>{formik.errors.pincode}</div>
+              {formik.touched.zipcode && formik.errors.zipcode ? (
+                <div className='text-danger my-1'>{formik.errors.zipcode}</div>
               ) : null}
               <label className='form-label mt-2 mb-1'>Store Location</label>
               <select
@@ -372,9 +412,43 @@ function NewOrder() {
                   );
                 })}
               </select>
+
               {formik.touched.stores && formik.errors.stores ? (
                 <div className='text-danger my-1'>{formik.errors.stores}</div>
               ) : null}
+
+              {/* delivery executive  */}
+              <label className='form-label mt-2 mb-1'>Delivery Executive</label>
+              <select
+                className='form-select'
+                id='storesID'
+                name='deliveryExecutive'
+                defaultValue={formik.values.deliveryExecutive ?? "STR_1"}
+                value={formik.values.deliveryExecutive ?? ""}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              >
+                <option value=''>Choose Delivery Executive</option>
+                {deliverExectiveList?.map((person) => {
+                  return (
+                    <option
+                      key={person.code}
+                      data-key={person.code}
+                      value={person.code}
+                    >
+                      {person.firstName} {person.lastName}
+                    </option>
+                  );
+                })}
+              </select>
+
+              {formik.touched.deliveryExecutive &&
+              formik.errors.deliveryExecutive ? (
+                <div className='text-danger my-1'>
+                  {formik.errors.deliveryExecutive}
+                </div>
+              ) : null}
+
               <h6 className='my-3'>Previous Order</h6>
               <div>
                 <table className='table text-center border-none'>
@@ -488,7 +562,11 @@ function NewOrder() {
 
                 {/* SpecialMenu */}
                 <div id='special' className='container tab-pane m-0 p-0'>
-                  <SpecialMenu />
+                  <SpecialMenu
+                    payloadEdit={payloadEdit}
+                    setPayloadEdit={setPayloadEdit}
+                    specialTabRef={specialTabRef}
+                  />
                 </div>
 
                 {/* All SIdes */}
@@ -511,12 +589,16 @@ function NewOrder() {
                     getCartList={getCartList}
                     discount={discount}
                     taxPer={taxPer}
+                    payloadEdit={payloadEdit}
+                    setPayloadEdit={setPayloadEdit}
                   />
                 </div>
 
                 {/* All Drinks */}
                 <div id='drinksMenu' className='container tab-pane m-0 p-0'>
                   <DrinksMenu
+                    payloadEdit={payloadEdit}
+                    setPayloadEdit={setPayloadEdit}
                     getCartList={getCartList}
                     discount={discount}
                     taxPer={taxPer}
