@@ -100,6 +100,9 @@ function DipsMenu({
         productName: dipsitem?.dipsName,
         productType: "dips",
         quantity: 1,
+        config: {
+          dips: dipsArr,
+        },
         price: dipsitem?.price,
         amount: dipsitem?.price,
         discountAmount: discount,
@@ -145,6 +148,9 @@ function DipsMenu({
         productCode: selectedDips[0].dipsCode,
         productName: selectedDips[0].dipsName,
         productType: "dips",
+        config: {
+          dips: dipsArr,
+        },
         quantity: selectedDips[0].qty ? selectedDips[0].qty : 1,
         price: selectedDips[0].price,
         amount: totalAmount.toFixed(2),
@@ -154,7 +160,6 @@ function DipsMenu({
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
       );
-      console.log(payloadEdit, payloadForEdit, "pppp");
       let tempPayload = [...cartdata];
       tempPayload[updatedCart] = payloadForEdit;
       addToCartAndResetQty(
@@ -178,6 +183,9 @@ function DipsMenu({
         cashierCode: localStorage.getItem("cashierCode"),
         productCode: selectedDips[0].dipsCode,
         productName: selectedDips[0].dipsName,
+        config: {
+          dips: dipsArr,
+        },
         productType: "dips",
         quantity: selectedDips[0].qty ? selectedDips[0].qty : 1,
         price: selectedDips[0].price,

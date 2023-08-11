@@ -73,3 +73,6 @@ export const orderPlaceApi = async (payload) => {
 export const updateCartApi = async (payload) => {
   return await privateAPi.post("/cart/update", payload);
 };
+export const settingsApi = async () => {
+  return await privateAPi.get("/settings");
+};

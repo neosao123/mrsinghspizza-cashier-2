@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../reducer/cartReducer";
 import { v4 as uuidv4 } from "uuid";
+import { addToCartAndResetQty } from "./drinksMenuFunctions/drinksMenuFunction";
 
 function DrinksMenu({
   getCartList,
@@ -14,6 +15,7 @@ function DrinksMenu({
   payloadEdit,
 }) {
   const [softDrinksData, setSoftDrinksData] = useState();
+  const [drinksArr, setDrinksArr] = useState([]);
   const [quantity, setQuantity] = useState(1);
   let cartdata = useSelector((state) => state.cart.cart);
   const dispatch = useDispatch();
@@ -32,19 +34,42 @@ function DrinksMenu({
       setQuantity(inputValue);
     }
     console.log(softDrinksData, "softDrinksData");
-    let index = softDrinksData?.findIndex(
+    let itemToUpdate = drinksArr?.findIndex(
       (item) => item.softdrinkCode === data.softdrinkCode
     );
+    console.log(data, "itemToUpdate");
 
-    if (index !== -1) {
-      let arr = [...softDrinksData];
-      arr[index] = {
+    if (itemToUpdate !== -1) {
+      let arr = [...drinksArr];
+      arr[itemToUpdate] = {
         ...data,
         qty: inputValue,
       };
-      setSoftDrinksData(arr);
+      setDrinksArr(arr);
+    } else {
+      setDrinksArr([
+        ...drinksArr,
+        {
+          ...data,
+          qty: inputValue,
+        },
+      ]);
     }
   };
+  console.log(drinksArr, "dinks arr");
+  useEffect(() => {
+    if (payloadEdit !== undefined && payloadEdit.productType === "drinks") {
+      setDrinksArr([
+        ...drinksArr,
+        {
+          softdrinkCode: payloadEdit?.productCode,
+          softDrinksName: payloadEdit?.productName,
+          price: payloadEdit?.price,
+          qty: payloadEdit?.quantity,
+        },
+      ]);
+    }
+  }, [payloadEdit]);
 
   // API - SoftDrinks
   const drinks = () => {
@@ -66,10 +91,13 @@ function DrinksMenu({
   }, [payloadEdit]);
 
   // Onclick Add To Cart - API Add To Cart
-  const handleAddToCart = async (e, drinksCode) => {
+  const handleAddToCart = async (e, drink) => {
     e.preventDefault();
-    const selectedDrinks = softDrinksData.filter(
-      (drinks) => drinks.softdrinkCode === drinksCode
+    // const selectedDrinks = softDrinksData.filter(
+    //   (drinks) => drinks.softdrinkCode === drinksCode
+    // );
+    const selectedDrinks = drinksArr?.filter(
+      (drinks) => drinks.softdrinkCode === drink.softdrinkCode
     );
     let cart = JSON.parse(localStorage.getItem("CartData"));
     let cartCode;
@@ -78,7 +106,7 @@ function DrinksMenu({
       cartCode = cart.cartCode;
       customerCode = cart.customerCode;
     }
-    let price = selectedDrinks[0].price;
+    let price = selectedDrinks[0]?.price;
     let totalAmount = 0;
     totalAmount =
       Number(price) *
@@ -86,6 +114,39 @@ function DrinksMenu({
         ? Number(selectedDrinks[0]?.qty)
         : 1);
     console.log(payloadEdit, "payloadEditDrinks");
+
+    if (drinksArr.length === 0) {
+      const payload = {
+        id: uuidv4(),
+        cartCode: cartCode ? cartCode : "#NA",
+        customerCode: customerCode ? customerCode : "#NA",
+        cashierCode: localStorage.getItem("cashierCode"),
+        productCode: drink?.softdrinkCode,
+        productName: drink?.softDrinksName,
+        productType: "dips",
+        quantity: 1,
+        config: {
+          drinks: drinksArr,
+        },
+        price: drink?.price,
+        amount: drink?.price,
+        discountAmount: discount,
+        taxPer: taxPer,
+      };
+
+      addToCartAndResetQty(
+        dispatch,
+        addToCart,
+        [...cartdata, payload],
+        toast,
+        setDrinksArr,
+        setSoftDrinksData,
+        softDrinksData,
+        [drink],
+        "Added Successfully"
+      );
+      return;
+    }
 
     if (payloadEdit !== undefined && payloadEdit.productType === "drinks") {
       const payloadForEdit = {
@@ -96,6 +157,9 @@ function DrinksMenu({
         productCode: selectedDrinks[0].softdrinkCode,
         productName: selectedDrinks[0].softDrinksName,
         productType: "drinks",
+        config: {
+          drinks: drinksArr,
+        },
         quantity: selectedDrinks[0].qty ? selectedDrinks[0].qty : 1,
         price: selectedDrinks[0].price,
         amount: totalAmount.toFixed(2),
@@ -109,7 +173,9 @@ function DrinksMenu({
       let tempPayload = [...cartdata];
       tempPayload[updatedCart] = payloadForEdit;
       dispatch(addToCart([...tempPayload]));
-      toast.success(`${selectedDrinks[0].dipsName} ` + "Updated Successfully");
+      toast.success(
+        `${selectedDrinks[0].softDrinksName} ` + "Updated Successfully"
+      );
       setPayloadEdit();
     } else {
       const payload = {
@@ -117,21 +183,29 @@ function DrinksMenu({
         cartCode: cartCode ? cartCode : "#NA",
         customerCode: customerCode ? customerCode : "#NA",
         cashierCode: localStorage.getItem("cashierCode"),
-        productCode: selectedDrinks[0].softdrinkCode,
-        productName: selectedDrinks[0].softDrinksName,
+        productCode: selectedDrinks[0]?.softdrinkCode,
+        productName: selectedDrinks[0]?.softDrinksName,
         productType: "drinks",
-        quantity: selectedDrinks[0].qty ? selectedDrinks[0].qty : 1,
-        price: selectedDrinks[0].price,
+        config: {
+          drinks: drinksArr,
+        },
+        quantity: selectedDrinks[0]?.qty ? selectedDrinks[0]?.qty : 1,
+        price: selectedDrinks[0]?.price,
         amount: totalAmount.toFixed(2),
         discountAmount: discount,
         taxPer: taxPer,
       };
-      dispatch(addToCart([...cartdata, payload]));
-      setQuantity();
-      toast.success(
-        `${selectedDrinks[0].softDrinksName} ` + "Added Successfully"
+      addToCartAndResetQty(
+        dispatch,
+        addToCart,
+        [...cartdata, payload],
+        toast,
+        setDrinksArr,
+        setSoftDrinksData,
+        softDrinksData,
+        [drink],
+        "Added Successfully"
       );
-      dispatch(addToCart([...cartdata, payload]));
     }
     // const payload = {
     //   cartCode: cartCode ? cartCode : "#NA",
@@ -170,11 +244,19 @@ function DrinksMenu({
     //   toast.error("Quantity is required");
     // }
   };
+  useEffect(() => {
+    console.log(softDrinksData, "softDrinksData");
+    console.log(drinksArr, "softDrinksData drinksArr");
+  }, [softDrinksData, drinksArr]);
 
   return (
     <>
       <ul className='list-group'>
         {softDrinksData?.map((data) => {
+          let obj = drinksArr?.find(
+            (item) => item.softdrinkCode === data.softdrinkCode
+          );
+          console.log(obj, "obj");
           return (
             <li className='list-group-item' key={data.softdrinkCode}>
               <div className='d-flex justify-content-between align-items-end py-2 px-1'>
@@ -196,6 +278,7 @@ function DrinksMenu({
                     <input
                       type='number'
                       defaultValue={1}
+                      value={obj !== undefined ? obj.qty : data.qty}
                       className='form-control'
                       style={{ width: "20%" }}
                       onChange={(e) => {
@@ -206,9 +289,13 @@ function DrinksMenu({
                       type='button'
                       className='btn btn-sm customize py-1 px-2'
                       style={{ width: "auto" }}
-                      onClick={(e) => handleAddToCart(e, data.softdrinkCode)}
+                      onClick={(e) => handleAddToCart(e, data)}
                     >
-                      Add To Cart
+                      {payloadEdit !== undefined &&
+                      payloadEdit.productType === "drinks" &&
+                      obj !== undefined
+                        ? "Edit"
+                        : "Add To Cart"}
                     </button>
                   </div>
                 </div>

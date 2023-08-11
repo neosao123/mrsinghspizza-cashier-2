@@ -59,7 +59,8 @@ function CreateYourOwn({
   // Calculate Price
   const calculatePrice = () => {
     let calculatePrice = 0;
-    let crust_price = crustSelected?.price ? crustSelected?.price : 0;
+    console.log(crustSelected, "crustSelected?.crustPrice");
+    let crust_price = crustSelected?.crustPrice ? crustSelected?.crustPrice : 0;
     let cheese_price = cheeseSelected?.price ? cheeseSelected?.price : 0;
     let specialbase_price = specialBasesSelected?.price
       ? specialBasesSelected?.price
@@ -146,7 +147,11 @@ function CreateYourOwn({
       tempPayload[updatedCart] = payloadForEdit;
       dispatch(addToCart([...tempPayload]));
       setPayloadEdit();
-      setCrustSelected(allIngredients?.crust[0]);
+      setCrustSelected({
+        crustCode: allIngredients?.crust[0]?.crustCode,
+        crustPrice: allIngredients?.crust[0]?.crustPrice,
+        crustName: allIngredients?.crust[0]?.crustName,
+      });
       setCheeseSelected(allIngredients?.cheese[0]);
       setSpecialBasesSelected();
       setDips([]);
@@ -193,14 +198,18 @@ function CreateYourOwn({
           price: price,
           amount: price,
           comments: comments,
-          pizzaSize: pizzaSize,
+          pizzaSize: sizesOfPizzaSelected,
           discountAmount: discount,
           taxPer: taxPer,
         };
         console.log(payload, "payload142");
         dispatch(addToCart([...cartdata, payload]));
         toast.success(`Custom Pizza Added Successfully...`);
-        setCrustSelected(allIngredients?.crust[0]);
+        setCrustSelected({
+          crustCode: allIngredients?.crust[0]?.crustCode,
+          crustPrice: allIngredients?.crust[0]?.crustPrice,
+          crustName: allIngredients?.crust[0]?.crustName,
+        });
         setCheeseSelected(allIngredients?.cheese[0]);
         // setSpecialBasesSelected({});
         setSpecialBasesSelected();
@@ -522,17 +531,17 @@ function CreateYourOwn({
     );
     if (selectedDrinks.length > 0) {
       let drinksObj = {
-        softdrinkCode: selectedDrinks[0].softdrinkCode,
+        drinksCode: selectedDrinks[0].softdrinkCode,
         drinksName: selectedDrinks[0].softDrinksName,
         drinksPrice: selectedDrinks[0].price ? selectedDrinks[0].price : "0",
       };
-      if (e.target.checked === true) {
+      if (checked) {
         setDrinks([...drinks, drinksObj]);
       } else {
         const newDrinks = drinks.filter(
-          (updatedDrinks) =>
-            updatedDrinks.softdrinkCode !== drinksObj.softdrinkCode
+          (updatedDrinks) => updatedDrinks.drinksCode !== code
         );
+        console.log(newDrinks, "newDrinks");
         setDrinks(newDrinks);
       }
     }
@@ -605,11 +614,25 @@ function CreateYourOwn({
 
   const handleCrustChange = (event) => {
     const selectedValue = event.target.value;
+    console.log(selectedValue, "selectedValue New");
 
     const selectedObject = allIngredients?.crust?.find(
       (option) => option.crustCode === selectedValue
     );
-    setCrustSelected(selectedObject);
+
+    console.log(
+      {
+        crustCode: selectedObject?.crustCode,
+        crustName: selectedObject?.crustName,
+        crustPrice: selectedObject?.price,
+      },
+      "selectedValue New"
+    );
+    setCrustSelected({
+      crustCode: selectedObject?.crustCode,
+      crustName: selectedObject?.crustName,
+      crustPrice: selectedObject?.price,
+    });
   };
   const handleCheeseChange = (event) => {
     const selectedValue = event.target.value;
@@ -656,10 +679,17 @@ function CreateYourOwn({
 
   useEffect(() => {
     console.log("key ", allIngredients?.specialbases[0]);
-    setCrustSelected(allIngredients?.crust[0]);
+    setCrustSelected({
+      crustCode: allIngredients?.crust[0]?.crustCode,
+      crustPrice: allIngredients?.crust[0]?.price,
+      crustName: allIngredients?.crust[0]?.crustName,
+    });
     setCheeseSelected(allIngredients?.cheese[0]);
     setSpecialBasesSelected();
   }, [allIngredients]);
+  useEffect(() => {
+    console.log(crustSelected, "selectedValue New");
+  }, [crustSelected]);
 
   return (
     <>
@@ -1158,7 +1188,7 @@ function CreateYourOwn({
                     console.log(drinksData, "drinks data");
                     console.log(drinks, "drinks arr");
                     const comm = drinks.findIndex(
-                      (item) => item.softdrinkCode === drinksData.softdrinkCode
+                      (item) => item.drinksCode === drinksData.softdrinkCode
                     );
                     return (
                       <li

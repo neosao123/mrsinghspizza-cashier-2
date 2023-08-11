@@ -10,6 +10,7 @@ import {
   orderPlaceApi,
   storeLocationApi,
   deliveryExecutiveApi,
+  settingsApi,
 } from "../../API/ongoingOrder";
 import SidesMenu from "./SidesMenu";
 import DipsMenu from "./DipsMenu";
@@ -31,7 +32,7 @@ import {
 } from "./newOrder/newOrderCustomApiHandler";
 import Cart from "./cart";
 import { useDispatch, useSelector } from "react-redux";
-import { setDisplaySpecialForm } from "../../reducer/cartReducer";
+import { addToCart, setDisplaySpecialForm } from "../../reducer/cartReducer";
 import { getSpecialDetails } from "./specialMenu/specialMenuCustomApiHandler";
 
 function NewOrder() {
@@ -51,6 +52,7 @@ function NewOrder() {
   const [isEdit, setIsEdit] = useState(false);
   const [cartCode, setCartCode] = useState();
   const [cartLineCode, setCartLineCode] = useState();
+  const [settingsData, setSettingsData] = useState();
   const globalCtx = useContext(GlobalContext);
   const [cartItemDetails, setCartItemDetails] = globalCtx.cartItem;
   const [orderData, setOrderData] = useState();
@@ -97,13 +99,15 @@ function NewOrder() {
 
   console.log(cartdata, "cartdatacartdata");
   cartdata.forEach((item) => {
+    console.log(item.amount, "item");
     totalPrice += Number(item.amount);
   });
+
   const discountedTotalPrice = totalPrice - discount;
   const taxAmount = (discountedTotalPrice * taxPer) / 100;
   const grandTotal = discountedTotalPrice + taxAmount;
 
-  console.log(totalPrice, "cartdatacartdata");
+  console.log(totalPrice, "");
 
   const initialValues = {
     phoneno: "",
@@ -168,47 +172,14 @@ function NewOrder() {
         });
     }
   };
+  const settings = async () => {
+    await settingsApi()
+      .then((res) => setSettingsData(res.data.data))
+      .catch((err) => {
+        console.log("Error From Settings API: ", err);
+      });
+  };
 
-  //API - Delete Item
-  // const deleteCartItem = async (e, cartLineCode) => {
-  //   e.preventDefault();
-  //   swal({
-  //     title: "Are you sure you want to delete?",
-  //     text: "You will not be able to recover this item!",
-  //     icon: "warning",
-  //     buttons: ["Cancel", "Delete"],
-  //     dangerMode: true,
-  //   }).then(async (willDelete) => {
-  //     if (willDelete) {
-  //       let cart = JSON.parse(localStorage.getItem("CartData"));
-  //       let payload = {
-  //         cartLineCode: cartLineCode,
-  //         discountAmount: "0",
-  //         taxPer: "0",
-  //       };
-  //       await deleteCartItemApi(payload)
-  //         .then((res) => {
-  //           toast.success("Product Deleted Successfully..");
-  //           getCartList();
-  //         })
-  //         .catch((err) => {
-  //           console.log("Error From Delete Cart Item API: ", err);
-  //         });
-  //     }
-  //   });
-  // };
-
-  // Edit Cart Item
-  // const handleEditCartItem = (e, cartLineCode, cartCode) => {
-  //   e.preventDefault();
-  //   setIsEdit(true);
-  //   setCartCode(cartCode);
-  //   setCartLineCode(cartLineCode);
-  //   const filteredCart = cartListData?.cartItems?.filter(
-  //     (cartItem) => cartItem.code === cartLineCode
-  //   );
-  //   setCartItemDetails(filteredCart[0]);
-  // };
   const validateSchema = Yup.object({
     phoneno: Yup.string()
       .required("Phone number is required")
@@ -236,32 +207,351 @@ function NewOrder() {
     validateOnBlur: true,
     validationSchema: validateSchema,
     onSubmit: async (values, { resetForm }) => {
-      console.log(
-        "Before : ",
-        values.customername,
-        values.phoneno,
-        values.address,
-        values.category,
-        values.stores,
-        values.deliveryExecutive
-      );
-      resetForm();
-      return false;
-      // const payload = {
-      //   cartCode: localStorage.getItem("cartCode"),
-      //   customerName: values.customername,
-      //   mobileNumber: values.phoneno,
-      //   address: values.address,
-      //   deliveryType: "pickup",
-      //   storeLocation: values.stores,
-      // };
+      try {
+        // Log the form values before resetting the form
+        console.log(
+          "Before : ",
+          values.customername,
+          values.phoneno,
+          values.address,
+          values.category,
+          values.stores,
+          values.deliveryExecutive,
+          values.zipcode
+        );
+        console.log(cartdata, "cartdata item");
+        let cart = JSON.parse(localStorage.getItem("CartData"));
+        let cashierCode = localStorage.getItem("cashierCode");
+        // Call the order placing API here
+        const payload = {
+          cashierCode: cashierCode,
+          customerName: values.customername,
+          mobileNumber: values.phoneno,
+          address: values.address,
+          zipCode: values.zipcode,
+          deliveryType: deliveryType,
+          storeLocation: values.stores,
+          deliveryExecutive: values.deliveryExecutive,
+          products: cartdata,
+          subTotal: totalPrice,
+          discountAmount: discount,
+          taxPer: taxPer,
+          taxAmount: 0,
+          deliveryCharges: settingsData?.filter(
+            (item) => item.settingName === "Delivery Charges"
+          )[0].settingValue,
+          extraDeliveryCharges: 0,
+          grandTotal: grandTotal,
+        };
+
+        const response = await orderPlaceApi(payload);
+
+        if (response.status === 200) {
+          resetForm();
+          dispatch(addToCart([]));
+          toast.success("order placed successfully");
+        } else {
+          toast.error("Failed to place the order");
+        }
+      } catch (error) {
+        toast.error("Error placing the order:" + error);
+      }
+      // console.log(
+      //   "Before : ",
+      //   values.customername,
+      //   values.phoneno,
+      //   values.address,
+      //   values.category,
+      //   values.stores,
+      //   values.deliveryExecutive
+      // );
+      // resetForm();
+      // return false;
     },
   });
+  // const payload = {
+  //   cartCode: localStorage.getItem("cartCode"),
+  //   customerName: values.customername,
+  //   mobileNumber: values.phoneno,
+  //   address: values.address,
+  //   deliveryType: "pickup",
+  //   storeLocation: values.stores,
+  // };
+
+  // const data = {
+  //   cashierCode: "CST_1",
+  //   customerName: "seema shelar",
+  //   mobileNumber: "7875544444",
+  //   address: "kolhapur",
+  //   zipCode: "",
+  //   deliveryType: "pickup",
+  //   storeLocation: "STR_1",
+  //   deliveryExecutive: "USR_1",
+  //   products: [
+  //     {
+  //       productCode: "SPO_8",
+  //       productName: "Thin Pizza With Burger",
+  //       productType: "specials",
+  //       config: {
+  //         pizza: [
+  //           {
+  //             crust: {
+  //               crustCode: "CR_2",
+  //               crustName: "Gluten",
+  //               crustPrice: "0",
+  //             },
+  //             cheese: {
+  //               cheeseCode: "CHE_2",
+  //               cheeseName: "Feta",
+  //               cheesePrice: "0",
+  //             },
+  //             specialBases: {
+  //               specialbaseCode: "SPB_6",
+  //               specialbaseName: "Tandoori",
+  //               specialbasePrice: "2.00",
+  //             },
+  //             toppings: {
+  //               countAsTwoToppings: [
+  //                 {
+  //                   toppingsCode: "TOP_42",
+  //                   toppingsName: "VEGAN PANEER",
+  //                   toppingsPrice: "10.00",
+  //                   toppingsPlacement: "righthalf",
+  //                 },
+  //               ],
+  //               countAsOneToppings: [
+  //                 {
+  //                   toppingsCode: "TOP_49",
+  //                   toppingsName: "Thick Crust",
+  //                   toppingsPrice: "10.00",
+  //                   toppingsPlacement: "righthalf",
+  //                 },
+  //                 {
+  //                   toppingsCode: "TOP_48",
+  //                   toppingsName: "Red Chilli",
+  //                   toppingsPrice: "10.00",
+  //                   toppingsPlacement: "whole",
+  //                 },
+  //               ],
+  //               freeToppings: [
+  //                 {
+  //                   toppingsCode: "TOP_49",
+  //                   toppingsName: "Thick Crust",
+  //                   toppingsPrice: "10.00",
+  //                   toppingsPlacement: "righthalf",
+  //                 },
+  //                 {
+  //                   toppingsCode: "TOP_46",
+  //                   toppingsName: "Ginger",
+  //                   toppingsPrice: "10.00",
+  //                   toppingsPlacement: "whole",
+  //                 },
+  //                 {
+  //                   toppingsCode: "TOP_47",
+  //                   toppingsName: "Green Chilli",
+  //                   toppingsPrice: "10.00",
+  //                   toppingsPlacement: "whole",
+  //                 },
+  //               ],
+  //             },
+  //           },
+  //         ],
+  //         sides: [
+  //           {
+  //             sidesCode: "SD_25",
+  //             sidesName: "Shahi Paneer",
+  //             sidesType: "poutine",
+  //             lineCode: "SDL_38",
+  //             sidesPrice: "12.99",
+  //             sidesSize: "1 BOC",
+  //           },
+  //           {
+  //             sidesCode: "SD_24",
+  //             sidesName: "Tandoori Paneer",
+  //             sidesType: "poutine",
+  //             lineCode: "SDL_37",
+  //             sidesPrice: "12.99",
+  //             sidesSize: "1 BOX",
+  //           },
+  //           {
+  //             sidesCode: "SD_11",
+  //             sidesName: "Mushroom Bites",
+  //             sidesType: "side",
+  //             lineCode: "SDL_18",
+  //             sidesPrice: "12.99",
+  //             sidesSize: "10 PIECES",
+  //           },
+  //         ],
+  //         dips: [
+  //           {
+  //             dipsCode: "DI_2",
+  //             dipsName: "Chilli Chipotle",
+  //             dipsPrice: "1.50",
+  //           },
+  //         ],
+  //         drinks: [
+  //           {
+  //             drinksCode: "SFD_3",
+  //             drinksName: "6 Pops",
+  //             drinksPrice: "5.99",
+  //           },
+  //           {
+  //             drinksCode: "SFD_4",
+  //             drinksName: "1 Can",
+  //             drinksPrice: "4.99",
+  //           },
+  //         ],
+  //       },
+  //       quantity: "2",
+  //       price: "100",
+  //       amount: "200",
+  //       pizzaSize: "large",
+  //       comments: "test",
+  //     },
+  //     // {
+  //     //   productCode: "SPO_8",
+  //     //   productName: "Thin Pizza With Burger",
+  //     //   productType: "specials",
+  //     //   config: {
+  //     //     pizza: [
+  //     //       {
+  //     //         crust: {
+  //     //           crustCode: "CR_2",
+  //     //           crustName: "Gluten",
+  //     //           crustPrice: "0",
+  //     //         },
+  //     //         cheese: {
+  //     //           cheeseCode: "CHE_2",
+  //     //           cheeseName: "Feta",
+  //     //           cheesePrice: "0",
+  //     //         },
+  //     //         specialBases: {
+  //     //           specialbaseCode: "SPB_6",
+  //     //           specialbaseName: "Tandoori",
+  //     //           specialbasePrice: "2.00",
+  //     //         },
+  //     //         toppings: {
+  //     //           countAsTwoToppings: [
+  //     //             {
+  //     //               toppingsCode: "TOP_42",
+  //     //               toppingsName: "VEGAN PANEER",
+  //     //               toppingsPrice: "10.00",
+  //     //               toppingsPlacement: "righthalf",
+  //     //             },
+  //     //           ],
+  //     //           countAsOneToppings: [
+  //     //             {
+  //     //               toppingsCode: "TOP_49",
+  //     //               toppingsName: "Thick Crust",
+  //     //               toppingsPrice: "10.00",
+  //     //               toppingsPlacement: "righthalf",
+  //     //             },
+  //     //             {
+  //     //               toppingsCode: "TOP_48",
+  //     //               toppingsName: "Red Chilli",
+  //     //               toppingsPrice: "10.00",
+  //     //               toppingsPlacement: "whole",
+  //     //             },
+  //     //           ],
+  //     //           freeToppings: [
+  //     //             {
+  //     //               toppingsCode: "TOP_49",
+  //     //               toppingsName: "Thick Crust",
+  //     //               toppingsPrice: "10.00",
+  //     //               toppingsPlacement: "righthalf",
+  //     //             },
+  //     //             {
+  //     //               toppingsCode: "TOP_46",
+  //     //               toppingsName: "Ginger",
+  //     //               toppingsPrice: "10.00",
+  //     //               toppingsPlacement: "whole",
+  //     //             },
+  //     //             {
+  //     //               toppingsCode: "TOP_47",
+  //     //               toppingsName: "Green Chilli",
+  //     //               toppingsPrice: "10.00",
+  //     //               toppingsPlacement: "whole",
+  //     //             },
+  //     //           ],
+  //     //         },
+  //     //       },
+  //     //     ],
+  //     //     sides: [
+  //     //       {
+  //     //         sidesCode: "SD_25",
+  //     //         sidesName: "Shahi Paneer",
+  //     //         sidesType: "poutine",
+  //     //         lineCode: "SDL_38",
+  //     //         sidesPrice: "12.99",
+  //     //         sidesSize: "1 BOC",
+  //     //       },
+  //     //       {
+  //     //         sidesCode: "SD_24",
+  //     //         sidesName: "Tandoori Paneer",
+  //     //         sidesType: "poutine",
+  //     //         lineCode: "SDL_37",
+  //     //         sidesPrice: "12.99",
+  //     //         sidesSize: "1 BOX",
+  //     //       },
+  //     //       {
+  //     //         sidesCode: "SD_11",
+  //     //         sidesName: "Mushroom Bites",
+  //     //         sidesType: "side",
+  //     //         lineCode: "SDL_18",
+  //     //         sidesPrice: "12.99",
+  //     //         sidesSize: "10 PIECES",
+  //     //       },
+  //     //     ],
+  //     //     dips: [
+  //     //       {
+  //     //         dipsCode: "DI_2",
+  //     //         dipsName: "Chilli Chipotle",
+  //     //         dipsPrice: "1.50",
+  //     //       },
+  //     //     ],
+  //     //     drinks: [
+  //     //       {
+  //     //         drinksCode: "SFD_3",
+  //     //         drinksName: "6 Pops",
+  //     //         drinksPrice: "5.99",
+  //     //       },
+  //     //       {
+  //     //         drinksCode: "SFD_4",
+  //     //         drinksName: "1 Can",
+  //     //         drinksPrice: "4.99",
+  //     //       },
+  //     //     ],
+  //     //   },
+  //     //   quantity: "2",
+  //     //   price: "100",
+  //     //   amount: "200",
+  //     //   pizzaSize: "large",
+  //     //   comments: "test",
+  //     // },
+  //   ],
+  //   subtotal: "",
+  //   discountAmount: "10",
+  //   taxPer: "5",
+  //   taxAmount: "",
+  //   deliveryCharges: "",
+  //   extraDeliveryCharges: "",
+  //   grandTotal: "",
+  // };
+  console.log(cartdata, "cartdata");
+  useEffect(() => {
+    console.log(
+      settingsData?.filter((item) => item.settingName === "Delivery Charges")[0]
+        .settingValue,
+      "settingsData"
+    );
+  }, [settingsData]);
 
   const handleRadiobtn = (e) => {
     setDeliveryType(e.target.value);
   };
-  useEffect(() => {}, [deliveryType]);
+  useEffect(() => {
+    formik.resetForm();
+  }, [deliveryType]);
 
   const [payloadEdit, setPayloadEdit] = useState();
   useEffect(() => {
@@ -269,6 +559,7 @@ function NewOrder() {
     sidesIngredient(sidesApi, setSidesData);
     storeLocation();
     getCartList();
+    settings();
   }, []);
 
   return (

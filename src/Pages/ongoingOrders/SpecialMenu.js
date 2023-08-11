@@ -341,7 +341,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   useEffect(() => {
     specialIngredients();
     dispatch(setDisplaySpecialForm(false));
-  }, []);
+  }, []); 
 
   //Component - Special Pizza Selection
   const elements = [];

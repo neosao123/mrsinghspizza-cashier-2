@@ -61,10 +61,46 @@ function SidesMenu({
   // Onclick handle Add To Cart & API - Add To Cart
   const handleAddToCart = async (e, sideCode, Obj) => {
     e.preventDefault();
-    const selectedSideForNewItem = sidesData?.filter(
+    let cart = JSON.parse(localStorage.getItem("CartData"));
+    let cartCode;
+    let customerCode;
+    let lineCode = $("#combination-" + sideCode)
+      .find(":selected")
+      .attr("data-key");
+    console.log("Combination Code : ", lineCode);
+    console.log("sideCode", sideCode);
+
+    if (cart !== null && cart !== undefined) {
+      cartCode = cart.cartCode;
+      customerCode = cart.customerCode;
+    }
+
+    const selectedSideForNewItem = sidesArr?.filter(
       (sides) => sides.sideCode === sideCode
     );
+    const selectedCombination = selectedSideForNewItem[0]?.combination?.filter(
+      (data) => data.lineCode === lineCode
+    );
+    const selectedCombinationObj = Obj?.combination?.filter(
+      (data) => data.lineCode === lineCode
+    );
+    console.log(selectedSideForNewItem, "selectedSideForNewItem");
+    console.log(Obj, "selectedCombination");
+    console.log(selectedCombination, "selectedCombination");
+    console.log();
+    let price =
+      selectedCombination !== undefined
+        ? selectedCombination[0]?.price
+        : selectedCombinationObj[0]?.price;
+    let totalAmount = 0;
+    totalAmount =
+      Number(price) *
+      (selectedSideForNewItem[0]?.qty !== undefined
+        ? Number(selectedSideForNewItem[0]?.qty)
+        : 1);
+
     if (selectedSideForNewItem.length === 0) {
+      console.log(selectedCombinationObj[0].price, "cartdata");
       const payload = {
         id: uuidv4(),
         customerCode: customerCode ? customerCode : "#NA",
@@ -72,11 +108,11 @@ function SidesMenu({
         productName: Obj?.sideName,
         productType: "side",
         config: {
-          lineCode: selectedCombination[0].lineCode,
-          sidesSize: selectedCombination[0].size,
+          lineCode: selectedCombinationObj[0].lineCode,
+          sidesSize: selectedCombinationObj[0].size,
         },
         quantity: 1,
-        price: Obj.price,
+        price: selectedCombinationObj.price,
         amount: totalAmount.toFixed(2),
         discountAmount: discount,
         taxPer: taxPer,
@@ -91,6 +127,7 @@ function SidesMenu({
         };
       });
       setSidesData(temp);
+      setSidesArr([]);
 
       dispatch(addToCart([...cartdata, payload]));
       console.log(payload, "payload : ");
@@ -105,33 +142,11 @@ function SidesMenu({
         qty: 1,
       },
     ]);
-    let lineCode = $("#combination-" + sideCode)
-      .find(":selected")
-      .attr("data-key");
-    console.log("Combination Code : ", lineCode);
-    console.log("sideCode", sideCode);
+
     const selectedSide = sidesArr?.filter(
       (sides) => sides.sideCode === sideCode
     );
     console.log(selectedSide, "payload : ");
-    const selectedCombination = selectedSide[0]?.combination?.filter(
-      (data) => data.lineCode === lineCode
-    );
-
-    let cart = JSON.parse(localStorage.getItem("CartData"));
-    let cartCode;
-    let customerCode;
-
-    if (cart !== null && cart !== undefined) {
-      cartCode = cart.cartCode;
-      customerCode = cart.customerCode;
-    }
-    let price = selectedCombination[0]?.price;
-    let totalAmount = 0;
-
-    totalAmount =
-      Number(price) *
-      (selectedSide[0]?.qty !== undefined ? Number(selectedSide[0]?.qty) : 1);
 
     if (payloadEdit !== undefined && payloadEdit.productType === "side") {
       console.log("editt", payloadEdit);
@@ -141,11 +156,11 @@ function SidesMenu({
         productName: selectedSide[0].sideName,
         productType: "side",
         config: {
-          lineCode: selectedCombination[0].lineCode,
-          sidesSize: selectedCombination[0].size,
+          lineCode: selectedSideForNewItem[0].lineCode,
+          sidesSize: selectedSideForNewItem[0].size,
         },
         quantity: selectedSide[0].qty,
-        price: selectedCombination[0].price,
+        price: selectedSideForNewItem[0].price,
         amount: totalAmount.toFixed(2),
         discountAmount: discount,
         taxPer: taxPer,
@@ -165,24 +180,30 @@ function SidesMenu({
         };
       });
       setSidesData(temp);
+      setSidesArr([]);
+
       setQuantity(1);
     } else {
+      console.log(selectedCombination[0]?.price, "cartdata");
       const payload = {
         id: uuidv4(),
         customerCode: customerCode ? customerCode : "#NA",
-        productCode: selectedSide[0].sideCode,
-        productName: selectedSide[0].sideName,
+        productCode: selectedSideForNewItem[0]?.sideCode,
+        productName: selectedSideForNewItem[0]?.sideName,
         productType: "side",
         config: {
-          lineCode: selectedCombination[0].lineCode,
-          sidesSize: selectedCombination[0].size,
+          lineCode: selectedCombination[0]?.lineCode,
+          sidesSize: selectedCombination[0]?.size,
         },
-        quantity: selectedSide[0].qty ? selectedSide[0].qty : 1,
-        price: selectedCombination[0].price,
+        quantity: selectedSideForNewItem[0]?.qty
+          ? selectedSideForNewItem[0]?.qty
+          : 1,
+        price: selectedCombination[0]?.price,
         amount: totalAmount.toFixed(2),
         discountAmount: discount,
         taxPer: taxPer,
       };
+      console.log(payload);
       // let index = sidesData?.findIndex(
       //   (item) => item.sideCode === side.sideCode
       // );
@@ -193,10 +214,13 @@ function SidesMenu({
         };
       });
       setSidesData(temp);
+      setSidesArr([]);
 
       dispatch(addToCart([...cartdata, payload]));
       console.log(payload, "payload : ");
-      toast.success(`${selectedSide[0].sideName} ` + "Added Successfully");
+      toast.success(
+        `${selectedSideForNewItem[0]?.sideName} ` + "Added Successfully"
+      );
       // setQuantity(1);
     }
 
@@ -218,6 +242,19 @@ function SidesMenu({
     //   toast.error("Quantity is required");
     // }
   };
+  useEffect(() => {
+    if (payloadEdit !== undefined && payloadEdit.productType === "side") {
+      setSidesArr([
+        ...sidesArr,
+        {
+          sideCode: payloadEdit?.productCode,
+          sideName: payloadEdit?.productName,
+          price: payloadEdit?.price,
+          qty: payloadEdit?.quantity,
+        },
+      ]);
+    }
+  }, [payloadEdit]);
 
   //API - Sides
   const sides = () => {
@@ -262,6 +299,7 @@ function SidesMenu({
         style={{ overflowY: "scroll", height: "30rem" }}
       >
         {sidesData?.map((data, index) => {
+          let obj = sidesArr?.find((item) => item.sideCode === data.sideCode);
           return (
             <li className='list-group-item' key={data.sideCode}>
               <div className='d-flex justify-content-between align-items-end py-2 px-1'>
@@ -306,7 +344,7 @@ function SidesMenu({
                       step={1}
                       min={1}
                       // value={data?.qty}
-                      value={data?.combination[index]?.qty}
+                      value={obj !== undefined ? obj.qty : data.qty}
                       max={100}
                       defaultValue={1}
                     />
@@ -316,9 +354,14 @@ function SidesMenu({
                       style={{ width: "auto" }}
                       onClick={(e) => handleAddToCart(e, data.sideCode, data)}
                     >
-                      {payloadEdit !== undefined &&
+                      {/* {payloadEdit !== undefined &&
                       payloadEdit.productType === "side"
                         ? "Edit Side"
+                        : "Add To Cart"} */}
+                      {payloadEdit !== undefined &&
+                      payloadEdit.productType === "side" &&
+                      obj !== undefined
+                        ? "Edit"
                         : "Add To Cart"}
                     </button>
                   </div>
