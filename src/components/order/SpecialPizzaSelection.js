@@ -33,6 +33,7 @@ function SpecialPizzaSelection({
               value={pizzaState[count - 1]?.crust?.code}
               onChange={(e) => {
                 handleCrustChange(e, count);
+                // dropDownPrice(e);
               }}
             >
               {getSpecialData?.crust?.map((data) => {
@@ -208,7 +209,7 @@ function SpecialPizzaSelection({
                 className='container tab-pane m-0 p-0 topping-list'
               >
                 {toppingsData?.toppings?.countAsOne?.map(
-                  (countAsOneToppings) => {
+                  (countAsOneToppings, index) => {
                     const comm = pizzaState[
                       count - 1
                     ]?.toppings?.countAsOneToppings.findIndex(
@@ -244,6 +245,10 @@ function SpecialPizzaSelection({
                           <select
                             className='form-select d-inline-block'
                             style={{ width: "65%" }}
+                            value={
+                              pizzaState[count - 1]?.toppings
+                                ?.countAsOneToppings[index]?.placement
+                            }
                             onChange={(e) => {
                               handleCountAsOneToppingsPlacementChange(
                                 e,
@@ -252,8 +257,6 @@ function SpecialPizzaSelection({
                               );
                             }}
                           >
-                            <option value='lefthalf'>Left Half</option>
-                            <option value='righthalf'>Right Half</option>
                             <option
                               value='whole'
                               selected={
@@ -265,6 +268,8 @@ function SpecialPizzaSelection({
                             >
                               Whole
                             </option>
+                            <option value='lefthalf'>Left Half</option>
+                            <option value='righthalf'>Right Half</option>
                           </select>
                         </div>
                       </li>
@@ -277,67 +282,85 @@ function SpecialPizzaSelection({
                 id={`toppings-free-tab-special${count}`}
                 className='container tab-pane m-0 p-0 topping-list'
               >
-                {toppingsData?.toppings?.freeToppings?.map((freeToppings) => {
-                  const comm = pizzaState[
-                    count - 1
-                  ]?.toppings?.freeToppings.findIndex(
-                    (item) => item.toppingsCode === freeToppings.toppingsCode
-                  );
-                  return (
-                    <li
-                      className='list-group-item d-flex justify-content-between align-items-center'
-                      key={freeToppings.toppingsCode}
-                    >
-                      <label className=''>
-                        <input
-                          type='checkbox'
-                          className='mx-3 d-inline-block'
-                          onChange={(e) =>
-                            handleFreeToppings(e, count, freeToppings)
-                          }
-                          checked={comm !== -1 ? true : false}
-                        />
-                        {freeToppings.toppingsName}
-                      </label>
-                      <div
-                        className='d-flex justify-content-between align-items-center'
-                        style={{ width: "12rem" }}
+                {/* {console.log(
+                  toppingsData?.toppings?.freeToppings,
+                  "toppings?.price"
+                )} */}
+
+                {toppingsData?.toppings?.freeToppings?.map(
+                  (freeToppings, index) => {
+                    console.log();
+                    const comm = pizzaState[
+                      count - 1
+                    ]?.toppings?.freeToppings.findIndex(
+                      (item) => item.toppingsCode === freeToppings.toppingsCode
+                    );
+                    return (
+                      <li
+                        className='list-group-item d-flex justify-content-between align-items-center'
+                        key={freeToppings.toppingsCode}
                       >
-                        <p
-                          className='mx-2 mb-0 text-end'
-                          style={{ width: "35%" }}
-                        >
-                          $ 0
-                        </p>
-                        <select
-                          className='form-select d-inline-block'
-                          style={{ width: "65%" }}
-                          onChange={(e) => {
-                            handleFreeToppingsPlacementChange(
-                              e,
-                              count,
-                              freeToppings.toppingsCode
-                            );
-                          }}
-                        >
-                          <option value='lefthalf'>Left Half</option>
-                          <option value='righthalf'>Right Half</option>
-                          <option
-                            value='whole'
-                            selected={
-                              pizzaState[count - 1]?.toppings?.freeToppings
-                                ?.length === 0
-                                ? true
-                                : false
+                        <label className=''>
+                          <input
+                            type='checkbox'
+                            className='mx-3 d-inline-block'
+                            onChange={(e) =>
+                              handleFreeToppings(e, count, freeToppings)
                             }
+                            checked={comm !== -1 ? true : false}
+                          />
+                          {freeToppings.toppingsName}
+                        </label>
+                        <div
+                          className='d-flex justify-content-between align-items-center'
+                          style={{ width: "12rem" }}
+                        >
+                          <p
+                            className='mx-2 mb-0 text-end'
+                            style={{ width: "35%" }}
                           >
-                            Whole
-                          </option>
-                        </select>
-                      </div>
-                    </li>
-                  );
-                })}
+                            $ {freeToppings?.price}
+                          </p>
+                          {console.log(
+                            pizzaState[count - 1],
+                            count,
+                            "pizza state array"
+                          )}
+                          <select
+                            className='form-select d-inline-block'
+                            style={{ width: "65%" }}
+                            value={
+                              pizzaState[count - 1]?.toppings?.freeToppings[
+                                index
+                              ]?.placement
+                            }
+                            onChange={(e) => {
+                              handleFreeToppingsPlacementChange(
+                                e,
+                                count,
+                                freeToppings.toppingsCode
+                              );
+                            }}
+                          >
+                            <option
+                              value='whole'
+                              selected={
+                                pizzaState[count - 1]?.toppings?.freeToppings
+                                  ?.length === 0
+                                  ? true
+                                  : false
+                              }
+                            >
+                              Whole
+                            </option>
+                            <option value='lefthalf'>Left Half</option>
+                            <option value='righthalf'>Right Half</option>
+                          </select>
+                        </div>
+                      </li>
+                    );
+                  }
+                )}
               </div>
             </div>
           </div>

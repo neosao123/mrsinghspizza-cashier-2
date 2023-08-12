@@ -245,6 +245,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         placement: selectedValue,
       };
     }
+    console.log(arr, "pizza order ");
     setPizzaState(arr);
   };
   const handleCountAsOneToppingsPlacementChange = (
@@ -278,7 +279,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   };
   const handleFreeToppings = (e, count, freeToppings) => {
     const { checked } = e.target;
-    console.log(checked, "toppings");
+    console.log(freeToppings, "toppings?.price");
     if (checked) {
       let arr = [...pizzaState];
       const tempFreeToppings = [
@@ -290,6 +291,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         ...arr[count - 1].toppings,
         freeToppings: tempFreeToppings,
       };
+      console.log(arr, "pizza state array");
       setPizzaState(arr);
 
       console.log(freeToppings, "selected freeToppings");
@@ -341,7 +343,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   useEffect(() => {
     specialIngredients();
     dispatch(setDisplaySpecialForm(false));
-  }, []); 
+  }, []);
 
   //Component - Special Pizza Selection
   const elements = [];
@@ -620,18 +622,12 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
     // Iterate through pizzaState
     pizzaState?.forEach((item) => {
-      // Add prices for cheese, crust, special bases
-      console.log("item?.cheese?.price ", item?.cheese?.price);
-      console.log("item?.cheese?.price ", item?.crust?.price);
-      console.log("item?.cheese?.price ", item?.specialbasess?.price);
       totalPrice += item?.cheese?.price ? Number(item?.cheese?.price) : 0;
       totalPrice += item?.crust?.price ? Number(item?.crust?.price) : 0;
       totalPrice += item?.specialbases?.price
         ? Number(item?.specialbases?.price)
         : 0;
 
-      // Add prices for countAsOneToppings
-      console.log("Initial totalPrice: Base pizza price:", totalPrice);
       // item?.toppings?.countAsOneToppings?.forEach((toppings, index) => {
       //   if (
       //     item?.toppings?.countAsOneToppings.length <=
@@ -648,47 +644,50 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       // });
 
       // Add prices for countAsTwoToppings
-      // item?.toppings?.countAsTwoToppings?.forEach((toppings) => {
-      //   totalPrice += Number(toppings?.price);
-      //   console.log("Initial totalPrice: Base pizza price:", totalPrice);
-      // });
+      item?.toppings?.countAsTwoToppings?.forEach((toppings) => {
+        totalPrice += Number(toppings?.price);
+        console.log("Initial totalPrice: Base pizza price:", totalPrice);
+      });
+      item?.toppings?.countAsOneToppings?.forEach((toppings) => {
+        totalPrice += Number(toppings?.price);
+        console.log("Initial totalPrice: Base pizza price:", totalPrice);
+      });
 
       // Add prices for freeToppings
-      // item?.toppings?.freeToppings?.forEach((toppings) => {
-      //   totalPrice += Number(toppings?.price);
-      //   console.log("Initial totalPrice: Base pizza price:", totalPrice);
-      // });
+      item?.toppings?.freeToppings?.forEach((toppings) => {
+        console.log(toppings?.price, "toppings?.price");
+        totalPrice += Number(toppings?.price);
+        console.log("Initial totalPrice: Base pizza price:", totalPrice);
+      });
     });
 
     // Iterate through dipsArr
-    // dipsArr?.forEach((item) => {
-    //   totalPrice += Number(item?.price) * Number(item?.qty);
-    //   console.log("Initial totalPrice: Base pizza price:", totalPrice);
-    // });
+    dipsArr?.forEach((item) => {
+      totalPrice += Number(item?.price) * Number(item?.qty);
+      console.log("Initial totalPrice: Base pizza price:", totalPrice);
+    });
 
     // // Iterate through sidesArr
-    // sidesArr?.forEach((item) => {
-    //   totalPrice += Number(item?.lineEntries[0]?.price);
-    //   console.log("Initial totalPrice: Base pizza price:", totalPrice);
-    // });
+    sidesArr?.forEach((item) => {
+      totalPrice += Number(item?.lineEntries[0]?.price);
+      console.log("Initial totalPrice: Base pizza price:", totalPrice);
+    });
 
-    // // Iterate through drinksArr
-    // drinksArr?.forEach((drinks) => {
-    //   drinks[0]?.forEach((drinks) => {
-    //     totalPrice += Number(drinks?.price);
-    //   });
-    //   drinks[1]?.forEach((drinks) => {
-    //     totalPrice += Number(drinks?.price);
-    //   });
+    // Iterate through drinksArr
+    drinksArr?.forEach((drinks) => {
+      totalPrice += Number(drinks?.price);
+    });
+    // drinks[1]?.forEach((drinks) => {
+    //   totalPrice += Number(drinks?.price);
+    // });
 
     //   // totalPrice += Number(drinks?.price);
     //   console.log("Initial totalPrice: Base pizza price:", totalPrice);
-    // });
 
-    // // Iterate through popsArr
+    // Iterate through popsArr
     // popsArr?.forEach((item) => {
     //   totalPrice += Number(item?.price);
-    //   console.log("Initial totalPrice: Base pizza price:", totalPrice);
+    //   // console.log("Initial totalPrice: Base pizza price:", totalPrice);
     // });
 
     // Set the calculated price
@@ -700,20 +699,20 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     console.log("Initial totalPrice: Base pizza price:", totalPrice);
   };
 
-  // useEffect(() => {
-  //   console.log(popsArr, "popsArr");
+  useEffect(() => {
+    console.log(drinksArr, "drinksArr");
+    console.log(popsArr, "drinksArr");
 
-  //   calculatePrice();
-  // }, [
-  //   pizzaState,
-
-  // sidesArr,
-  // dipsArr,
-  // selectedLineEntries,
-  // pizzaSize,
-  // drinksArr,
-  // popsArr,
-  // ]);
+    calculatePrice();
+  }, [
+    pizzaState,
+    sidesArr,
+    dipsArr,
+    selectedLineEntries,
+    pizzaSize,
+    drinksArr,
+    popsArr,
+  ]);
   useEffect(() => {
     // console.log(getSpecialData);
     if (getSpecialData) {
@@ -807,10 +806,13 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                 </label>
                                 <div style={{ width: "12rem" }}>
                                   <select
-                                    // value={selectedLineEntries}
+                                    value={
+                                      comm !== -1
+                                        ? sidesArr[comm]?.lineEntries[0]?.code
+                                        : ""
+                                    }
                                     className='form-select w-100 d-inline-block'
                                     onChange={(e) => {
-                                      // setSelectedLineEntries(e.target.value);
                                       handleSidelineEntries(e, sidesData);
                                     }}
                                   >
@@ -851,13 +853,13 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                     <h6 className='text-left mt-1 mb-2'>Dips</h6>
                     <div id='dips' className='mb-3'>
                       <ul className='list-group'>
-                        {dipsData?.map((data) => {
+                        {dipsData?.map((data, index) => {
                           console.log(dipsArr, "dips map");
                           const comm = dipsArr?.findIndex(
                             (item) => item.dipsCode === data.dipsCode
                           );
-                          console.log(dipsArr, "comm dips");
-                          console.log(comm, "comm dips");
+                          console.log(dipsArr, "comm dips" + index);
+                          console.log(comm, "comm dips" + index);
 
                           return (
                             <li className='list-group-item' key={data.dipsCode}>
@@ -877,6 +879,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                   type='number'
                                   defaultValue={1}
                                   min={1}
+                                  value={
+                                    dipsArr[comm]?.qty ? dipsArr[comm]?.qty : 1
+                                  }
                                   className='form-control mx-2'
                                   style={{ width: "75px" }}
                                   onChange={(e) => handleDipsCount(e, data)}

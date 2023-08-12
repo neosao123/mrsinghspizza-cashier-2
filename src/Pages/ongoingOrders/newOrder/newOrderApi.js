@@ -7,3 +7,8 @@ export const allIngredientsApi = async () => {
 export const sidesApi = async () => {
   return await privateAPi.get("/sides");
 };
+export const isZipCodeDelivarable = async (payload) => {
+  return await privateAPi.post("/zipcode/check/deliverable", {
+    zipcode: payload.toString(),
+  });
+};

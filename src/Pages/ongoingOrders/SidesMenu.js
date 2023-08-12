@@ -17,6 +17,7 @@ function SidesMenu({
   const [sidesData, setSidesData] = useState();
   const [quantity, setQuantity] = useState(1);
   const [sidesArr, setSidesArr] = useState([]);
+  const [comments, setComments] = useState("");
   let cartdata = useSelector((state) => state.cart.cart);
   const dispatch = useDispatch();
 
@@ -112,14 +113,13 @@ function SidesMenu({
           sidesSize: selectedCombinationObj[0].size,
         },
         quantity: 1,
-        price: selectedCombinationObj.price,
+        price: selectedCombinationObj[0].price,
         amount: totalAmount.toFixed(2),
         discountAmount: discount,
         taxPer: taxPer,
+        pizzaSize: "",
+        comments: "",
       };
-      // let index = sidesData?.findIndex(
-      //   (item) => item.sideCode === side.sideCode
-      // );
       let temp = sidesData.map((item) => {
         return {
           ...item,
@@ -151,6 +151,7 @@ function SidesMenu({
     if (payloadEdit !== undefined && payloadEdit.productType === "side") {
       console.log("editt", payloadEdit);
       const payloadForEdit = {
+        id: payloadEdit?.id,
         customerCode: customerCode ? customerCode : "#NA",
         productCode: selectedSide[0].sideCode,
         productName: selectedSide[0].sideName,
@@ -164,6 +165,8 @@ function SidesMenu({
         amount: totalAmount.toFixed(2),
         discountAmount: discount,
         taxPer: taxPer,
+        pizzaSize: "",
+        comments: "",
       };
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
@@ -184,7 +187,7 @@ function SidesMenu({
 
       setQuantity(1);
     } else {
-      console.log(selectedCombination[0]?.price, "cartdata");
+      console.log(selectedCombination[0]?.price, "selectedCombination price");
       const payload = {
         id: uuidv4(),
         customerCode: customerCode ? customerCode : "#NA",
@@ -202,6 +205,8 @@ function SidesMenu({
         amount: totalAmount.toFixed(2),
         discountAmount: discount,
         taxPer: taxPer,
+        pizzaSize: "",
+        comments: "",
       };
       console.log(payload);
       // let index = sidesData?.findIndex(

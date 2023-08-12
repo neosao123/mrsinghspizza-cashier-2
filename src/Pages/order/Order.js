@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from "react";
 import Nav from "../../layout/Nav";
 import "../../css/orders.css";
-import { orderDetails, orderListApi } from "../../API/order";
+import {
+  allDeliveryExecutiveApi,
+  changeDeliveryExecutive,
+  orderDetails,
+  orderListApi,
+} from "../../API/order";
+import { ToastContainer, toast } from "react-toastify";
 
 function Order() {
   const [listData, setListData] = useState();
   const [orderFrom, setOrderFrom] = useState("all");
   const [orderDetail, setOrderDetail] = useState();
   const [orderId, setOrderId] = useState();
+  const [allDeliveryExecutiveData, setAllDeliveryExecutiveData] = useState();
+  const [updatedDeliveryExecutive, setUpdatedDeliveryExecutive] = useState();
 
   const orderList = async () => {
     let cashierCode = localStorage.getItem("cashierCode");
@@ -19,10 +27,40 @@ function Order() {
         console.log("ERROR From Order List API : ", err);
       });
   };
+  const handleDeliveryExecutiveChange = (payload) => {
+    console.log(payload, "Order Detail :");
+    if (payload !== "") {
+      setUpdatedDeliveryExecutive(payload);
+    }
+  };
   const getOrderDetailsApi = async () => {
     await orderDetails({ orderCode: orderId }).then((res) => {
       setOrderDetail(res.data.data);
     });
+  };
+  const updateDeliveryExecutive = async () => {
+    if (updatedDeliveryExecutive !== "") {
+      await changeDeliveryExecutive({
+        orderCode: orderId,
+        deliveryExecutiveCode: updatedDeliveryExecutive,
+      })
+        .then((res) => {
+          toast.success(res.data.message);
+          getOrderDetailsApi();
+          setUpdatedDeliveryExecutive();
+        })
+        .catch((err) => toast.error(err?.response?.data.message));
+    } else {
+      toast.error("select delivery executive");
+    }
+  };
+
+  const getAllDeliveryExecutive = async () => {
+    await allDeliveryExecutiveApi()
+      .then((res) => {
+        setAllDeliveryExecutiveData(res.data.data);
+      })
+      .catch((err) => console.log(err));
   };
   useEffect(() => {
     console.log(orderDetail, "orderDetail");
@@ -37,6 +75,7 @@ function Order() {
   useEffect(() => {
     orderList();
     setOrderDetail();
+    getAllDeliveryExecutive();
   }, [orderFrom]);
 
   return (
@@ -44,7 +83,7 @@ function Order() {
       <Nav />
       <div className='container-fluid'>
         <div className='row'>
-          <div className='col-lg-3 p-0 vh-100 text-center main'>
+          <div className='col-lg-4 p-0   text-center main'>
             <div className='card'>
               <div className='selectDiv p-0'>
                 <select
@@ -71,73 +110,83 @@ function Order() {
                     {orderFrom.toLocaleUpperCase()}
                   </h6>
                 )}
-                <ul className='list-group list-group-flush'>
-                  {listData?.map((data) => {
-                    return (
-                      <li
-                        className='list-group-item p-1 orderList'
-                        key={data.code}
-                        onClick={() => setOrderId(data.code)}
-                      >
-                        <div className='d-flex px-3 my-1 justify-content-between align-items-center'>
-                          <div>
-                            <span>
-                              <strong>#</strong>
-                            </span>
-                            <span className='mx-3'>{data.code}</span>
+                <div
+                  className='overflow-scroll'
+                  style={{ height: "calc(100vh - 147px)" }}
+                >
+                  <ul className='list-group list-group-flush'>
+                    {listData?.map((data) => {
+                      return (
+                        <li
+                          className='list-group-item p-1 orderList'
+                          key={data.code}
+                          onClick={() => setOrderId(data.code)}
+                        >
+                          <div className='d-flex px-3 my-1 justify-content-between align-items-center'>
+                            <div>
+                              <span>
+                                <strong>#</strong>
+                              </span>
+                              <span className='mx-3'>{data.code}</span>
+                            </div>
+                            <div>
+                              <span className='mx-3'>$ {data.grandTotal}</span>
+                            </div>
+                            <div className='d-flex my-1 justify-content-end '>
+                              <span>
+                                <i
+                                  class='fa fa-map-marker'
+                                  aria-hidden='true'
+                                ></i>
+                              </span>
+                              <span className='mx-2 badge bg-info'>Store</span>
+                            </div>
+                            <div className='d-flex my-1 justify-content-end'>
+                              <span>
+                                <i class='fa fa-check' aria-hidden='true'></i>
+                              </span>
+                              <span className='mx-2 badge bg-secondary'>
+                                {data?.deliveryType}
+                              </span>
+                            </div>
+                            <div className='d-flex my-1 justify-content-end'>
+                              <span>
+                                <i class='fa fa-trash' aria-hidden='true'></i>
+                              </span>
+                              <span className='mx-2 badge bg-danger'>
+                                Cancel
+                              </span>
+                            </div>
                           </div>
-                          <div>
-                            <span className='mx-3'>$ {data.grandTotal}</span>
+                          <div className='d-flex justify-content-between'>
+                            <div className='d-flex px-3 my-1 justify-content-start'>
+                              <span>
+                                <i class='fa fa-user' aria-hidden='true'></i>
+                              </span>
+                              <span className='mx-3'>{data.customerName}</span>
+                            </div>
+                            <div className='d-flex px-3 my-1 justify-content-end'>
+                              <span className='mx-2'>
+                                <i class='fa fa-phone' aria-hidden='true'></i>
+                              </span>
+                              <span className='mx-2'>{data.mobileNumber}</span>
+                            </div>
                           </div>
-                          <div className='d-flex my-1 justify-content-end '>
-                            <span>
-                              <i
-                                class='fa fa-map-marker'
-                                aria-hidden='true'
-                              ></i>
-                            </span>
-                            <span className='mx-2 badge bg-info'>Store</span>
-                          </div>
-                          <div className='d-flex my-1 justify-content-end'>
-                            <span>
-                              <i class='fa fa-check' aria-hidden='true'></i>
-                            </span>
-                            <span className='mx-2 badge bg-warning'>
-                              Picked Up
-                            </span>
-                          </div>
-                          <div className='d-flex my-1 justify-content-end'>
-                            <span>
-                              <i class='fa fa-trash' aria-hidden='true'></i>
-                            </span>
-                            <span className='mx-2 badge bg-danger'>Cancel</span>
-                          </div>
-                        </div>
-                        <div className='d-flex justify-content-between'>
-                          <div className='d-flex px-3 my-1 justify-content-start'>
-                            <span>
-                              <i class='fa fa-user' aria-hidden='true'></i>
-                            </span>
-                            <span className='mx-3'>{data.customerName}</span>
-                          </div>
-                          <div className='d-flex px-3 my-1 justify-content-end'>
-                            <span className='mx-2'>
-                              <i class='fa fa-phone' aria-hidden='true'></i>
-                            </span>
-                            <span className='mx-2'>{data.mobileNumber}</span>
-                          </div>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
           {orderDetail && (
-            <div className='col-lg-9'>
+            <div
+              className='col-lg-8 overflow-scroll'
+              style={{ height: "calc(100vh - 147px)" }}
+            >
               <div
-                className='col-11  m-5 px-5 py-1 rounded vh-100'
+                className='m-5 px-5 p-4 rounded vh-100'
                 style={{ backgroundColor: "#ff8c0021" }}
               >
                 <div className='col-12 d-flex justify-content-between my-3'>
@@ -184,12 +233,14 @@ function Order() {
                   </div>
                 </div>
                 <div className='col-12 d-flex justify-content-end'>
-                  <div
+                  <button
                     className='btn text-white  m-2'
                     style={{ backgroundColor: "#ff8c00" }}
+                    data-bs-toggle='modal'
+                    data-bs-target='#exampleModal'
                   >
                     Change Delivery Person
-                  </div>
+                  </button>
                 </div>
                 <div className='col-12'>
                   <h5>Product Detail :</h5>
@@ -268,7 +319,7 @@ function Order() {
                       <td></td>
                       <td></td>
                       <th>Delivery Charges:</th>
-                      <td>$ 0</td>
+                      <td>$ {orderDetail?.deliveryCharges}</td>
                     </tr>
                     <tr>
                       <td></td>
@@ -284,6 +335,65 @@ function Order() {
           )}
         </div>
       </div>
+      <div
+        class='modal fade'
+        id='exampleModal'
+        tabindex='-1'
+        aria-labelledby='exampleModalLabel'
+        aria-hidden='true'
+      >
+        <div class='modal-dialog modal-dialog-centered'>
+          <div class='modal-content'>
+            <div class='modal-header'>
+              <h5 class='modal-title'>Change Delivery Executive</h5>
+              <button
+                type='button'
+                class='btn-close'
+                data-bs-dismiss='modal'
+                aria-label='Close'
+              ></button>
+            </div>
+            <div class='modal-body'>
+              <select
+                class='form-select form-select-sm'
+                aria-label='.form-select-sm example'
+                value={updatedDeliveryExecutive?.code}
+                onChange={(e) => handleDeliveryExecutiveChange(e.target.value)}
+              >
+                <option selected value={""}>
+                  Choose Delivery Executive
+                </option>
+                {allDeliveryExecutiveData?.map((executive) => {
+                  return (
+                    <option value={executive?.code} key={executive?.code}>
+                      {executive.firstName} {executive.lastName}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <div class='modal-footer'>
+              <button
+                type='button'
+                class='btn btn-secondary'
+                data-bs-dismiss='modal'
+              >
+                Close
+              </button>
+              <button
+                type='button'
+                style={{ backgroundColor: "#ff8c00" }}
+                class='btn text-white'
+                data-bs-dismiss='modal'
+                onClick={updateDeliveryExecutive}
+              >
+                Save changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ToastContainer position='top-center' />
     </>
   );
 }

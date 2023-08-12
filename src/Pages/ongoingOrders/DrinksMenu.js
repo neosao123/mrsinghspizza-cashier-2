@@ -126,12 +126,20 @@ function DrinksMenu({
         productType: "dips",
         quantity: 1,
         config: {
-          drinks: drinksArr,
+          drinks: [
+            {
+              drinksCode: drink?.softdrinkCode,
+              drinksName: drink?.softDrinksName,
+              drinksPrice: drink?.price,
+            },
+          ],
         },
         price: drink?.price,
         amount: drink?.price,
         discountAmount: discount,
         taxPer: taxPer,
+        pizzaSize: "",
+        comments: "",
       };
 
       addToCartAndResetQty(
@@ -165,18 +173,31 @@ function DrinksMenu({
         amount: totalAmount.toFixed(2),
         discountAmount: discount,
         taxPer: taxPer,
+        pizzaSize: "",
+        comments: "",
       };
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
       );
       console.log(payloadEdit, payloadForEdit, "pppp");
+
       let tempPayload = [...cartdata];
       tempPayload[updatedCart] = payloadForEdit;
       dispatch(addToCart([...tempPayload]));
       toast.success(
         `${selectedDrinks[0].softDrinksName} ` + "Updated Successfully"
       );
+
       setPayloadEdit();
+      let temp = softDrinksData.map((item) => {
+        return {
+          ...item,
+          qty: 1,
+        };
+      });
+      console.log(temp, "temp");
+      setSoftDrinksData(temp);
+      setDrinksArr([]);
     } else {
       const payload = {
         id: uuidv4(),
@@ -194,6 +215,8 @@ function DrinksMenu({
         amount: totalAmount.toFixed(2),
         discountAmount: discount,
         taxPer: taxPer,
+        pizzaSize: "",
+        comments: "",
       };
       addToCartAndResetQty(
         dispatch,
@@ -278,6 +301,7 @@ function DrinksMenu({
                     <input
                       type='number'
                       defaultValue={1}
+                      min={0}
                       value={obj !== undefined ? obj.qty : data.qty}
                       className='form-control'
                       style={{ width: "20%" }}

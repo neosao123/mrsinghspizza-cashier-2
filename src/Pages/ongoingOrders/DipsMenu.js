@@ -107,6 +107,8 @@ function DipsMenu({
         amount: dipsitem?.price,
         discountAmount: discount,
         taxPer: taxPer,
+        pizzaSize: "",
+        comments: "",
       };
 
       addToCartAndResetQty(
@@ -156,6 +158,8 @@ function DipsMenu({
         amount: totalAmount.toFixed(2),
         discountAmount: discount,
         taxPer: taxPer,
+        pizzaSize: "",
+        comments: "",
       };
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
@@ -192,6 +196,8 @@ function DipsMenu({
         amount: totalAmount.toFixed(2),
         discountAmount: discount,
         taxPer: taxPer,
+        pizzaSize: "",
+        comments: "",
       };
 
       addToCartAndResetQty(

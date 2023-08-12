@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import "../../css/ongoingOrder.css";
 import Nav from "../../layout/Nav";
 import SpecialMenu from "./SpecialMenu";
+
 import CreateYourOwn from "../../components/order/CreateYourOwn";
 import {
   deleteCartItemApi,
@@ -25,7 +26,11 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import IntlTelInput from "react-intl-tel-input";
 import "react-intl-tel-input/dist/main.css";
-import { allIngredientsApi, sidesApi } from "./newOrder/newOrderApi";
+import {
+  allIngredientsApi,
+  isZipCodeDelivarable,
+  sidesApi,
+} from "./newOrder/newOrderApi";
 import {
   pizzaIngredients,
   sidesIngredient,
@@ -34,6 +39,8 @@ import Cart from "./cart";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, setDisplaySpecialForm } from "../../reducer/cartReducer";
 import { getSpecialDetails } from "./specialMenu/specialMenuCustomApiHandler";
+import { useDebounce } from "./newOrder/newOrderFunctions";
+import NotDeliverableModel from "./newOrder/model";
 
 function NewOrder() {
   // const [show, setShow] = useState(false);
@@ -56,6 +63,10 @@ function NewOrder() {
   const globalCtx = useContext(GlobalContext);
   const [cartItemDetails, setCartItemDetails] = globalCtx.cartItem;
   const [orderData, setOrderData] = useState();
+  const [isZipcodeAvailable, setIsZipcodeAvailable] = useState(true);
+  const [extraDeliveryCharges, setExtraDeliveryCharges] = useState(0);
+  const [applyExtraDeliveryCharges, setApplyExtraDeliveryCharges] =
+    useState(false);
   const canadianPhoneNumberRegExp = /^\d{3}\d{3}\d{4}$/;
   const createYourOwnRef = useRef(null);
   const specialTabRef = useRef(null);
@@ -63,6 +74,8 @@ function NewOrder() {
   const dispatch = useDispatch();
   const sidesRef = useRef(null);
   const drinksRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
+
   const handleProductClick = (productType) => {
     console.log("productType", productType);
     switch (productType) {
@@ -102,12 +115,18 @@ function NewOrder() {
     console.log(item.amount, "item");
     totalPrice += Number(item.amount);
   });
+  const delivery_charges = settingsData?.filter(
+    (item) => item.settingName === "Delivery Charges"
+  )[0].settingValue;
+  // console.log(taxPer, "delivery_charges");
 
   const discountedTotalPrice = totalPrice - discount;
   const taxAmount = (discountedTotalPrice * taxPer) / 100;
-  const grandTotal = discountedTotalPrice + taxAmount;
-
-  console.log(totalPrice, "");
+  const grandTotal =
+    discountedTotalPrice +
+    taxAmount +
+    Number(delivery_charges) +
+    Number(extraDeliveryCharges);
 
   const initialValues = {
     phoneno: "",
@@ -135,13 +154,13 @@ function NewOrder() {
   //deliver executive
   useEffect(() => {
     if (storesLocationData !== undefined) {
-      deliverExecutive(storesLocationData[0]?.code);
+      deliveryExecutive(storesLocationData[0]?.code);
     }
 
     console.log(storesLocationData, "storesLocationData");
   }, [storesLocationData]);
 
-  const deliverExecutive = async (payload) => {
+  const deliveryExecutive = async (payload) => {
     await deliveryExecutiveApi(payload).then((res) => {
       setDeliverExectiveList(res.data.data);
     });
@@ -240,9 +259,10 @@ function NewOrder() {
           deliveryCharges: settingsData?.filter(
             (item) => item.settingName === "Delivery Charges"
           )[0].settingValue,
-          extraDeliveryCharges: 0,
+          extraDeliveryCharges: extraDeliveryCharges ? extraDeliveryCharges : 0,
           grandTotal: grandTotal,
         };
+        console.log(payload, "Final Order :");
 
         const response = await orderPlaceApi(payload);
 
@@ -269,280 +289,35 @@ function NewOrder() {
       // return false;
     },
   });
-  // const payload = {
-  //   cartCode: localStorage.getItem("cartCode"),
-  //   customerName: values.customername,
-  //   mobileNumber: values.phoneno,
-  //   address: values.address,
-  //   deliveryType: "pickup",
-  //   storeLocation: values.stores,
-  // };
+  const debouncedInputValue = useDebounce(formik.values.zipcode, 2000);
+  const fetchZipcodeIsDeliverable = async (zipcode) => {
+    // Make your API call here with searchTerm
+    console.log("API call triggered with input:", zipcode);
+    await isZipCodeDelivarable(zipcode)
+      .then((res) => {
+        setIsZipcodeAvailable(res.data.deliverable);
+        res.data.deliverable ? setIsOpen(false) : setIsOpen(true);
+      })
+      .catch((err) => toast.error(err?.response?.data?.message));
+  };
 
-  // const data = {
-  //   cashierCode: "CST_1",
-  //   customerName: "seema shelar",
-  //   mobileNumber: "7875544444",
-  //   address: "kolhapur",
-  //   zipCode: "",
-  //   deliveryType: "pickup",
-  //   storeLocation: "STR_1",
-  //   deliveryExecutive: "USR_1",
-  //   products: [
-  //     {
-  //       productCode: "SPO_8",
-  //       productName: "Thin Pizza With Burger",
-  //       productType: "specials",
-  //       config: {
-  //         pizza: [
-  //           {
-  //             crust: {
-  //               crustCode: "CR_2",
-  //               crustName: "Gluten",
-  //               crustPrice: "0",
-  //             },
-  //             cheese: {
-  //               cheeseCode: "CHE_2",
-  //               cheeseName: "Feta",
-  //               cheesePrice: "0",
-  //             },
-  //             specialBases: {
-  //               specialbaseCode: "SPB_6",
-  //               specialbaseName: "Tandoori",
-  //               specialbasePrice: "2.00",
-  //             },
-  //             toppings: {
-  //               countAsTwoToppings: [
-  //                 {
-  //                   toppingsCode: "TOP_42",
-  //                   toppingsName: "VEGAN PANEER",
-  //                   toppingsPrice: "10.00",
-  //                   toppingsPlacement: "righthalf",
-  //                 },
-  //               ],
-  //               countAsOneToppings: [
-  //                 {
-  //                   toppingsCode: "TOP_49",
-  //                   toppingsName: "Thick Crust",
-  //                   toppingsPrice: "10.00",
-  //                   toppingsPlacement: "righthalf",
-  //                 },
-  //                 {
-  //                   toppingsCode: "TOP_48",
-  //                   toppingsName: "Red Chilli",
-  //                   toppingsPrice: "10.00",
-  //                   toppingsPlacement: "whole",
-  //                 },
-  //               ],
-  //               freeToppings: [
-  //                 {
-  //                   toppingsCode: "TOP_49",
-  //                   toppingsName: "Thick Crust",
-  //                   toppingsPrice: "10.00",
-  //                   toppingsPlacement: "righthalf",
-  //                 },
-  //                 {
-  //                   toppingsCode: "TOP_46",
-  //                   toppingsName: "Ginger",
-  //                   toppingsPrice: "10.00",
-  //                   toppingsPlacement: "whole",
-  //                 },
-  //                 {
-  //                   toppingsCode: "TOP_47",
-  //                   toppingsName: "Green Chilli",
-  //                   toppingsPrice: "10.00",
-  //                   toppingsPlacement: "whole",
-  //                 },
-  //               ],
-  //             },
-  //           },
-  //         ],
-  //         sides: [
-  //           {
-  //             sidesCode: "SD_25",
-  //             sidesName: "Shahi Paneer",
-  //             sidesType: "poutine",
-  //             lineCode: "SDL_38",
-  //             sidesPrice: "12.99",
-  //             sidesSize: "1 BOC",
-  //           },
-  //           {
-  //             sidesCode: "SD_24",
-  //             sidesName: "Tandoori Paneer",
-  //             sidesType: "poutine",
-  //             lineCode: "SDL_37",
-  //             sidesPrice: "12.99",
-  //             sidesSize: "1 BOX",
-  //           },
-  //           {
-  //             sidesCode: "SD_11",
-  //             sidesName: "Mushroom Bites",
-  //             sidesType: "side",
-  //             lineCode: "SDL_18",
-  //             sidesPrice: "12.99",
-  //             sidesSize: "10 PIECES",
-  //           },
-  //         ],
-  //         dips: [
-  //           {
-  //             dipsCode: "DI_2",
-  //             dipsName: "Chilli Chipotle",
-  //             dipsPrice: "1.50",
-  //           },
-  //         ],
-  //         drinks: [
-  //           {
-  //             drinksCode: "SFD_3",
-  //             drinksName: "6 Pops",
-  //             drinksPrice: "5.99",
-  //           },
-  //           {
-  //             drinksCode: "SFD_4",
-  //             drinksName: "1 Can",
-  //             drinksPrice: "4.99",
-  //           },
-  //         ],
-  //       },
-  //       quantity: "2",
-  //       price: "100",
-  //       amount: "200",
-  //       pizzaSize: "large",
-  //       comments: "test",
-  //     },
-  //     // {
-  //     //   productCode: "SPO_8",
-  //     //   productName: "Thin Pizza With Burger",
-  //     //   productType: "specials",
-  //     //   config: {
-  //     //     pizza: [
-  //     //       {
-  //     //         crust: {
-  //     //           crustCode: "CR_2",
-  //     //           crustName: "Gluten",
-  //     //           crustPrice: "0",
-  //     //         },
-  //     //         cheese: {
-  //     //           cheeseCode: "CHE_2",
-  //     //           cheeseName: "Feta",
-  //     //           cheesePrice: "0",
-  //     //         },
-  //     //         specialBases: {
-  //     //           specialbaseCode: "SPB_6",
-  //     //           specialbaseName: "Tandoori",
-  //     //           specialbasePrice: "2.00",
-  //     //         },
-  //     //         toppings: {
-  //     //           countAsTwoToppings: [
-  //     //             {
-  //     //               toppingsCode: "TOP_42",
-  //     //               toppingsName: "VEGAN PANEER",
-  //     //               toppingsPrice: "10.00",
-  //     //               toppingsPlacement: "righthalf",
-  //     //             },
-  //     //           ],
-  //     //           countAsOneToppings: [
-  //     //             {
-  //     //               toppingsCode: "TOP_49",
-  //     //               toppingsName: "Thick Crust",
-  //     //               toppingsPrice: "10.00",
-  //     //               toppingsPlacement: "righthalf",
-  //     //             },
-  //     //             {
-  //     //               toppingsCode: "TOP_48",
-  //     //               toppingsName: "Red Chilli",
-  //     //               toppingsPrice: "10.00",
-  //     //               toppingsPlacement: "whole",
-  //     //             },
-  //     //           ],
-  //     //           freeToppings: [
-  //     //             {
-  //     //               toppingsCode: "TOP_49",
-  //     //               toppingsName: "Thick Crust",
-  //     //               toppingsPrice: "10.00",
-  //     //               toppingsPlacement: "righthalf",
-  //     //             },
-  //     //             {
-  //     //               toppingsCode: "TOP_46",
-  //     //               toppingsName: "Ginger",
-  //     //               toppingsPrice: "10.00",
-  //     //               toppingsPlacement: "whole",
-  //     //             },
-  //     //             {
-  //     //               toppingsCode: "TOP_47",
-  //     //               toppingsName: "Green Chilli",
-  //     //               toppingsPrice: "10.00",
-  //     //               toppingsPlacement: "whole",
-  //     //             },
-  //     //           ],
-  //     //         },
-  //     //       },
-  //     //     ],
-  //     //     sides: [
-  //     //       {
-  //     //         sidesCode: "SD_25",
-  //     //         sidesName: "Shahi Paneer",
-  //     //         sidesType: "poutine",
-  //     //         lineCode: "SDL_38",
-  //     //         sidesPrice: "12.99",
-  //     //         sidesSize: "1 BOC",
-  //     //       },
-  //     //       {
-  //     //         sidesCode: "SD_24",
-  //     //         sidesName: "Tandoori Paneer",
-  //     //         sidesType: "poutine",
-  //     //         lineCode: "SDL_37",
-  //     //         sidesPrice: "12.99",
-  //     //         sidesSize: "1 BOX",
-  //     //       },
-  //     //       {
-  //     //         sidesCode: "SD_11",
-  //     //         sidesName: "Mushroom Bites",
-  //     //         sidesType: "side",
-  //     //         lineCode: "SDL_18",
-  //     //         sidesPrice: "12.99",
-  //     //         sidesSize: "10 PIECES",
-  //     //       },
-  //     //     ],
-  //     //     dips: [
-  //     //       {
-  //     //         dipsCode: "DI_2",
-  //     //         dipsName: "Chilli Chipotle",
-  //     //         dipsPrice: "1.50",
-  //     //       },
-  //     //     ],
-  //     //     drinks: [
-  //     //       {
-  //     //         drinksCode: "SFD_3",
-  //     //         drinksName: "6 Pops",
-  //     //         drinksPrice: "5.99",
-  //     //       },
-  //     //       {
-  //     //         drinksCode: "SFD_4",
-  //     //         drinksName: "1 Can",
-  //     //         drinksPrice: "4.99",
-  //     //       },
-  //     //     ],
-  //     //   },
-  //     //   quantity: "2",
-  //     //   price: "100",
-  //     //   amount: "200",
-  //     //   pizzaSize: "large",
-  //     //   comments: "test",
-  //     // },
-  //   ],
-  //   subtotal: "",
-  //   discountAmount: "10",
-  //   taxPer: "5",
-  //   taxAmount: "",
-  //   deliveryCharges: "",
-  //   extraDeliveryCharges: "",
-  //   grandTotal: "",
-  // };
+  useEffect(() => {
+    if (formik.values.zipcode.length > 0) {
+      fetchZipcodeIsDeliverable(formik.values.zipcode);
+      console.log("API call triggered with input:", formik.values.zipcode);
+    }
+  }, [debouncedInputValue]);
+
   console.log(cartdata, "cartdata");
   useEffect(() => {
     console.log(
       settingsData?.filter((item) => item.settingName === "Delivery Charges")[0]
         .settingValue,
       "settingsData"
+    );
+    setTaxPer(
+      settingsData?.filter((item) => item.settingName === "Tax Percentage")[0]
+        .settingValue
     );
   }, [settingsData]);
 
@@ -593,7 +368,6 @@ function NewOrder() {
                   id
                 ) => {
                   if (value.length <= 10) {
-                    // e.target.value = formattedValue;
                     formik.setFieldValue("phoneno", value);
                   }
                 }}
@@ -670,7 +444,6 @@ function NewOrder() {
               </label>
               <input
                 className='form-control'
-                type='number'
                 name='zipcode'
                 id='zipcode'
                 onChange={formik.handleChange}
@@ -680,6 +453,40 @@ function NewOrder() {
               {formik.touched.zipcode && formik.errors.zipcode ? (
                 <div className='text-danger my-1'>{formik.errors.zipcode}</div>
               ) : null}
+              <NotDeliverableModel
+                extraDeliveryCharges={extraDeliveryCharges}
+                setExtraDeliveryCharges={setExtraDeliveryCharges}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+              />
+
+              {applyExtraDeliveryCharges && (
+                // <div className='d-flex flex-wrap my-2 my-2 justify-content-end align-items-center'>
+                //   <div className='input-group w-100'>
+                //     <div className='input-group-prepend'>
+                //       <span className='input-group-text inputGroupTxt px-2'>
+                //         $
+                //       </span>
+                //     </div>
+                //     <input
+                //       className='form-control w-25 text-end'
+                //       type='number'
+                //       placeholder='0.00'
+                //       min='0'
+                //       step='1'
+                //       defaultValue={0}
+                //       value={extraDeliveryCharges}
+                //       onChange={(e) => setExtraDeliveryCharges(e.target.value)}
+                //     ></input>
+                //     <div className='input-group-append'>
+                //       <span className='input-group-text inputGroupTxt'>
+                //         CAD
+                //       </span>
+                //     </div>
+                //   </div>
+                // </div>
+                <></>
+              )}
               <label className='form-label mt-2 mb-1'>Store Location</label>
               <select
                 className='form-select'
@@ -978,11 +785,17 @@ function NewOrder() {
                         <input
                           className='form-control w-25 text-end'
                           type='number'
+                          readOnly
                           placeholder='0.00'
                           min='0'
                           step='1'
                           defaultValue={0}
-                          onChange={(e) => setTaxPer(e.target.value)}
+                          value={
+                            settingsData?.filter(
+                              (item) => item.settingName === "Tax Percentage"
+                            )[0].settingValue
+                          }
+                          // onChange={(e) => setTaxPer(e.target.value)}
                         ></input>
                         <div className='input-group-append'>
                           <span className='input-group-text inputGroupTxt'>
@@ -993,6 +806,36 @@ function NewOrder() {
                     </div>
 
                     {/* Grand Total / Total Price */}
+                    <div className='d-flex flex-wrap my-2 justify-content-end align-items-center'>
+                      <label className='form-label w-25'>
+                        Delivery Charges
+                      </label>
+                      <div className='input-group w-75'>
+                        <div className='input-group-prepend'>
+                          <span className='input-group-text inputGroupTxt px-2'>
+                            $
+                          </span>
+                        </div>
+                        <input
+                          className='form-control w-25 text-end'
+                          type='number'
+                          placeholder='0.00'
+                          min='0'
+                          step='0.01'
+                          value={
+                            settingsData?.filter(
+                              (item) => item.settingName === "Delivery Charges"
+                            )[0].settingValue
+                          }
+                          readOnly
+                        ></input>
+                        <div className='input-group-append'>
+                          <span className='input-group-text inputGroupTxt'>
+                            CAD
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                     <div className='d-flex flex-wrap my-2 justify-content-end align-items-center'>
                       <label className='form-label w-25'>Total Price</label>
                       <div className='input-group w-75'>
