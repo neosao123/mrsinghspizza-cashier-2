@@ -439,8 +439,8 @@ function NewOrder() {
               {formik.touched.address && formik.errors.address ? (
                 <div className='text-danger my-1'>{formik.errors.address}</div>
               ) : null}
-              <label className='form-label'>
-                Zip Code <small className='text-danger'>*</small>
+              <label className='form-label mt-2 mb-1'>
+                Postal Code <small className='text-danger'>*</small>
               </label>
               <input
                 className='form-control'
