@@ -105,6 +105,7 @@ const Cart = ({ payloadEdit, setPayloadEdit, onProductClick }) => {
                       console.log(cartdata[index], "clickedProductType");
 
                       setPayloadEdit(cartdata[index]);
+                      console.log(cartdata[index].productType, "typeofproduct");
                       onProductClick(cartdata[index].productType);
                     }
                     // handleEditCartItem(e, data.code, cartListData?.code)

@@ -123,7 +123,7 @@ function DrinksMenu({
         cashierCode: localStorage.getItem("cashierCode"),
         productCode: drink?.softdrinkCode,
         productName: drink?.softDrinksName,
-        productType: "dips",
+        productType: "drinks",
         quantity: 1,
         config: {
           drinks: [
