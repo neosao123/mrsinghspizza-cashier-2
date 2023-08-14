@@ -208,6 +208,10 @@ function SpecialPizzaSelection({
                 id={`toppings-count-1-tab-special${count}`}
                 className='container tab-pane m-0 p-0 topping-list'
               >
+                {console.log(
+                  pizzaState[count - 1]?.toppings?.countAsOneToppings,
+                  "countasone"
+                )}
                 {toppingsData?.toppings?.countAsOne?.map(
                   (countAsOneToppings, index) => {
                     const comm = pizzaState[
@@ -216,6 +220,7 @@ function SpecialPizzaSelection({
                       (item) =>
                         item.toppingsCode === countAsOneToppings.toppingsCode
                     );
+                    console.log(comm, "index of count as one selected");
                     return (
                       <li
                         className='list-group-item d-flex justify-content-between align-items-center'

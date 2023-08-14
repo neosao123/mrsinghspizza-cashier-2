@@ -50,6 +50,10 @@ const Cart = ({ payloadEdit, setPayloadEdit, onProductClick }) => {
                   <span className=''>{data.quantity}</span>
                 </div>
               </div>
+              {/* {console.log(
+                data.productType === "Special_Pizza",
+                data.productType === "custom_pizza"
+              )} */}
               <div className='row d-flex'>
                 <div className='d-flex justify-content-left'>
                   <h6 className='me-1 col-auto'>Toppings : </h6>
@@ -57,7 +61,7 @@ const Cart = ({ payloadEdit, setPayloadEdit, onProductClick }) => {
                     {data?.config?.pizza?.map((pizza, index) => {
                       return (
                         <>
-                          <p key={"pizza" + index} className='  '>
+                          <p key={"pizza" + index} className='mb-1'>
                             Pizza {index + 1} :{" "}
                             {[
                               ...pizza?.toppings?.countAsOneToppings,
@@ -69,9 +73,9 @@ const Cart = ({ payloadEdit, setPayloadEdit, onProductClick }) => {
                                 return (
                                   <p
                                     key={pizzaItem.toppingsCode}
-                                    className='d-inline-block'
+                                    className='d-inline-block m-0'
                                   >
-                                    {pizzaItem?.toppingsName},
+                                    {pizzaItem?.toppingsName} ,
                                   </p>
                                 );
                               })}
@@ -82,36 +86,37 @@ const Cart = ({ payloadEdit, setPayloadEdit, onProductClick }) => {
                   </span>
                 </div>
               </div>
-                <div className='d-flex align-items-center'>
-                  <button
-                    className='btn m-0 p-0'
-                    onClick={() => deleteItemFromCart(index)}
-                    type='button'
-                  >
-                    
-                    <i
-                      className='fa fa-trash-o'
-                      aria-hidden='true'
-                      style={{ fontSize: "1.1rem", color: "#ff5555" }}
-                    ></i>
-                  </button>
-                  <button type='button' className='btn m-0 p-0 mx-3'>
-                    <i
-                      className='fa fa-pencil-square-o'
-                      aria-hidden='true'
-                      style={{ fontSize: "1.1rem", color: "#7a3ee7" }}
-                      onClick={
-                        () => {
-                          console.log(cartdata[index], "clickedProductType");
+              <div className='d-flex align-items-center'>
+                <span
+                  className='btn m-0 p-0'
+                  onClick={() => deleteItemFromCart(index)}
+                  type='button'
+                >
+                  <i
+                    className='fa fa-trash-o'
+                    aria-hidden='true'
+                    style={{ fontSize: "1.1rem", color: "#ff5555" }}
+                  ></i>
+                </span>
+                <span
+                  className='btn  mx-3'
+                  onClick={
+                    () => {
+                      console.log(cartdata[index], "clickedProductType");
 
-                          setPayloadEdit(cartdata[index]);
-                          onProductClick(cartdata[index].productType);
-                        }
-                        // handleEditCartItem(e, data.code, cartListData?.code)
-                      }
-                    ></i>
-                  </button>
-                </div>
+                      setPayloadEdit(cartdata[index]);
+                      onProductClick(cartdata[index].productType);
+                    }
+                    // handleEditCartItem(e, data.code, cartListData?.code)
+                  }
+                >
+                  <i
+                    className='fa fa-pencil-square-o'
+                    aria-hidden='true'
+                    style={{ fontSize: "1.1rem", color: "#7a3ee7" }}
+                  ></i>
+                </span>
+              </div>
               <hr className='border border-2 my-2 divider'></hr>
             </div>
           );
