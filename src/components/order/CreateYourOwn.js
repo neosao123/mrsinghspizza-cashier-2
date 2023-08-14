@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { addToCartApi } from "../../API/ongoingOrder";
 import $ from "jquery";
 import { Link } from "react-router-dom";
-import { number } from "yup";
 import { v4 as uuidv4 } from "uuid";
-
 import { toast } from "react-toastify";
 import EditCartProduct from "./EditCartProduct";
 import {
@@ -26,10 +23,7 @@ function CreateYourOwn({
   cartLineCode,
   cartCode,
   payloadEdit,
-  setOrderData,
   setPayloadEdit,
-  setCartListData,
-  setAllIngredients,
 }) {
   const [dips, setDips] = useState([]);
   const [drinks, setDrinks] = useState([]);
@@ -43,9 +37,6 @@ function CreateYourOwn({
   const [count, setCount] = useState(0);
   const [allCheckBoxes, setAllCheckBoxes] = useState([]);
   // react
-  useEffect(() => {
-    console.log(freeToppingsArr, "freeToppingsArr use");
-  }, []);
   const [sizesOfPizza, setSizesOfPizza] = useState(["Large", "Extra Large"]);
   const [sizesOfPizzaSelected, setSizesOfPizzaSelected] = useState(
     sizesOfPizza[0]
@@ -59,7 +50,6 @@ function CreateYourOwn({
   // Calculate Price
   const calculatePrice = () => {
     let calculatePrice = 0;
-    console.log(crustSelected, "crustSelected?.crustPrice");
     let crust_price = crustSelected?.crustPrice ? crustSelected?.crustPrice : 0;
     let cheese_price = cheeseSelected?.price ? cheeseSelected?.price : 0;
     let specialbase_price = specialBasesSelected?.price
@@ -75,13 +65,10 @@ function CreateYourOwn({
     countTwoToppingsArr.map(
       (two) => (totalTwoToppings += Number(two.toppingsPrice))
     );
-    console.log("countTwoToppingsArr : ", countTwoToppingsArr);
-    console.log("totalTwoToppings :", totalTwoToppings);
     countOneToppingsArr.map(
       (one) => (totalOneToppings += Number(one.toppingsPrice))
     );
     freeToppingsArr.map((free) => (totalFreeToppings += 0));
-    console.log("sidesArray inside calculated function :", sidesArr);
     sidesArr.map((side) => (totalSidesPrice += Number(side.sidesPrice)));
     dips.map((dips) => (totalDips += Number(dips.dipsPrice)));
     drinks.map((drinks) => (totalDrinks += Number(drinks.drinksPrice)));
@@ -96,7 +83,6 @@ function CreateYourOwn({
     calculatePrice += totalDips;
     calculatePrice += totalDrinks;
 
-    console.log("calculatePrice after : ", calculatePrice);
     setPrice(calculatePrice.toFixed(2));
   };
   let cartdata = useSelector((state) => state.cart.cart);
@@ -138,7 +124,6 @@ function CreateYourOwn({
         discountAmount: discount,
         taxPer: taxPer,
       };
-      console.log(cartdata, "cartdata payload edit");
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
       );
@@ -166,11 +151,7 @@ function CreateYourOwn({
 
       toast.success(`Custom Pizza edited Successfully...`);
     } else {
-      if (
-        crustSelected &&
-        cheeseSelected &&
-        specialBasesSelected !== undefined
-      ) {
+      if (crustSelected && cheeseSelected) {
         console.log(crustSelected, "crustSelectedcrustSelected");
         const payload = {
           id: uuidv4(),
@@ -202,7 +183,6 @@ function CreateYourOwn({
           discountAmount: discount,
           taxPer: taxPer,
         };
-        console.log(payload, "payload142");
         dispatch(addToCart([...cartdata, payload]));
         toast.success(`Custom Pizza Added Successfully...`);
         setCrustSelected({
@@ -211,7 +191,6 @@ function CreateYourOwn({
           crustName: allIngredients?.crust[0]?.crustName,
         });
         setCheeseSelected(allIngredients?.cheese[0]);
-        // setSpecialBasesSelected({});
         setSpecialBasesSelected();
         setDips([]);
         setDrinks([]);
@@ -226,38 +205,6 @@ function CreateYourOwn({
         toast.error("Add something ..");
       }
     }
-
-    // await addToCartApi(payload)
-    //   .then((res) => {
-    //     const resData = res.data.data;
-    //     localStorage.setItem("CartData", JSON.stringify(res.data.data));
-    //     localStorage.setItem("cartCode", resData.cartCode);
-    //     //clear fields from create your own
-
-    //     //reset all states
-    //     setCrust({});
-    //     setCheese({});
-    //     setSpecialBases({});
-    //     setDips([]);
-    //     setDrinks([]);
-    //     setSideArr([]);
-    //     setCountTwoToppingsArr([]);
-    //     setCountOneToppingsArr([]);
-    //     setFreeToppingsArr([]);
-    //     setPrice(0);
-
-    //     uncheckAllCheckboxes();
-
-    //     getCartList();
-    //   })
-    //   .catch((err) => {
-    //     if (err.response.status === 400 || err.response.status === 500) {
-    //       toast.error(err.response.data.message);
-    //     }
-    //   });
-    // console.log(payload, "payload 55");
-
-    //reset all states
   };
 
   useEffect(() => {
@@ -265,7 +212,6 @@ function CreateYourOwn({
       payloadEdit !== undefined &&
       payloadEdit.productType === "custom_pizza"
     ) {
-      console.log(payloadEdit, "payloadEdit");
       setPrice(payloadEdit?.amount);
       setSizesOfPizzaSelected(payloadEdit?.pizzaSize);
       setCrustSelected(payloadEdit?.config?.pizza[0]?.crust);
@@ -284,18 +230,13 @@ function CreateYourOwn({
     }
   }, [payloadEdit]);
   // handle Two Toppings
-  const handleTwoToppings = (e, index, toppingCode) => {
+  const handleTwoToppings = (e, toppingCode) => {
     const { checked } = e.target;
-    console.log(checked, "toppings");
     if (checked) {
       const selectedTopping = allIngredients?.toppings?.countAsTwo.filter(
         (topping) => topping.toppingsCode === toppingCode
       );
       let placement = "whole";
-      const placementValue = $("#placement-" + toppingCode).val();
-      if (placementValue !== "" && placementValue !== undefined) {
-        placement = placementValue;
-      }
       const toppingObj = {
         toppingsCode: selectedTopping[0].toppingsCode,
         toppingsName: selectedTopping[0].toppingsName,
@@ -305,8 +246,7 @@ function CreateYourOwn({
         toppingsPlacement: placement,
       };
 
-      setCountTwoToppingsArr((prevToppings) => [...prevToppings, toppingObj]);
-      console.log("countTwoToppingsArr", countTwoToppingsArr);
+      setCountTwoToppingsArr([...countTwoToppingsArr, toppingObj]);
     } else {
       setCountTwoToppingsArr((prevToppings) =>
         prevToppings.filter(
@@ -322,18 +262,24 @@ function CreateYourOwn({
     );
   };
   // handle Two Toppings Placement
-  const handleCountTwoPlacementChange = (e, toppingCode) => {
-    const placement = e.target.value;
-    const filteredToppings = countTwoToppingsArr.filter(
-      (topping) => topping.toppingsCode === toppingCode
+  const handleCountAsTwoToppingsPlacementChange = (e, countAsTwoToppings) => {
+    const selectedValue = e.target.value;
+    let arr = [...countTwoToppingsArr];
+    let selectedObject = countTwoToppingsArr?.find(
+      (option) => option.toppingsCode === countAsTwoToppings.toppingsCode
     );
-    console.log("placement : ", countTwoToppingsArr);
+    selectedObject = {
+      ...selectedObject,
+      toppingsPlacement: selectedValue,
+    };
+    let indexOfSelectedObject = countTwoToppingsArr?.findIndex(
+      (option) => option.toppingsCode === countAsTwoToppings.toppingsCode
+    );
 
-    if (filteredToppings.length > 0) {
-      let filteredTopping = filteredToppings[0];
-      filteredTopping.toppingsPlacement = placement;
+    if (indexOfSelectedObject !== -1) {
+      arr[indexOfSelectedObject] = selectedObject;
     }
-    console.log("placement : ", filteredToppings);
+    setCountTwoToppingsArr(arr);
   };
 
   // handle One Toppings
@@ -359,14 +305,12 @@ function CreateYourOwn({
       };
 
       setCountOneToppingsArr((prevToppings) => [...prevToppings, toppingObj]);
-      console.log(countOneToppingsArr, "count one toppings");
     } else {
       setCountOneToppingsArr((prevToppings) =>
         prevToppings.filter(
           (toppingObj) => toppingObj.toppingsCode !== toppingCode
         )
       );
-      console.log(countOneToppingsArr, "count one toppings");
     }
     setAllCheckBoxes((prevCheckboxes) =>
       prevCheckboxes.map((checkbox) =>
@@ -375,15 +319,24 @@ function CreateYourOwn({
     );
   };
   // handle One Toppings Placement
-  const handleCountOnePlacementChange = (e, toppingCode) => {
-    const placement = e.target.value;
-    const filteredToppings = countOneToppingsArr.filter(
-      (topping) => topping.toppingsCode === toppingCode
+  const handleCountOnePlacementChange = (e, countAsOneToppings) => {
+    const selectedValue = e.target.value;
+    let arr = [...countOneToppingsArr];
+    let selectedObject = countOneToppingsArr?.find(
+      (option) => option.toppingsCode === countAsOneToppings.toppingsCode
     );
-    if (filteredToppings.length > 0) {
-      let filteredTopping = filteredToppings[0];
-      filteredTopping.toppingsPlacement = placement;
+    selectedObject = {
+      ...selectedObject,
+      toppingsPlacement: selectedValue,
+    };
+    let indexOfSelectedObject = countOneToppingsArr?.findIndex(
+      (option) => option.toppingsCode === countAsOneToppings.toppingsCode
+    );
+
+    if (indexOfSelectedObject !== -1) {
+      arr[indexOfSelectedObject] = selectedObject;
     }
+    setCountOneToppingsArr(arr);
   };
 
   // handle Free Toppings
@@ -459,12 +412,10 @@ function CreateYourOwn({
         sidesSize: size,
       };
       setSideArr((prevSides) => [...prevSides, sidesObj]);
-      console.log("sidesArr checked : ", sidesArr);
     } else {
       setSideArr((prevSides) =>
         prevSides.filter((sidesObj) => sidesObj.sideCode !== sideCode)
       );
-      console.log("sidesArr unchecked : ", sidesArr);
     }
     setAllCheckBoxes((prevCheckboxes) =>
       prevCheckboxes.map((checkbox) =>
@@ -502,7 +453,6 @@ function CreateYourOwn({
       const selectedDips = allIngredients?.dips.filter(
         (dips) => dips.dipsCode === code
       );
-      console.log("selectedDips : ", selectedDips);
       if (selectedDips.length > 0) {
         let dipsObj = {
           dipsCode: selectedDips[0].dipsCode,
@@ -541,7 +491,6 @@ function CreateYourOwn({
         const newDrinks = drinks.filter(
           (updatedDrinks) => updatedDrinks.drinksCode !== code
         );
-        console.log(newDrinks, "newDrinks");
         setDrinks(newDrinks);
       }
     }
@@ -614,20 +563,10 @@ function CreateYourOwn({
 
   const handleCrustChange = (event) => {
     const selectedValue = event.target.value;
-    console.log(selectedValue, "selectedValue New");
-
     const selectedObject = allIngredients?.crust?.find(
       (option) => option.crustCode === selectedValue
     );
 
-    console.log(
-      {
-        crustCode: selectedObject?.crustCode,
-        crustName: selectedObject?.crustName,
-        crustPrice: selectedObject?.price,
-      },
-      "selectedValue New"
-    );
     setCrustSelected({
       crustCode: selectedObject?.crustCode,
       crustName: selectedObject?.crustName,
@@ -639,7 +578,6 @@ function CreateYourOwn({
     const selectedObject = allIngredients?.cheese?.find(
       (option) => option.cheeseCode === selectedValue
     );
-    console.log("selected Object cheese", selectedObject);
     setCheeseSelected(selectedObject);
   };
   const handleSpecialBasesChange = (event) => {
@@ -647,13 +585,10 @@ function CreateYourOwn({
     const selectedObject = allIngredients?.specialbases?.find(
       (option) => option.specialbaseCode === selectedValue
     );
-    console.log("selected Object special selected ", selectedObject);
     setSpecialBasesSelected(selectedObject);
   };
   // all indian toppings
   const handleChangeAllIndianToppins = (e) => {
-    console.log(allIngredients?.toppings?.freeToppings, "allinf");
-    console.log(allCheckBoxes, "allinf");
     if (e.target.checked) {
       const tempAllBoxes = [...allIngredients?.toppings?.freeToppings].map(
         (item) => {
@@ -670,7 +605,6 @@ function CreateYourOwn({
           };
         }
       );
-      console.log(tempAllBoxes, "tempAllBoxes");
       setFreeToppingsArr(tempAllBoxes);
     } else {
       setFreeToppingsArr([]);
@@ -678,7 +612,6 @@ function CreateYourOwn({
   };
 
   useEffect(() => {
-    console.log("key ", allIngredients?.specialbases[0]);
     setCrustSelected({
       crustCode: allIngredients?.crust[0]?.crustCode,
       crustPrice: allIngredients?.crust[0]?.price,
@@ -687,9 +620,6 @@ function CreateYourOwn({
     setCheeseSelected(allIngredients?.cheese[0]);
     setSpecialBasesSelected();
   }, [allIngredients]);
-  useEffect(() => {
-    console.log(crustSelected, "selectedValue New");
-  }, [crustSelected]);
 
   return (
     <>
@@ -847,14 +777,14 @@ function CreateYourOwn({
                   id='toppings-count-2-tab'
                   className='container tab-pane active m-0 p-0 topping-list'
                 >
+                  {console.log(countTwoToppingsArr, "countTwoToppingsArr")}
                   {allIngredients?.toppings?.countAsTwo?.map(
                     (countAsTwoToppings, index) => {
                       const toppingCode = countAsTwoToppings.toppingsCode;
-                      const comm = countTwoToppingsArr.findIndex(
+                      const comm = countTwoToppingsArr?.findIndex(
                         (item) =>
                           item.toppingsCode === countAsTwoToppings.toppingsCode
                       );
-
                       return (
                         <>
                           <li
@@ -867,7 +797,7 @@ function CreateYourOwn({
                                 className='mx-3 d-inline-block'
                                 checked={comm !== -1 ? true : false}
                                 onChange={(e) =>
-                                  handleTwoToppings(e, index, toppingCode)
+                                  handleTwoToppings(e, toppingCode)
                                 }
                               />
                               {countAsTwoToppings.toppingsName}
@@ -887,21 +817,13 @@ function CreateYourOwn({
                                 style={{ width: "65%" }}
                                 id={"placement-" + toppingCode}
                                 value={
-                                  countTwoToppingsArr[index]?.toppingsPlacement
+                                  countTwoToppingsArr[comm]?.toppingsPlacement
                                 }
                                 onChange={(e) => {
-                                  if (comm !== -1) {
-                                    const selectedPlacement = e.target.value;
-                                    const updatedTopping = {
-                                      ...countTwoToppingsArr[index],
-                                      toppingsPlacement: selectedPlacement,
-                                    };
-                                    const updatedArray = [
-                                      ...countTwoToppingsArr,
-                                    ];
-                                    updatedArray[index] = updatedTopping;
-                                    setCountTwoToppingsArr(updatedArray);
-                                  }
+                                  handleCountAsTwoToppingsPlacementChange(
+                                    e,
+                                    countAsTwoToppings
+                                  );
                                 }}
                               >
                                 <option
@@ -932,11 +854,10 @@ function CreateYourOwn({
                   {allIngredients?.toppings?.countAsOne?.map(
                     (countAsOneToppings, index) => {
                       const toppingCode = countAsOneToppings.toppingsCode;
-                      const comm = countOneToppingsArr.findIndex(
+                      const comm = countOneToppingsArr?.findIndex(
                         (item) =>
-                          item.toppingsCode === countAsOneToppings.toppingsCode
+                          item.toppingsCode == countAsOneToppings.toppingsCode
                       );
-
                       return (
                         <>
                           <li
@@ -969,21 +890,13 @@ function CreateYourOwn({
                                 style={{ width: "65%" }}
                                 id={"placement-" + toppingCode}
                                 value={
-                                  countOneToppingsArr[index]?.toppingsPlacement
+                                  countOneToppingsArr[comm]?.toppingsPlacement
                                 }
                                 onChange={(e) => {
-                                  if (comm !== -1) {
-                                    const selectedPlacement = e.target.value;
-                                    const updatedTopping = {
-                                      ...countOneToppingsArr[index],
-                                      toppingsPlacement: selectedPlacement,
-                                    };
-                                    const updatedArray = [
-                                      ...countOneToppingsArr,
-                                    ];
-                                    updatedArray[index] = updatedTopping;
-                                    setCountOneToppingsArr(updatedArray);
-                                  }
+                                  handleCountOnePlacementChange(
+                                    e,
+                                    countAsOneToppings
+                                  );
                                 }}
                               >
                                 <option
@@ -1013,7 +926,6 @@ function CreateYourOwn({
                 >
                   {allIngredients?.toppings?.freeToppings?.map(
                     (freeToppings, index) => {
-                      console.log(freeToppings, "freeToppings");
                       const toppingCode = freeToppings.toppingsCode;
                       const comm = freeToppingsArr.findIndex(
                         (item) =>
@@ -1097,7 +1009,6 @@ function CreateYourOwn({
                     const comm = sidesArr.findIndex(
                       (item) => item.sideCode === sidesData.sideCode
                     );
-                    console.log(comm, "sidesflag");
                     return (
                       <>
                         <li
@@ -1185,8 +1096,6 @@ function CreateYourOwn({
                 >
                   {allIngredients?.softdrinks?.map((drinksData) => {
                     const softdrinkCode = drinksData.softdrinkCode;
-                    console.log(drinksData, "drinks data");
-                    console.log(drinks, "drinks arr");
                     const comm = drinks.findIndex(
                       (item) => item.drinksCode === drinksData.softdrinkCode
                     );

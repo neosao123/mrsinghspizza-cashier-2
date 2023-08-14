@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { SelectDropDownCrust } from "./createYourOwn/selectDropDown";
+import React from "react";
 import { Link } from "react-router-dom";
 
 function SpecialPizzaSelection({
@@ -8,10 +7,8 @@ function SpecialPizzaSelection({
   toppingsData,
   handleCrustChange,
   pizzaState,
-  crustSelected,
   handleCheeseChange,
   handleOneToppings,
-  cheeseSelected,
   handleSpecialBasesChange,
   handleFreeToppingsPlacementChange,
   handleFreeToppings,
@@ -19,8 +16,6 @@ function SpecialPizzaSelection({
   handleCountAsTwoToppingsPlacementChange,
   handleCountAsOneToppingsPlacementChange,
 }) {
-  // useEffect(() => {}, [count]);
-
   return (
     <>
       <div className='jumbotron'>
@@ -33,7 +28,6 @@ function SpecialPizzaSelection({
               value={pizzaState[count - 1]?.crust?.code}
               onChange={(e) => {
                 handleCrustChange(e, count);
-                // dropDownPrice(e);
               }}
             >
               {getSpecialData?.crust?.map((data) => {
@@ -53,8 +47,6 @@ function SpecialPizzaSelection({
               className='form-select'
               value={pizzaState[count - 1]?.cheese?.code}
               onChange={(e) => {
-                //ch9
-                //{code:,name,price},
                 handleCheeseChange(e, count);
               }}
             >
@@ -73,11 +65,20 @@ function SpecialPizzaSelection({
             <label className='mt-2 mb-1'>Special Bases</label>
             <select
               className='form-select'
+              defaultValue={""}
               value={pizzaState[count - 1]?.specialbases?.code}
               onChange={(e) => {
                 handleSpecialBasesChange(e, count);
               }}
             >
+              <option
+                value={""}
+                selected={
+                  pizzaState[count - 1]?.specialbases?.code ? false : true
+                }
+              >
+                ---choose special base---
+              </option>
               {getSpecialData?.specialbases?.map((data) => {
                 return (
                   <>
@@ -134,14 +135,12 @@ function SpecialPizzaSelection({
               >
                 {toppingsData?.toppings?.countAsTwo?.map(
                   (countAsTwoToppings, index) => {
-                    console.log(pizzaState, "pizzaState in map");
                     const comm = pizzaState[
                       count - 1
                     ]?.toppings?.countAsTwoToppings.findIndex(
                       (item) =>
                         item.toppingsCode === countAsTwoToppings.toppingsCode
                     );
-                    console.log(comm, "index found?");
                     return (
                       <li
                         className='list-group-item d-flex justify-content-between align-items-center'
@@ -173,7 +172,7 @@ function SpecialPizzaSelection({
                             style={{ width: "65%" }}
                             value={
                               pizzaState[count - 1]?.toppings
-                                ?.countAsTwoToppings[index]?.placement
+                                ?.countAsTwoToppings[comm]?.placement
                             }
                             onChange={(e) => {
                               handleCountAsTwoToppingsPlacementChange(
@@ -208,10 +207,6 @@ function SpecialPizzaSelection({
                 id={`toppings-count-1-tab-special${count}`}
                 className='container tab-pane m-0 p-0 topping-list'
               >
-                {console.log(
-                  pizzaState[count - 1]?.toppings?.countAsOneToppings,
-                  "countasone"
-                )}
                 {toppingsData?.toppings?.countAsOne?.map(
                   (countAsOneToppings, index) => {
                     const comm = pizzaState[
@@ -220,7 +215,6 @@ function SpecialPizzaSelection({
                       (item) =>
                         item.toppingsCode === countAsOneToppings.toppingsCode
                     );
-                    console.log(comm, "index of count as one selected");
                     return (
                       <li
                         className='list-group-item d-flex justify-content-between align-items-center'
@@ -252,7 +246,7 @@ function SpecialPizzaSelection({
                             style={{ width: "65%" }}
                             value={
                               pizzaState[count - 1]?.toppings
-                                ?.countAsOneToppings[index]?.placement
+                                ?.countAsOneToppings[comm]?.placement
                             }
                             onChange={(e) => {
                               handleCountAsOneToppingsPlacementChange(
@@ -287,11 +281,6 @@ function SpecialPizzaSelection({
                 id={`toppings-free-tab-special${count}`}
                 className='container tab-pane m-0 p-0 topping-list'
               >
-                {/* {console.log(
-                  toppingsData?.toppings?.freeToppings,
-                  "toppings?.price"
-                )} */}
-
                 {toppingsData?.toppings?.freeToppings?.map(
                   (freeToppings, index) => {
                     console.log();

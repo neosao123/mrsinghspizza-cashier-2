@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import specialImg1 from "../../assets/bg-img.jpg";
 import backBtn from "../../assets/back-button.png";
 import { v4 as uuidv4 } from "uuid";
 import "../../css/specialMenu.css";
@@ -10,7 +9,6 @@ import {
   specialPizzaApi,
   toppingsApi,
 } from "../../API/ongoingOrder";
-import Selection from "../../json/Selection.json";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, setDisplaySpecialForm } from "../../reducer/cartReducer";
 import { toast } from "react-toastify";
@@ -184,10 +182,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           countAsTwoToppings: tempCountAsTwo,
         },
       };
-      // arr[count - 1].toppings = {
-      //   ...arr[count - 1].toppings,
-      //   countAsTwoToppings: tempCountAsTwo,
-      // };
       setPizzaState(arr);
     } else {
       let arr = [...pizzaState];
@@ -204,17 +198,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           getSpecialData?.noofToppings,
           "offeredFreeToppings "
         );
-        // if (
-        //   offeredFreeToppings >= 0 &&
-        //   offeredFreeToppings < Number(getSpecialData?.noofToppings)
-        // ) {
-        //   if (offeredFreeToppings + 2 > Number(getSpecialData?.noofToppings)) {
-        //     setOfferedFreeToppings((prev) => prev + 1);
-        //   } else {
-        //     setOfferedFreeToppings((prev) => prev + 2);
-        //   }
-        // }
-
         setOfferedFreeToppings((prev) => prev + 2);
 
         const updatedToppings =
@@ -223,16 +206,12 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
         arr[count - 1].toppings.countAsTwoToppings = updatedToppings;
       }
-
-      console.log(arr, "array modified");
-
       setPizzaState(arr);
     }
   };
 
   const handleOneToppings = (e, count, countAsOneToppings) => {
     const { checked } = e.target;
-    console.log(checked, "toppings");
     if (checked) {
       let arr = [...pizzaState];
       const tempCountAsOne = [
@@ -252,36 +231,21 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         countAsOneToppings: tempCountAsOne,
       };
       setPizzaState(arr);
-
-      console.log(countAsOneToppings, "selected countAsTwoToppings");
     } else {
-      console.log(countAsOneToppings, "remove CountAsone");
       let arr = [...pizzaState];
       const index = arr[count - 1].toppings?.countAsOneToppings.findIndex(
         (item) => item.toppingsCode == countAsOneToppings.toppingsCode
       );
-      console.log(
-        arr[count - 1].toppings?.countAsOneToppings,
-        "remove CountAsone"
-      );
       if (index !== -1) {
-        console.log(index, "remove CountAsone");
         arr[count - 1].toppings?.countAsOneToppings.splice(index, 1);
 
-        // if (
-        //   offeredFreeToppings >= 0 &&
-        //   offeredFreeToppings < Number(getSpecialData?.noofToppings)
-        // ) {
         setOfferedFreeToppings((prev) => prev + 1);
-        // }
       }
       setPizzaState(arr);
     }
   };
   const handleFreeToppingsPlacementChange = (event, count, toppingsCode) => {
     const selectedValue = event.target.value;
-    console.log(event.target.value, "selected Object ");
-    console.log(getSpecialData?.crust, "selected Object ");
     let arr = [...pizzaState];
     let selectedObject = arr[count - 1]?.toppings?.freeToppings?.find(
       (option) => option.toppingsCode === toppingsCode
@@ -313,7 +277,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         },
       };
     }
-    console.log(arr, "pizza order ");
     setPizzaState(arr);
   };
   const handleCountAsOneToppingsPlacementChange = (
@@ -322,8 +285,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     toppingsCode
   ) => {
     const selectedValue = event.target.value;
-    console.log(event.target.value, "selected Object ");
-    console.log(getSpecialData?.crust, "selected Object ");
     let arr = [...pizzaState];
     let selectedObject = arr[count - 1]?.toppings?.countAsOneToppings?.find(
       (option) => option.toppingsCode === toppingsCode
@@ -359,7 +320,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   };
   const handleFreeToppings = (e, count, freeToppings) => {
     const { checked } = e.target;
-    console.log(freeToppings, "toppings?.price");
     if (checked) {
       let arr = [...pizzaState];
       const tempFreeToppings = [
@@ -371,10 +331,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         ...arr[count - 1].toppings,
         freeToppings: tempFreeToppings,
       };
-      console.log(arr, "pizza state array");
       setPizzaState(arr);
-
-      console.log(freeToppings, "selected freeToppings");
     } else {
       let arr = [...pizzaState];
       const index = arr[count - 1].toppings?.freeToppings.findIndex(
@@ -391,35 +348,19 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       payloadEdit !== undefined &&
       payloadEdit?.productType === "Special_Pizza"
     ) {
-      console.log(payloadEdit, "comm dips special pizza edit");
       handleGetSpecial({ code: payloadEdit?.code });
-      console.log(payloadEdit?.config?.pizza, "payloadEdit?.config?.pizza");
       setPizzaSize(payloadEdit?.pizzaSize);
-      // console.log(pizzaSize, "pizzaSize");
       setPizzaState(payloadEdit?.config?.pizza);
       setDrinksArr(payloadEdit?.config?.drinks);
-      console.log(payloadEdit?.config?.dips, "payloadEdit?.config?.dipsArr");
       setDipsArr(payloadEdit?.config?.dips);
       setSidesArr(payloadEdit?.config?.sides);
-      console.log(payloadEdit?.amount, "(payloadEdit?.amount");
-      console.log(price, "ttttprice before");
       setPrice(Number(payloadEdit?.amount));
-      console.log(price, "ttttprice after");
-      console.log(pizzaState, "pizza state useeffect editpayload");
     }
   }, [payloadEdit]);
-  useEffect(() => {
-    console.log(price, "payloadEdit?.amount useeffect");
-  }, []);
-  const [freeToppingsCount, setFreeToppingsCount] = useState(0);
 
-  useEffect(() => {
-    console.log(pizzaState, "pizza state useeffect");
-  }, [pizzaState]);
+  useEffect(() => {}, [pizzaState]);
 
-  useEffect(() => {
-    console.log(pizzaState, "all pizza state");
-  }, [pizzaState]);
+  useEffect(() => {}, [pizzaState]);
   useEffect(() => {
     specialIngredients();
     dispatch(setDisplaySpecialForm(false));
@@ -427,12 +368,11 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
   //Component - Special Pizza Selection
   const elements = [];
-  console.log(getSpecialData, "getSpecialData");
   const createEmptyObjects = (count) => {
     const emptyObjectsArray = Array.from({ length: count }, () => ({
       crust: getSpecialData?.crust[0],
       cheese: getSpecialData?.cheese[0],
-      specialbases: getSpecialData?.specialbases[0],
+      specialbases: {},
       toppings: {
         countAsTwoToppings: [],
         countAsOneToppings: [],
@@ -443,15 +383,12 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   };
 
   useEffect(() => {
-    console.log("select function 2 : ");
     if (getSpecialData?.noofToppings !== undefined) {
       setOfferedFreeToppings(Number(getSpecialData?.noofToppings));
     }
-    console.log(getSpecialData, "getSpecialData");
     if (payloadEdit === undefined) {
       createEmptyObjects(Number(getSpecialData?.noofPizzas));
     }
-    setFreeToppingsCount(Number(getSpecialData?.noofToppings));
   }, [getSpecialData]);
 
   for (let i = 1; i <= getSpecialData?.noofPizzas; i++) {
@@ -464,7 +401,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         getSpecialData={getSpecialData}
         count={i}
         toppingsData={toppingsData}
-        // setCrust={setCrust}
         handleCrustChange={handleCrustChange}
         crustSelected={crustSelected}
         cheeseSelected={cheeseSelected}
@@ -504,17 +440,12 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         ...dips,
         qty: e.target.value,
       };
-      console.log(updatedDips, "updatedDips");
-      console.log(updatedDips, "dips updated: ");
-      console.log(dipsArr, "dips updated: ");
       let temp = [...dipsArr];
       temp[ind] = updatedDips;
-      console.log(temp, "dips updated: ");
       setDipsArr(temp);
     }
   };
   const handleSides = (e, sides) => {
-    // console.log(sides, "index of side new addded");
     let { checked } = e.target;
 
     if (checked) {
@@ -523,7 +454,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         lineEntries: [sides.lineEntries[0]],
         qty: 1,
       };
-      console.log(obj, "index of side new addded");
       setSidesArr([...sidesArr, obj]);
     } else {
       let filteredSides = sidesArr?.filter((item) => item.code !== sides.code);
@@ -549,7 +479,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   const handleDrinks = (e, drink) => {
     let { checked } = e.target;
     if (checked) {
-      console.log(drink, "drink");
       setDrinksArr([...drinksArr, drink]);
     } else {
       let filteredDrinks = drinksArr?.filter(
@@ -663,7 +592,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   const toppings = () => {
     toppingsApi()
       .then((res) => {
-        console.log(res.data.data, "api res toppingsdata");
         setToppingsData(res.data.data);
       })
       .catch((err) => {
@@ -683,121 +611,61 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   // Calculate Price
   const calculatePrice = () => {
     let totalPrice = 0;
-    console.log("Initial totalPrice: ", totalPrice);
 
     // Calculate base pizza price
     totalPrice +=
       pizzaSize === "Large"
         ? Number(getSpecialData?.largePizzaPrice)
         : Number(getSpecialData?.extraLargePizzaPrice);
-    console.log("Initial totalPrice: pizza size price:", totalPrice);
 
     // Iterate through pizzaState
     pizzaState?.forEach((item) => {
       totalPrice += item?.cheese?.price ? Number(item?.cheese?.price) : 0;
-      console.log("Initial totalPrice:  cheese price:", totalPrice);
+
       totalPrice += item?.crust?.price ? Number(item?.crust?.price) : 0;
-      console.log("Initial totalPrice: crust price:", totalPrice);
+
       totalPrice += item?.specialbases?.price
         ? Number(item?.specialbases?.price)
         : 0;
-      console.log("Initial totalPrice: specialbases price:", totalPrice);
-
-      // item?.toppings?.countAsOneToppings?.forEach((toppings, index) => {
-      //   if (
-      //     item?.toppings?.countAsOneToppings.length <=
-      //     getSpecialData?.noofToppings
-      //   ) {
-      //     setOfferedFreeToppings(offeredFreeToppings + 1);
-      //   }
-      //   if (getSpecialData?.noofToppings < index + 1) {
-      //     totalPrice += Number(toppings?.price);
-      //   } else if (offeredFreeToppings > 0) {
-      //     setOfferedFreeToppings(offeredFreeToppings - 1);
-      //   }
-      //   console.log("Initial totalPrice: Base pizza price:", totalPrice);
-      // });
-
       // Add prices for countAsTwoToppings
       item?.toppings?.countAsTwoToppings?.forEach((toppings) => {
-        console.log(
-          "Initial totalPrice: countAsTwoToppings ",
-          freeToppingsCount,
-          " "
-        );
         if (offeredFreeToppings <= 0) {
           totalPrice += Number(toppings?.price);
         }
-        console.log(
-          "Initial totalPrice: countAsTwoToppings price:",
-          totalPrice
-        );
       });
       item?.toppings?.countAsOneToppings?.forEach((toppings) => {
-        console.log(freeToppingsCount, "freeToppingsCount");
         totalPrice += Number(toppings?.price);
-        console.log(
-          "Initial totalPrice: countAsOneToppings price:",
-          totalPrice
-        );
       });
 
       // Add prices for freeToppings
-      console.log("Initial totalPrice: countAsOneToppings price:", totalPrice);
+
       item?.toppings?.freeToppings?.forEach((toppings) => {
-        console.log(freeToppingsCount, "freeToppingsCount");
-        console.log(toppings?.price, "toppings?.price");
         totalPrice += Number(toppings?.price);
-        console.log("Initial totalPrice: freeToppings price:", totalPrice);
       });
     });
 
     // Iterate through dipsArr
     dipsArr?.forEach((item) => {
       totalPrice += Number(item?.price) * Number(item?.qty);
-      console.log("Initial totalPrice: dipsArr price:", totalPrice);
     });
 
     // // Iterate through sidesArr
     sidesArr?.forEach((item) => {
       totalPrice += Number(item?.lineEntries[0]?.price);
-      console.log("Initial totalPrice: sidesArr price:", totalPrice);
     });
 
     // Iterate through drinksArr
 
-    console.log("Initial totalPrice: drinks price:", drinksArr);
     drinksArr?.forEach((drinks) => {
-      console.log("Initial totalPrice: drinks price:", drinks?.price);
       totalPrice += Number(drinks?.price);
-      console.log("Initial totalPrice: drinksArr price:", totalPrice);
     });
-    // drinks[1]?.forEach((drinks) => {
-    //   totalPrice += Number(drinks?.price);
-    // });
-
-    //   // totalPrice += Number(drinks?.price);
-    //   console.log("Initial totalPrice: Base pizza price:", totalPrice);
-
-    // Iterate through popsArr
-    // popsArr?.forEach((item) => {
-    // totalPrice += Number(item?.price);
-    // console.log("Initial totalPrice: Base pizza price:", totalPrice);
-    // });
 
     // Set the calculated price
-    console.log(price, "ttttprice befire calculate");
 
     setPrice(Number(totalPrice.toFixed(2)));
-
-    console.log(price, "ttttprice after calculate");
-    console.log("Initial totalPrice: Base pizza price:", totalPrice);
   };
 
   useEffect(() => {
-    console.log(drinksArr, "drinksArr");
-    console.log(popsArr, "drinksArr");
-
     calculatePrice();
   }, [
     pizzaState,
@@ -809,7 +677,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     popsArr,
   ]);
   useEffect(() => {
-    // console.log(getSpecialData);
     if (getSpecialData) {
       calculatePrice();
     }

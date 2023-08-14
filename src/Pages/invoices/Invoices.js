@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Nav from "../../layout/Nav";
 import { getInvoicesList } from "../../API/invoice";
 import DataTable from "react-data-table-component";
- 
 
 function Invoices() {
   const columns = [
@@ -171,35 +170,35 @@ function Invoices() {
   return (
     <>
       <Nav />
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-12">
-            <form className="row border-bottom mb-3">
-              <div className="col-lg-2">
-                <label className="my-2">From Date</label>
+      <div className='container-fluid'>
+        <div className='row'>
+          <div className='col-12'>
+            <form className='row border-bottom mb-3'>
+              <div className='col-lg-2'>
+                <label className='my-2'>From Date</label>
 
                 <input
-                  type="date"
-                  className="mb-3 form-control"
+                  type='date'
+                  className='mb-3 form-control'
                   onChange={(e) => {
                     setFromDate(e.target.value);
                   }}
                 ></input>
               </div>
-              <div className="col-lg-2">
-                <label className="my-2">To Date</label>
+              <div className='col-lg-2'>
+                <label className='my-2'>To Date</label>
                 <input
-                  type="date"
-                  className="mb-3 form-control"
+                  type='date'
+                  className='mb-3 form-control'
                   onChange={(e) => {
                     setToDate(e.target.value);
                   }}
                 ></input>
               </div>
-              <div className="col-lg-2">
-                <label className="my-2">Delivery Type</label>
+              <div className='col-lg-2'>
+                <label className='my-2'>Delivery Type</label>
                 <select
-                  className="mb-3 form-select"
+                  className='mb-3 form-select'
                   defaultValue={""}
                   onChange={(e) => setDeliveryType(e.target.value)}
                 >
@@ -208,30 +207,30 @@ function Invoices() {
                   <option value={"delivery"}>Delivery</option>
                 </select>
               </div>
-              <div className="col-lg-2 d-none">
-                <label className="my-2">Order Type</label>
+              <div className='col-lg-2 d-none'>
+                <label className='my-2'>Order Type</label>
                 <select
-                  className="mb-3 form-select"
+                  className='mb-3 form-select'
                   defaultValue={""}
                   onChange={(e) => setOrderType(e.target.value)}
                 >
                   <option>-- Choose Order Type --</option>
-                  <option value="store">Store Order</option>
-                  <option value="online">Online Order</option>
+                  <option value='store'>Store Order</option>
+                  <option value='online'>Online Order</option>
                 </select>
               </div>
-              <div className="col-lg-2">
-                <label className="my-2">Order Id</label>
+              <div className='col-lg-2'>
+                <label className='my-2'>Order Id</label>
                 <input
-                  type="text"
-                  className="mb-3 form-control"
+                  type='text'
+                  className='mb-3 form-control'
                   onChange={(e) => setOrderId(e.target.value)}
                 ></input>
               </div>
-              <div className="col-lg-2 my-2 d-flex justify-content-center align-items-end">
+              <div className='col-lg-2 my-2 d-flex justify-content-center align-items-end'>
                 <button
-                  type="button"
-                  className="mb-2 btn btn-sm bg-secondary text-white px-3 fw-bold"
+                  type='button'
+                  className='mb-2 btn btn-sm bg-secondary text-white px-3 fw-bold'
                   onClick={handleClick}
                 >
                   Search
@@ -239,7 +238,7 @@ function Invoices() {
               </div>
             </form>
           </div>
-          <div className="col-12">
+          <div className='col-12'>
             <DataTable
               columns={columns}
               data={data}

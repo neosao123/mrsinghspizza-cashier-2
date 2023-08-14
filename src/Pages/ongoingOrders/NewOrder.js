@@ -108,9 +108,14 @@ function NewOrder() {
     console.log(item.amount, "item");
     totalPrice += Number(item.amount);
   });
-  const delivery_charges = settingsData?.filter(
-    (item) => item.settingName === "Delivery Charges"
-  )[0].settingValue;
+
+  const delivery_charges =
+    cartdata.length !== 0
+      ? settingsData?.filter(
+          (item) => item.settingName === "Delivery Charges"
+        )[0].settingValue
+      : 0;
+
   // console.log(taxPer, "delivery_charges");
 
   const discountedTotalPrice = totalPrice - discount;
@@ -390,7 +395,12 @@ function NewOrder() {
                   Delivery
                 </label>
               </div>
-              <label className='form-label'>Customer Name</label>
+              <label className='form-label'>
+                Customer Name{" "}
+                {deliveryType === "delivery" && (
+                  <small className='text-danger'>*</small>
+                )}
+              </label>
               <input
                 className='form-control'
                 type='text'
@@ -405,7 +415,12 @@ function NewOrder() {
                   {formik.errors.customername}
                 </div>
               ) : null}
-              <label className='form-label mt-2 mb-1'>Address</label>
+              <label className='form-label mt-2 mb-1'>
+                Address{" "}
+                {deliveryType === "delivery" && (
+                  <small className='text-danger'>*</small>
+                )}
+              </label>
               <textarea
                 className='form-control'
                 rows='4'
@@ -419,18 +434,23 @@ function NewOrder() {
                 <div className='text-danger my-1'>{formik.errors.address}</div>
               ) : null}
               <label className='form-label mt-2 mb-1'>
-                Postal Code <small className='text-danger'>*</small>
+                Postal Code{" "}
+                {deliveryType === "delivery" && (
+                  <small className='text-danger'>*</small>
+                )}
               </label>
               <input
                 className='form-control'
-                name='zipcode'
-                id='zipcode'
+                name='postalcode'
+                id='postalcode'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.zipcode}
               />
-              {formik.touched.zipcode && formik.errors.zipcode ? (
-                <div className='text-danger my-1'>{formik.errors.zipcode}</div>
+              {formik.touched.postalcode && formik.errors.postalcode ? (
+                <div className='text-danger my-1'>
+                  {formik.errors.postalcode}
+                </div>
               ) : null}
               <NotDeliverableModel
                 extraDeliveryCharges={extraDeliveryCharges}
@@ -438,7 +458,9 @@ function NewOrder() {
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
               />
-              <label className='form-label mt-2 mb-1'>Store Location</label>
+              <label className='form-label mt-2 mb-1'>
+                Store Location <small className='text-danger'>*</small>
+              </label>
               <select
                 className='form-select'
                 id='storesID'
@@ -470,7 +492,10 @@ function NewOrder() {
               {deliveryType === "delivery" && (
                 <>
                   <label className='form-label mt-2 mb-1'>
-                    Delivery Executive
+                    Delivery Executive{" "}
+                    {deliveryType === "delivery" && (
+                      <small className='text-danger'>*</small>
+                    )}
                   </label>
                   <select
                     className='form-select'
@@ -780,9 +805,12 @@ function NewOrder() {
                           min='0'
                           step='0.01'
                           value={
-                            settingsData?.filter(
-                              (item) => item.settingName === "Delivery Charges"
-                            )[0].settingValue
+                            cartdata.length !== 0
+                              ? settingsData?.filter(
+                                  (item) =>
+                                    item.settingName === "Delivery Charges"
+                                )[0].settingValue
+                              : null
                           }
                           readOnly
                         ></input>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { addToCartApi, sidesApi } from "../../API/ongoingOrder";
+import { sidesApi } from "../../API/ongoingOrder";
 import specialImg1 from "../../assets/bg-img.jpg";
 import $ from "jquery";
 import { toast } from "react-toastify";
@@ -7,13 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../reducer/cartReducer";
 
-function SidesMenu({
-  getCartList,
-  discount,
-  taxPer,
-  payloadEdit,
-  setPayloadEdit,
-}) {
+function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
   const [sidesData, setSidesData] = useState();
   const [quantity, setQuantity] = useState(1);
   const [sidesArr, setSidesArr] = useState([]);
@@ -24,9 +18,6 @@ function SidesMenu({
   useEffect(() => {
     sides();
   }, []);
-  useEffect(() => {
-    console.log(payloadEdit, "payloadEditpayloadEdit");
-  }, [payloadEdit, quantity]);
 
   // handle Quantity
   const handleQuantity = (e, side) => {
@@ -35,29 +26,13 @@ function SidesMenu({
     console.log("edit ss", index);
     if (index !== -1) {
       let arr = [...sidesArr];
-      // arr[index] = {
-      //   ...side,
-      //   qty: e.target.value,
-      // };
       arr[index].qty = e.target.value;
       setSidesArr(arr);
       console.log(e.target.value, "edit ss : ");
     } else {
       setSidesArr([...sidesArr, { ...side, qty: inputValue }]);
     }
-    // console.log(arr, "payload : ");
-    // if (parseInt(inputValue) < 1) {
-    //   e.target.value = 1;
-    // } else if (parseInt(inputValue) > 100) {
-    //   e.target.value = 100;
-    // } else {
-    //   setQuantity(inputValue);
-    // }
   };
-  useEffect(() => {
-    // if(payloadEdit !== undefined && payloadEdit.productType === "side"){
-    // }
-  }, [payloadEdit]);
 
   // Onclick handle Add To Cart & API - Add To Cart
   const handleAddToCart = async (e, sideCode, Obj) => {
@@ -68,8 +43,6 @@ function SidesMenu({
     let lineCode = $("#combination-" + sideCode)
       .find(":selected")
       .attr("data-key");
-    console.log("Combination Code : ", lineCode);
-    console.log("sideCode", sideCode);
 
     if (cart !== null && cart !== undefined) {
       cartCode = cart.cartCode;
@@ -85,10 +58,6 @@ function SidesMenu({
     const selectedCombinationObj = Obj?.combination?.filter(
       (data) => data.lineCode === lineCode
     );
-    console.log(selectedSideForNewItem, "selectedSideForNewItem");
-    console.log(Obj, "selectedCombination");
-    console.log(selectedCombination, "selectedCombination");
-    console.log();
     let price =
       selectedCombination !== undefined
         ? selectedCombination[0]?.price
@@ -101,7 +70,6 @@ function SidesMenu({
         : 1);
 
     if (selectedSideForNewItem.length === 0) {
-      console.log(selectedCombinationObj[0].price, "cartdata");
       const payload = {
         id: uuidv4(),
         customerCode: customerCode ? customerCode : "#NA",
@@ -128,9 +96,7 @@ function SidesMenu({
       });
       setSidesData(temp);
       setSidesArr([]);
-
       dispatch(addToCart([...cartdata, payload]));
-      console.log(payload, "payload : ");
       toast.success(`${Obj.sideName} ` + "Added Successfully");
       return;
     }
@@ -146,7 +112,6 @@ function SidesMenu({
     const selectedSide = sidesArr?.filter(
       (sides) => sides.sideCode === sideCode
     );
-    console.log(selectedSide, "payload : ");
 
     if (payloadEdit !== undefined && payloadEdit.productType === "side") {
       console.log("editt", payloadEdit);
@@ -171,7 +136,6 @@ function SidesMenu({
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
       );
-      console.log(payloadEdit, payloadForEdit, "pppp");
       let tempPayload = [...cartdata];
       tempPayload[updatedCart] = payloadForEdit;
       dispatch(addToCart([...tempPayload]));
@@ -187,7 +151,6 @@ function SidesMenu({
 
       setQuantity(1);
     } else {
-      console.log(selectedCombination[0]?.price, "selectedCombination price");
       const payload = {
         id: uuidv4(),
         customerCode: customerCode ? customerCode : "#NA",
@@ -208,10 +171,6 @@ function SidesMenu({
         pizzaSize: "",
         comments: "",
       };
-      console.log(payload);
-      // let index = sidesData?.findIndex(
-      //   (item) => item.sideCode === side.sideCode
-      // );
       let temp = sidesData.map((item) => {
         return {
           ...item,
@@ -220,32 +179,11 @@ function SidesMenu({
       });
       setSidesData(temp);
       setSidesArr([]);
-
       dispatch(addToCart([...cartdata, payload]));
-      console.log(payload, "payload : ");
       toast.success(
         `${selectedSideForNewItem[0]?.sideName} ` + "Added Successfully"
       );
-      // setQuantity(1);
     }
-
-    // await addToCartApi(payload)
-    //   .then((res) => {
-    //     localStorage.setItem("CartData", JSON.stringify(res.data.data));
-    //     //clear fields from create your own
-    //     getCartList();
-    //     toast.success(
-    //       `${selectedSide[0].sideName} - ${selectedCombination[0].size} Added Successfully...`
-    //     );
-    //   })
-    //   .catch((err) => {
-    //     if (err.response.status === 400 || err.response.status === 500) {
-    //       toast.error(err.response.data.message);
-    //     }
-    //   });
-    // } else {
-    //   toast.error("Quantity is required");
-    // }
   };
   useEffect(() => {
     if (payloadEdit !== undefined && payloadEdit.productType === "side") {
@@ -265,21 +203,6 @@ function SidesMenu({
   const sides = () => {
     sidesApi()
       .then((res) => {
-        console.log(
-          res.data.data?.map((item) => {
-            return {
-              ...item,
-              qty: 1,
-            };
-          }),
-          "res.data.data"
-        );
-        let arr = res.data.data?.map((item) => {
-          return {
-            ...item,
-            qty: 1,
-          };
-        });
         setSidesData(
           res.data.data?.map((item) => {
             return {
@@ -293,9 +216,6 @@ function SidesMenu({
         console.log("ERROR From SidesMenu API: ", err);
       });
   };
-  // useEffect(() => {
-
-  // }, [sidesData]);
 
   return (
     <>
@@ -359,10 +279,6 @@ function SidesMenu({
                       style={{ width: "auto" }}
                       onClick={(e) => handleAddToCart(e, data.sideCode, data)}
                     >
-                      {/* {payloadEdit !== undefined &&
-                      payloadEdit.productType === "side"
-                        ? "Edit Side"
-                        : "Add To Cart"} */}
                       {payloadEdit !== undefined &&
                       payloadEdit.productType === "side" &&
                       obj !== undefined

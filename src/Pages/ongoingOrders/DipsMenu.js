@@ -7,15 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { addToCartAndResetQty } from "./dipsMenu/dipsMenuFunctions";
 
-function DipsMenu({
-  discount,
-  taxPer,
-  getCartList,
-  setPayloadEdit,
-  payloadEdit,
-}) {
+function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
   const [dipsData, setDipsData] = useState();
-  const [quantity, setQuantity] = useState(1);
   const [dipsArr, setDipsArr] = useState([]);
   let cartdata = useSelector((state) => state.cart.cart);
   const dispatch = useDispatch();
@@ -31,10 +24,7 @@ function DipsMenu({
       e.target.value = 1;
     } else if (parseInt(inputValue) > 100) {
       e.target.value = 100;
-    } else {
-      setQuantity(inputValue);
     }
-
     let itemToUpdate = dipsArr?.findIndex((item) => item.dipsCode === dipsCode);
 
     if (itemToUpdate !== -1) {
@@ -59,7 +49,6 @@ function DipsMenu({
   const dips = () => {
     dipsApi()
       .then((res) => {
-        console.log(res.data.data, "api res dips");
         setDipsData(res.data.data);
       })
       .catch((err) => {
@@ -125,8 +114,6 @@ function DipsMenu({
       return;
     }
 
-    console.log(selectedDips, "selectedDips");
-
     if (cart !== null && cart !== undefined) {
       cartCode = cart.cartCode;
       customerCode = cart.customerCode;
@@ -137,9 +124,6 @@ function DipsMenu({
     totalAmount =
       Number(price) *
       (selectedDips[0]?.qty !== undefined ? Number(selectedDips[0]?.qty) : 1);
-
-    console.log(totalAmount, "totalAmount");
-    console.log(payloadEdit, "payloadEdit");
 
     if (payloadEdit !== undefined && payloadEdit.productType === "dips") {
       const payloadForEdit = {
@@ -199,7 +183,6 @@ function DipsMenu({
         pizzaSize: "",
         comments: "",
       };
-
       addToCartAndResetQty(
         dispatch,
         addToCart,
@@ -212,37 +195,6 @@ function DipsMenu({
         "Added Successfully"
       );
     }
-
-    // dispatch(addToCart([...cartdata, payload]));
-    // setQuantity(1);
-    // toast.success(`${selectedDips[0].dipsName} ` + "Added Successfully");
-    // let itemToUpdate = dipsData.findIndex((item) => item.dipsCode === dipsCode);
-
-    // if (itemToUpdate !== -1) {
-    //   let arr = [...dipsData];
-    //   arr[itemToUpdate] = {
-    //     ...selectedDips,
-    //     qty: 1,
-    //   };
-    //   setDipsData(arr);
-    // }
-    // await addToCartApi(payload)
-    //   .then((res) => {
-    //     localStorage.setItem("CartData", JSON.stringify(res.data.data));
-    //     //clear fields from create your own
-    //     toast.success(
-    //       `${quantity} - ${selectedDips[0].dipsName} Added Succesfully...`
-    //     );
-    //     getCartList();
-    //   })
-    //   .catch((err) => {
-    //     if (err.response.status === 400 || err.response.status === 500) {
-    //       toast.error(err.response.data.message);
-    //     }
-    //   });
-    // } else {
-    //   toast.error("Quantity is required");
-    // }
   };
 
   return (
