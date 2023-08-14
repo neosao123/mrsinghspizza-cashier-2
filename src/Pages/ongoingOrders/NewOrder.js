@@ -63,7 +63,7 @@ function NewOrder() {
   const globalCtx = useContext(GlobalContext);
   const [cartItemDetails, setCartItemDetails] = globalCtx.cartItem;
   const [orderData, setOrderData] = useState();
-  const [isZipcodeAvailable, setIsZipcodeAvailable] = useState(true);
+  const [ispostalcodeAvailable, setIspostalcodeAvailable] = useState(true);
   const [extraDeliveryCharges, setExtraDeliveryCharges] = useState(0);
   const [applyExtraDeliveryCharges, setApplyExtraDeliveryCharges] =
     useState(false);
@@ -93,14 +93,7 @@ function NewOrder() {
         break;
       case "Special_Pizza":
         specialTabRef.current.click();
-
         dispatch(setDisplaySpecialForm(true));
-        // getSpecialDetails(
-        //   { code: payloadEdit.code },
-        //   getSpecialDetailsApi,
-        //   setGetSpecialData
-        // );
-
         break;
       default:
         break;
@@ -134,7 +127,7 @@ function NewOrder() {
     customername: "",
     address: "",
     stores: "",
-    zipcode: "",
+    postalcode: "",
     deliveryExecutive: "",
   };
 
@@ -206,15 +199,18 @@ function NewOrder() {
         canadianPhoneNumberRegExp,
         "Invalid Canadian phone number format. Use (XXX) XXX-XXXX."
       ),
-    customername: Yup.string().required("Customer Name is Required."),
+    customername:
+      deliveryType === "pickup"
+        ? null
+        : Yup.string().required("Customer Name is Required."),
     address:
       deliveryType === "pickup"
         ? null
         : Yup.string().required("Address is Required"),
-    zipcode:
+    postalcode:
       deliveryType === "pickup"
         ? null
-        : Yup.string().required("zipcode is Required"),
+        : Yup.string().required("postalcode is Required"),
     deliveryExecutive:
       deliveryType === "pickup"
         ? null
@@ -236,7 +232,7 @@ function NewOrder() {
           values.category,
           values.stores,
           values.deliveryExecutive,
-          values.zipcode
+          values.postalcode
         );
         console.log(cartdata, "cartdata item");
         let cart = JSON.parse(localStorage.getItem("CartData"));
@@ -247,7 +243,7 @@ function NewOrder() {
           customerName: values.customername,
           mobileNumber: values.phoneno,
           address: values.address,
-          zipCode: values.zipcode,
+          postalcode: values.postalcode,
           deliveryType: deliveryType,
           storeLocation: values.stores,
           deliveryExecutive: values.deliveryExecutive,
@@ -276,35 +272,24 @@ function NewOrder() {
       } catch (error) {
         toast.error("Error placing the order:" + error);
       }
-      // console.log(
-      //   "Before : ",
-      //   values.customername,
-      //   values.phoneno,
-      //   values.address,
-      //   values.category,
-      //   values.stores,
-      //   values.deliveryExecutive
-      // );
-      // resetForm();
-      // return false;
     },
   });
-  const debouncedInputValue = useDebounce(formik.values.zipcode, 2000);
-  const fetchZipcodeIsDeliverable = async (zipcode) => {
+  const debouncedInputValue = useDebounce(formik.values.postalcode, 2000);
+  const fetchpostalcodeIsDeliverable = async (postalcode) => {
     // Make your API call here with searchTerm
-    console.log("API call triggered with input:", zipcode);
-    await isZipCodeDelivarable(zipcode)
+    console.log("API call triggered with input:", postalcode);
+    await isZipCodeDelivarable(postalcode)
       .then((res) => {
-        setIsZipcodeAvailable(res.data.deliverable);
+        setIspostalcodeAvailable(res.data.deliverable);
         res.data.deliverable ? setIsOpen(false) : setIsOpen(true);
       })
       .catch((err) => toast.error(err?.response?.data?.message));
   };
 
   useEffect(() => {
-    if (formik.values.zipcode.length > 0) {
-      fetchZipcodeIsDeliverable(formik.values.zipcode);
-      console.log("API call triggered with input:", formik.values.zipcode);
+    if (formik.values.postalcode.length > 0) {
+      fetchpostalcodeIsDeliverable(formik.values.postalcode);
+      console.log("API call triggered with input:", formik.values.postalcode);
     }
   }, [debouncedInputValue]);
 
@@ -380,7 +365,7 @@ function NewOrder() {
                   <input
                     className='mx-2'
                     type='radio'
-                    checked={formik.values.category === "pickup" ? true : false}
+                    checked={deliveryType === "pickup" ? true : false}
                     onChange={(e) => {
                       formik.handleChange(e);
                       handleRadiobtn(e);
@@ -395,9 +380,7 @@ function NewOrder() {
                     className='mx-2'
                     type='radio'
                     name='category'
-                    checked={
-                      formik.values.category === "delivery" ? true : false
-                    }
+                    checked={deliveryType === "delivery" ? true : false}
                     onChange={(e) => {
                       formik.handleChange(e);
                       handleRadiobtn(e);
@@ -407,9 +390,7 @@ function NewOrder() {
                   Delivery
                 </label>
               </div>
-              <label className='form-label'>
-                Customer Name <small className='text-danger'>*</small>
-              </label>
+              <label className='form-label'>Customer Name</label>
               <input
                 className='form-control'
                 type='text'
@@ -424,9 +405,7 @@ function NewOrder() {
                   {formik.errors.customername}
                 </div>
               ) : null}
-              <label className='form-label mt-2 mb-1'>
-                Address <small className='text-danger'>*</small>
-              </label>
+              <label className='form-label mt-2 mb-1'>Address</label>
               <textarea
                 className='form-control'
                 rows='4'
@@ -439,54 +418,33 @@ function NewOrder() {
               {formik.touched.address && formik.errors.address ? (
                 <div className='text-danger my-1'>{formik.errors.address}</div>
               ) : null}
-              <label className='form-label'>
-                Zip Code <small className='text-danger'>*</small>
-              </label>
-              <input
-                className='form-control'
-                name='zipcode'
-                id='zipcode'
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.zipcode}
-              />
-              {formik.touched.zipcode && formik.errors.zipcode ? (
-                <div className='text-danger my-1'>{formik.errors.zipcode}</div>
-              ) : null}
+
+              {deliveryType === "delivery" && (
+                <>
+                  <label className='form-label'>
+                    Postal Code <small className='text-danger'>*</small>
+                  </label>
+                  <input
+                    className='form-control'
+                    name='postalcode'
+                    id='postalcode'
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.postalcode}
+                  />
+                  {formik.touched.postalcode && formik.errors.postalcode ? (
+                    <div className='text-danger my-1'>
+                      {formik.errors.postalcode}
+                    </div>
+                  ) : null}
+                </>
+              )}
               <NotDeliverableModel
                 extraDeliveryCharges={extraDeliveryCharges}
                 setExtraDeliveryCharges={setExtraDeliveryCharges}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
               />
-
-              {applyExtraDeliveryCharges && (
-                // <div className='d-flex flex-wrap my-2 my-2 justify-content-end align-items-center'>
-                //   <div className='input-group w-100'>
-                //     <div className='input-group-prepend'>
-                //       <span className='input-group-text inputGroupTxt px-2'>
-                //         $
-                //       </span>
-                //     </div>
-                //     <input
-                //       className='form-control w-25 text-end'
-                //       type='number'
-                //       placeholder='0.00'
-                //       min='0'
-                //       step='1'
-                //       defaultValue={0}
-                //       value={extraDeliveryCharges}
-                //       onChange={(e) => setExtraDeliveryCharges(e.target.value)}
-                //     ></input>
-                //     <div className='input-group-append'>
-                //       <span className='input-group-text inputGroupTxt'>
-                //         CAD
-                //       </span>
-                //     </div>
-                //   </div>
-                // </div>
-                <></>
-              )}
               <label className='form-label mt-2 mb-1'>Store Location</label>
               <select
                 className='form-select'
@@ -516,36 +474,42 @@ function NewOrder() {
               ) : null}
 
               {/* delivery executive  */}
-              <label className='form-label mt-2 mb-1'>Delivery Executive</label>
-              <select
-                className='form-select'
-                id='storesID'
-                name='deliveryExecutive'
-                defaultValue={formik.values.deliveryExecutive ?? "STR_1"}
-                value={formik.values.deliveryExecutive ?? ""}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              >
-                <option value=''>Choose Delivery Executive</option>
-                {deliverExectiveList?.map((person) => {
-                  return (
-                    <option
-                      key={person.code}
-                      data-key={person.code}
-                      value={person.code}
-                    >
-                      {person.firstName} {person.lastName}
-                    </option>
-                  );
-                })}
-              </select>
+              {deliveryType === "delivery" && (
+                <>
+                  <label className='form-label mt-2 mb-1'>
+                    Delivery Executive
+                  </label>
+                  <select
+                    className='form-select'
+                    id='storesID'
+                    name='deliveryExecutive'
+                    defaultValue={formik.values.deliveryExecutive ?? "STR_1"}
+                    value={formik.values.deliveryExecutive ?? ""}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                  >
+                    <option value=''>Choose Delivery Executive</option>
+                    {deliverExectiveList?.map((person) => {
+                      return (
+                        <option
+                          key={person.code}
+                          data-key={person.code}
+                          value={person.code}
+                        >
+                          {person.firstName} {person.lastName}
+                        </option>
+                      );
+                    })}
+                  </select>
 
-              {formik.touched.deliveryExecutive &&
-              formik.errors.deliveryExecutive ? (
-                <div className='text-danger my-1'>
-                  {formik.errors.deliveryExecutive}
-                </div>
-              ) : null}
+                  {formik.touched.deliveryExecutive &&
+                  formik.errors.deliveryExecutive ? (
+                    <div className='text-danger my-1'>
+                      {formik.errors.deliveryExecutive}
+                    </div>
+                  ) : null}
+                </>
+              )}
 
               <h6 className='my-3'>Previous Order</h6>
               <div>
