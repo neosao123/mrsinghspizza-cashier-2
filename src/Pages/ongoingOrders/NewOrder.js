@@ -418,27 +418,20 @@ function NewOrder() {
               {formik.touched.address && formik.errors.address ? (
                 <div className='text-danger my-1'>{formik.errors.address}</div>
               ) : null}
-
-              {deliveryType === "delivery" && (
-                <>
-                  <label className='form-label'>
-                    Postal Code <small className='text-danger'>*</small>
-                  </label>
-                  <input
-                    className='form-control'
-                    name='postalcode'
-                    id='postalcode'
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.postalcode}
-                  />
-                  {formik.touched.postalcode && formik.errors.postalcode ? (
-                    <div className='text-danger my-1'>
-                      {formik.errors.postalcode}
-                    </div>
-                  ) : null}
-                </>
-              )}
+              <label className='form-label mt-2 mb-1'>
+                Postal Code <small className='text-danger'>*</small>
+              </label>
+              <input
+                className='form-control'
+                name='zipcode'
+                id='zipcode'
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.zipcode}
+              />
+              {formik.touched.zipcode && formik.errors.zipcode ? (
+                <div className='text-danger my-1'>{formik.errors.zipcode}</div>
+              ) : null}
               <NotDeliverableModel
                 extraDeliveryCharges={extraDeliveryCharges}
                 setExtraDeliveryCharges={setExtraDeliveryCharges}
