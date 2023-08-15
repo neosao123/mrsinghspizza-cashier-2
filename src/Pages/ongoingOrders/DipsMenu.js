@@ -208,13 +208,13 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
             <li className='list-group-item' key={data.dipsCode}>
               <div className='d-flex justify-content-between align-items-end py-2 px-1'>
                 <div className='d-flex justify-content-center w-auto'>
-                  <img
+                  {/* <img
                     className='rounded'
                     src={data.image === "" ? `${specialImg1}` : data.image}
                     width='50px'
                     height='50px'
                     alt=''
-                  ></img>
+                  ></img> */}
                 </div>
                 <div className='d-flex justify-content-center flex-column mx-2 px-2 py-1 w-100'>
                   <div className='d-flex justify-content-between align-items-center'>

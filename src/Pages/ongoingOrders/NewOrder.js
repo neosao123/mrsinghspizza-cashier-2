@@ -64,9 +64,7 @@ function NewOrder() {
   const [cartItemDetails, setCartItemDetails] = globalCtx.cartItem;
   const [orderData, setOrderData] = useState();
   const [ispostalcodeAvailable, setIspostalcodeAvailable] = useState(true);
-  const [extraDeliveryCharges, setExtraDeliveryCharges] = useState(0);
-  const [applyExtraDeliveryCharges, setApplyExtraDeliveryCharges] =
-    useState(false);
+  const [extraDeliveryCharges, setExtraDeliveryCharges] = useState(0); 
   const canadianPhoneNumberRegExp = /^\d{3}\d{3}\d{4}$/;
   const createYourOwnRef = useRef(null);
   const specialTabRef = useRef(null);
@@ -110,7 +108,7 @@ function NewOrder() {
   });
 
   const delivery_charges =
-    cartdata.length !== 0
+    cartdata.length !== 0 &&  deliveryType !== "pickup"
       ? settingsData?.filter(
           (item) => item.settingName === "Delivery Charges"
         )[0].settingValue
@@ -157,6 +155,7 @@ function NewOrder() {
 
     console.log(storesLocationData, "storesLocationData");
   }, [storesLocationData]);
+ 
 
   const deliveryExecutive = async (payload) => {
     await deliveryExecutiveApi(payload).then((res) => {
@@ -257,9 +256,11 @@ function NewOrder() {
           discountAmount: discount,
           taxPer: taxPer,
           taxAmount: 0,
-          deliveryCharges: settingsData?.filter(
-            (item) => item.settingName === "Delivery Charges"
-          )[0].settingValue,
+          deliveryCharges: cartdata.length !== 0 &&  deliveryType !== "pickup"
+          ? settingsData?.filter(
+              (item) => item.settingName === "Delivery Charges"
+            )[0].settingValue
+          : 0,
           extraDeliveryCharges: extraDeliveryCharges ? extraDeliveryCharges : 0,
           grandTotal: grandTotal,
         };
@@ -281,8 +282,7 @@ function NewOrder() {
   });
   const debouncedInputValue = useDebounce(formik.values.postalcode, 2000);
   const fetchpostalcodeIsDeliverable = async (postalcode) => {
-    // Make your API call here with searchTerm
-    console.log("API call triggered with input:", postalcode);
+    // Make your API call here with searchTerm 
     await isZipCodeDelivarable(postalcode)
       .then((res) => {
         setIspostalcodeAvailable(res.data.deliverable);
@@ -293,18 +293,12 @@ function NewOrder() {
 
   useEffect(() => {
     if (formik.values.postalcode.length > 0) {
-      fetchpostalcodeIsDeliverable(formik.values.postalcode);
-      console.log("API call triggered with input:", formik.values.postalcode);
+      fetchpostalcodeIsDeliverable(formik.values.postalcode); 
     }
   }, [debouncedInputValue]);
-
-  console.log(cartdata, "cartdata");
+ 
   useEffect(() => {
-    console.log(
-      settingsData?.filter((item) => item.settingName === "Delivery Charges")[0]
-        .settingValue,
-      "settingsData"
-    );
+    
     setTaxPer(
       settingsData?.filter((item) => item.settingName === "Tax Percentage")[0]
         .settingValue
@@ -433,7 +427,7 @@ function NewOrder() {
               {formik.touched.address && formik.errors.address ? (
                 <div className='text-danger my-1'>{formik.errors.address}</div>
               ) : null}
-              <label className='form-label mt-2 mb-1'>
+              {deliveryType === "pickup" ? null : (<><label className='form-label mt-2 mb-1'>
                 Postal Code{" "}
                 {deliveryType === "delivery" && (
                   <small className='text-danger'>*</small>
@@ -451,7 +445,7 @@ function NewOrder() {
                 <div className='text-danger my-1'>
                   {formik.errors.postalcode}
                 </div>
-              ) : null}
+              ) : null}</>)}
               <NotDeliverableModel
                 extraDeliveryCharges={extraDeliveryCharges}
                 setExtraDeliveryCharges={setExtraDeliveryCharges}
@@ -693,8 +687,7 @@ function NewOrder() {
               {/* Add to Cart */}
               <div className='d-flex flex-column cart'>
                 <div className='p-3 rounded mb-3 overflow-auto'>
-                  <Cart
-                    // cartRef={cartRef}
+                  <Cart 
                     onProductClick={handleProductClick}
                     payloadEdit={payloadEdit}
                     setPayloadEdit={setPayloadEdit}
@@ -773,11 +766,10 @@ function NewOrder() {
                           step='1'
                           defaultValue={0}
                           value={
-                            settingsData?.filter(
+                            cartdata.length !== 0 ? settingsData?.filter(
                               (item) => item.settingName === "Tax Percentage"
-                            )[0].settingValue
-                          }
-                          // onChange={(e) => setTaxPer(e.target.value)}
+                            )[0].settingValue : 0
+                          } 
                         ></input>
                         <div className='input-group-append'>
                           <span className='input-group-text inputGroupTxt'>
@@ -805,12 +797,12 @@ function NewOrder() {
                           min='0'
                           step='0.01'
                           value={
-                            cartdata.length !== 0
-                              ? settingsData?.filter(
-                                  (item) =>
-                                    item.settingName === "Delivery Charges"
-                                )[0].settingValue
-                              : null
+                            cartdata.length === 0 ||  deliveryType == "pickup"  
+                              ? 0
+                              : settingsData?.filter(
+                                (item) =>
+                                  item.settingName === "Delivery Charges"
+                              )[0].settingValue
                           }
                           readOnly
                         ></input>

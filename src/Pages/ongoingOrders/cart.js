@@ -38,54 +38,60 @@ const Cart = ({ payloadEdit, setPayloadEdit, onProductClick }) => {
               </div>
               <div className='d-flex justify-content-between'>
                 <div className='d-flex justify-content-left'>
-                  <h6>Size : </h6>
-                  <span className='mx-1'>
-                    {data.productType === "side"
-                      ? data.config.sidesSize
-                      : data.pizzaSize}
-                  </span>
+                  {data.productType === "custom_pizza" ||
+                    data.productType === "Special_Pizza" ||
+                    (data.productType === "side" && (
+                      <>
+                        <h6>Size : </h6>
+                        <span className='mx-1'>
+                          {data.productType === "side"
+                            ? data.config.sidesSize
+                            : data.pizzaSize}
+                        </span>
+                      </>
+                    ))}
                 </div>
                 <div className='d-flex justify-content-right mx-0 mb-1'>
                   <h6 className='mx-2'>Quantity : </h6>
                   <span className=''>{data.quantity}</span>
                 </div>
               </div>
-              {/* {console.log(
-                data.productType === "Special_Pizza",
-                data.productType === "custom_pizza"
-              )} */}
-              <div className='row d-flex'>
-                <div className='d-flex justify-content-left'>
-                  <h6 className='me-1 col-auto'>Toppings : </h6>
-                  <span className='mx-1'>
-                    {data?.config?.pizza?.map((pizza, index) => {
-                      return (
-                        <>
-                          <p key={"pizza" + index} className='mb-1'>
-                            Pizza {index + 1} :{" "}
-                            {[
-                              ...pizza?.toppings?.countAsOneToppings,
-                              ...pizza?.toppings?.countAsTwoToppings,
-                              ...pizza?.toppings?.freeToppings,
-                            ]
-                              .slice(0, 6)
-                              .map((pizzaItem) => {
-                                return (
-                                  <p
-                                    key={pizzaItem.toppingsCode}
-                                    className='d-inline-block m-0'
-                                  >
-                                    {pizzaItem?.toppingsName} ,
-                                  </p>
-                                );
-                              })}
-                          </p>
-                        </>
-                      );
-                    })}
-                  </span>
-                </div>
-              </div>
+              {data.productType === "Special_Pizza" ||
+                (data.productType === "custom_pizza" && (
+                  <div className='row d-flex'>
+                    <div className='d-flex justify-content-left'>
+                      <h6 className='me-1 col-auto'>Toppings : </h6>
+                      <span className='mx-1'>
+                        {data?.config?.pizza?.map((pizza, index) => {
+                          return (
+                            <>
+                              <p key={"pizza" + index} className='mb-1'>
+                                Pizza {index + 1} :{" "}
+                                {[
+                                  ...pizza?.toppings?.countAsOneToppings,
+                                  ...pizza?.toppings?.countAsTwoToppings,
+                                  ...pizza?.toppings?.freeToppings,
+                                ]
+                                  .slice(0, 6)
+                                  .map((pizzaItem) => {
+                                    return (
+                                      <p
+                                        key={pizzaItem.toppingsCode}
+                                        className='d-inline-block m-0'
+                                      >
+                                        {pizzaItem?.toppingsName} ,
+                                      </p>
+                                    );
+                                  })}
+                              </p>
+                            </>
+                          );
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+
               <div className='d-flex align-items-center'>
                 <span
                   className='btn m-0 p-0'

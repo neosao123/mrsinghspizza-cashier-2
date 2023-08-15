@@ -320,7 +320,7 @@ function Order() {
                       <td></td>
                       <td></td>
                       <th>Tax :</th>
-                      <td>$ {orderDetail?.taxPer}</td>
+                      <td>{orderDetail?.taxPer} %</td>
                     </tr>
                     <tr>
                       <td></td>
