@@ -36,7 +36,6 @@ function CreateYourOwn({
   const [price, setPrice] = useState(0);
   const [count, setCount] = useState(0);
   const [allCheckBoxes, setAllCheckBoxes] = useState([]);
-  // react
   const [sizesOfPizza, setSizesOfPizza] = useState(["Large", "Extra Large"]);
   const [sizesOfPizzaSelected, setSizesOfPizzaSelected] = useState(
     sizesOfPizza[0]
@@ -45,8 +44,6 @@ function CreateYourOwn({
   const [cheeseSelected, setCheeseSelected] = useState();
   const [specialBasesSelected, setSpecialBasesSelected] = useState();
   const dispatch = useDispatch();
-  //react
-
   // Calculate Price
   const calculatePrice = () => {
     let calculatePrice = 0;
@@ -777,7 +774,6 @@ function CreateYourOwn({
                   id='toppings-count-2-tab'
                   className='container tab-pane active m-0 p-0 topping-list'
                 >
-                  {console.log(countTwoToppingsArr, "countTwoToppingsArr")}
                   {allIngredients?.toppings?.countAsTwo?.map(
                     (countAsTwoToppings, index) => {
                       const toppingCode = countAsTwoToppings.toppingsCode;

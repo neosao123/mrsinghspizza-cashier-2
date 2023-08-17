@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { addToCartApi, dipsApi } from "../../API/ongoingOrder";
-import specialImg1 from "../../assets/bg-img.jpg";
+import { dipsApi } from "../../API/ongoingOrder";
 import { toast } from "react-toastify";
 import { addToCart } from "../../reducer/cartReducer";
 import { useDispatch, useSelector } from "react-redux";
@@ -202,8 +201,6 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       <ul className='list-group'>
         {dipsData?.map((data) => {
           let obj = dipsArr?.find((item) => item.dipsCode === data.dipsCode);
-          console.log(obj, "dipsarr obj");
-
           return (
             <li className='list-group-item' key={data.dipsCode}>
               <div className='d-flex justify-content-between align-items-end py-2 px-1'>

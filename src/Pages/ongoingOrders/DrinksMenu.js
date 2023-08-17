@@ -215,7 +215,6 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           let obj = drinksArr?.find(
             (item) => item.softdrinkCode === data.softdrinkCode
           );
-          console.log(obj, "obj");
           return (
             <li className='list-group-item' key={data.softdrinkCode}>
               <div className='d-flex justify-content-between align-items-end py-2 px-1'>

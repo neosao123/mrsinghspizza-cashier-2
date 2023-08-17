@@ -7,6 +7,7 @@ import {
   changeDeliveryExecutive,
   orderDetails,
   orderListApi,
+  statusChange,
 } from "../../API/order";
 import { ToastContainer, toast } from "react-toastify";
 
@@ -15,13 +16,19 @@ function Order() {
   const [orderFrom, setOrderFrom] = useState("all");
   const [orderDetail, setOrderDetail] = useState();
   const [orderId, setOrderId] = useState();
+  const [orderStatus, setOrderStatus] = useState();
+  const [orderByStatus, setOrderByStatus] = useState("");
   const [allDeliveryExecutiveData, setAllDeliveryExecutiveData] = useState();
   const [updatedDeliveryExecutive, setUpdatedDeliveryExecutive] = useState();
   const componentRef = useRef();
 
   const orderList = async () => {
     let cashierCode = localStorage.getItem("cashierCode");
-    orderListApi({ cashierCode: cashierCode, orderFrom: orderFrom })
+    orderListApi({
+      cashierCode: cashierCode,
+      orderFrom: orderFrom,
+      orderStatus: orderByStatus,
+    })
       .then((res) => {
         setListData(res.data.data);
       })
@@ -30,7 +37,6 @@ function Order() {
       });
   };
   const handleDeliveryExecutiveChange = (payload) => {
-    console.log(payload, "Order Detail :");
     if (payload !== "") {
       setUpdatedDeliveryExecutive(payload);
     }
@@ -56,6 +62,28 @@ function Order() {
       toast.error("select delivery executive");
     }
   };
+  const handleStatusChange = async (payload) => {
+    console.log(payload, "status payload");
+    if (
+      payload?.orderCurrentStatus === "placed" &&
+      payload?.orderCurrentStatus !== "cancelled" &&
+      payload?.orderCurrentStatus === "shipping" &&
+      payload?.orderCurrentStatus !== "completed"
+    ) {
+      console.log("status payload INSIDE ");
+      await statusChange({
+        orderCode: payload.orderCode,
+        orderStatus: payload.orderStatus,
+      })
+        .then((res) => {
+          toast.success(res.data.message);
+          orderList();
+        })
+        .catch((err) => toast.error(err?.response?.data.message));
+    } else {
+      toast.error("Order is already " + payload?.orderCurrentStatus);
+    }
+  };
 
   const getAllDeliveryExecutive = async () => {
     await allDeliveryExecutiveApi()
@@ -64,9 +92,7 @@ function Order() {
       })
       .catch((err) => console.log(err));
   };
-  useEffect(() => {
-    console.log(orderDetail, "orderDetail");
-  }, [orderDetail]);
+  useEffect(() => {}, [orderDetail]);
 
   useEffect(() => {
     if (orderId !== undefined) {
@@ -78,7 +104,8 @@ function Order() {
     orderList();
     setOrderDetail();
     getAllDeliveryExecutive();
-  }, [orderFrom]);
+    // setOrderByStatus("");
+  }, [orderFrom, orderByStatus]);
 
   return (
     <>
@@ -98,6 +125,22 @@ function Order() {
                   </option>
                   <option value='online' className='options'>
                     Online Order
+                  </option>
+                </select>
+                <select
+                  className='form-select px-4 py-2 orderType-selection'
+                  onChange={(e) => setOrderByStatus(e.target.value)}
+                >
+                  <option value=''>--Filter Orders By Status --</option>
+                  <option value=''>All</option>
+                  <option value='pickedup' className='options'>
+                    Pickedup
+                  </option>
+                  <option value='completed' className='options'>
+                    Completed
+                  </option>
+                  <option value='cancelled' className='options'>
+                    Cancelled
                   </option>
                 </select>
               </div>
@@ -124,54 +167,140 @@ function Order() {
                           key={data.code}
                           onClick={() => setOrderId(data.code)}
                         >
-                          <div className='d-flex px-3 my-1 justify-content-between align-items-center'>
+                          <div className='d-flex py-3 my-1 justify-content-between align-items-center'>
                             <div>
                               <span>
-                                <strong>#</strong>
+                                <strong>
+                                  <span
+                                    className='text-capitalize'
+                                    style={{ fontSize: "14px" }}
+                                  >
+                                    {data?.orderFrom}
+                                  </span>
+                                </strong>
                               </span>
                               <span className='mx-3'>{data.code}</span>
                             </div>
                             <div>
                               <span className='mx-3'>$ {data.grandTotal}</span>
                             </div>
-                            <div className='d-flex my-1 justify-content-end '>
-                              <span>
-                                <i
-                                  class='fa fa-map-marker'
-                                  aria-hidden='true'
-                                ></i>
-                              </span>
-                              <span className='mx-2 badge bg-info'>Store</span>
-                            </div>
-                            <div className='d-flex my-1 justify-content-end'>
-                              <span>
-                                <i class='fa fa-check' aria-hidden='true'></i>
-                              </span>
-                              <span className='mx-2 badge bg-secondary'>
-                                {data?.deliveryType}
-                              </span>
-                            </div>
-                            <div className='d-flex my-1 justify-content-end'>
-                              <span>
-                                <i class='fa fa-trash' aria-hidden='true'></i>
-                              </span>
-                              <span className='mx-2 badge bg-danger'>
-                                Cancel
-                              </span>
-                            </div>
+                            {console.log(data)}
+                            {data?.deliveryType === "pickup" ? (
+                              <div className='d-flex flex-wrap'>
+                                {" "}
+                                <div className='d-flex  my-1 justify-content-end '>
+                                  <span
+                                    className='mx-2 py-2 badge bg-secondary'
+                                    style={{ fontSize: "12px" }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStatusChange({
+                                        orderCode: data.code,
+                                        orderCurrentStatus: data.orderStatus,
+                                        orderStatus: "pickedup",
+                                      });
+                                    }}
+                                  >
+                                    Pickedup
+                                  </span>
+                                </div>
+                                <div className='d-flex my-1 justify-content-end'>
+                                  <span
+                                    className='mx-2 py-2 badge bg-danger'
+                                    style={{ fontSize: "12px" }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStatusChange({
+                                        orderCode: data.code,
+                                        orderCurrentStatus: data.orderStatus,
+                                        orderStatus: "cancelled",
+                                      });
+                                    }}
+                                  >
+                                    Cancel
+                                  </span>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className='d-flex flex-wrap'>
+                                <div className='d-flex  my-1 justify-content-end '>
+                                  <span
+                                    className='mx-2 py-2 badge bg-secondary'
+                                    style={{ fontSize: "12px" }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStatusChange({
+                                        orderCode: data.code,
+                                        orderCurrentStatus: data.orderStatus,
+                                        orderStatus: "shipping",
+                                      });
+                                    }}
+                                  >
+                                    Shipping
+                                  </span>
+                                </div>
+                                <div className='d-flex my-1 justify-content-end'>
+                                  <span
+                                    className='mx-2 py-2 badge bg-success'
+                                    style={{ fontSize: "12px" }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStatusChange({
+                                        orderCode: data.code,
+                                        orderCurrentStatus: data.orderStatus,
+                                        orderStatus: "delivered",
+                                      });
+                                    }}
+                                  >
+                                    Delivered
+                                  </span>
+                                </div>
+                                <div className='d-flex my-1 justify-content-end'>
+                                  <span
+                                    className='mx-2  py-2 badge bg-danger'
+                                    style={{ fontSize: "12px" }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStatusChange({
+                                        orderCode: data.code,
+                                        orderCurrentStatus: data.orderStatus,
+                                        orderStatus: "cancelled",
+                                      });
+                                    }}
+                                  >
+                                    Cancel
+                                  </span>
+                                </div>
+                              </div>
+                            )}
                           </div>
                           <div className='d-flex justify-content-between'>
-                            <div className='d-flex px-3 my-1 justify-content-start'>
+                            <div className='d-flex px-1 my-1 justify-content-start'>
                               <span>
                                 <i class='fa fa-user' aria-hidden='true'></i>
                               </span>
                               <span className='mx-3'>{data.customerName}</span>
                             </div>
-                            <div className='d-flex px-3 my-1 justify-content-end'>
-                              <span className='mx-2'>
-                                <i class='fa fa-phone' aria-hidden='true'></i>
+                            <div className='d-flex px-2 my-1 justify-content-between'>
+                              <span className='px-3'>
+                                <i
+                                  class='fa fa-phone mx-2'
+                                  aria-hidden='true'
+                                  style={{ fontSize: "14px" }}
+                                ></i>
+                                <span className='' style={{ fontSize: "14px" }}>
+                                  {data.mobileNumber}
+                                </span>
                               </span>
-                              <span className='mx-2'>{data.mobileNumber}</span>
+                              <span className='px-3'>
+                                <i class='' aria-hidden='true'></i>
+                                <strong
+                                  className='text-capitalize'
+                                  style={{ fontSize: "14px" }}
+                                >
+                                  {data.orderStatus}
+                                </strong>
+                              </span>
                             </div>
                           </div>
                         </li>
@@ -188,17 +317,37 @@ function Order() {
               style={{ height: "calc(100vh - 96px)" }}
             >
               <div
-                className=' p-4 rounded  '
+                className=' p-4 rounded '
                 style={{ backgroundColor: "#ff8c0021" }}
               >
                 <div className='col-12 d-flex justify-content-between my-3'>
                   <div className='col-6 h5'>Order Details</div>
-                  <div className='col-6 d-flex justify-content-end pe-4'>
+
+                  <div className=' d-flex pe-4'>
+                    {orderDetail?.deliveryType === "delivery" && (
+                      <button
+                        className='btn text-white mx-3'
+                        style={{ backgroundColor: "#ff8c00" }}
+                        data-bs-toggle='modal'
+                        data-bs-target='#exampleModal'
+                      >
+                        Change Delivery Person
+                      </button>
+                    )}
+
+                    {/* <button
+                      className='btn text-white  mx-3'
+                      style={{ backgroundColor: "#ff8c00" }}
+                      data-bs-toggle='modal'
+                      data-bs-target='#exampleModalStatus'
+                    >
+                      Change Order Status
+                    </button> */}
                     <ReactToPrint
                       trigger={() => (
                         <button
                           style={{ backgroundColor: "#ff8c00" }}
-                          className='btn text-white'
+                          className='btn text-white mx-3'
                           onClick={() => {}}
                         >
                           Print
@@ -218,7 +367,7 @@ function Order() {
                       Phone No : {orderDetail?.mobileNumber}
                     </h6>
                     <h6 className='py-2'>Address : {orderDetail?.address}</h6>
-                    <h6 className='py-2'>Zip Code : not received </h6>
+                    <h6 className='py-2'>Postal Code : not received </h6>
                     <h6 className='py-2'>
                       Delivery Type : {orderDetail?.deliveryType}
                     </h6>
@@ -243,16 +392,7 @@ function Order() {
                     <h6 className='py-2'>Type : {orderDetail?.orderFrom}</h6>
                   </div>
                 </div>
-                <div className='col-12 d-flex justify-content-end'>
-                  <button
-                    className='btn text-white  m-2'
-                    style={{ backgroundColor: "#ff8c00" }}
-                    data-bs-toggle='modal'
-                    data-bs-target='#exampleModal'
-                  >
-                    Change Delivery Person
-                  </button>
-                </div>
+
                 <div className='col-12'>
                   <h5>Product Detail :</h5>
                 </div>
@@ -267,18 +407,13 @@ function Order() {
                       <th>Amount</th>
                     </tr>
                     {orderDetail?.orderItems?.map((order, index) => {
-                      console.log(order, "order");
-
                       const objectToArray = Object.entries(order?.config).map(
                         ([key, value]) => ({ key, value })
                       );
-
-                      console.log(objectToArray, "keyNames");
-
                       return (
                         <tr key={index + order?.productName}>
                           <td scope='row'>{index + 1}</td>
-                          <td>
+                          <td className='text-capitalize'>
                             {order.productName}
                             {objectToArray?.map((item, index) => {
                               if (item?.key === "pizza") {
@@ -489,6 +624,60 @@ function Order() {
           </div>
         </div>
       </div>
+      {/* <div
+        class='modal fade'
+        id='exampleModalStatus'
+        tabindex='-1'
+        aria-labelledby='exampleModalLabel'
+        aria-hidden='true'
+      >
+        <div class='modal-dialog modal-dialog-centered'>
+          <div class='modal-content'>
+            <div class='modal-header'>
+              <h5 class='modal-title'>Change Order Status</h5>
+              <button
+                type='button'
+                class='btn-close'
+                data-bs-dismiss='modal'
+                aria-label='Close'
+              ></button>
+            </div>
+            <div class='modal-body'>
+              <select
+                class='form-select form-select-sm'
+                aria-label='.form-select-sm example'
+                value={orderStatus}
+                onChange={(e) => setOrderStatus(e.target.value)}
+              >
+                <option selected value={""}>
+                  Choose Order Status
+                </option>
+                <option value='pickedup'>Pickedup</option>
+                <option value='completed'>Completed</option>
+                <option value='cancelled'>Cancelled</option>
+              </select>
+            </div>
+            <div class='modal-footer'>
+              <button
+                type='button'
+                class='btn btn-secondary'
+                data-bs-dismiss='modal'
+              >
+                Close
+              </button>
+              <button
+                type='button'
+                style={{ backgroundColor: "#ff8c00" }}
+                class='btn text-white'
+                data-bs-dismiss='modal'
+                onClick={handleStatusChange}
+              >
+                Save changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div> */}
       <ToastContainer position='top-center' />
     </>
   );

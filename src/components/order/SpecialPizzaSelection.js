@@ -283,7 +283,6 @@ function SpecialPizzaSelection({
               >
                 {toppingsData?.toppings?.freeToppings?.map(
                   (freeToppings, index) => {
-                    console.log();
                     const comm = pizzaState[
                       count - 1
                     ]?.toppings?.freeToppings.findIndex(
@@ -315,11 +314,7 @@ function SpecialPizzaSelection({
                           >
                             $ {freeToppings?.price}
                           </p>
-                          {console.log(
-                            pizzaState[count - 1],
-                            count,
-                            "pizza state array"
-                          )}
+
                           <select
                             className='form-select d-inline-block'
                             style={{ width: "65%" }}

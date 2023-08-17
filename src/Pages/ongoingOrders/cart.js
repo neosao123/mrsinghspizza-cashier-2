@@ -3,26 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { addToCart } from "../../reducer/cartReducer";
 
-const Cart = ({ payloadEdit, setPayloadEdit, onProductClick }) => {
+const Cart = ({ setPayloadEdit, onProductClick }) => {
   const dispatch = useDispatch();
-
   const [cartListData, setCartListData] = useState();
-  // let cart = [];
   let cartdata = useSelector((state) => state.cart.cart);
-  // cart = [...cart, cartdata];
-
   const deleteItemFromCart = (ind) => {
-    console.log(ind, "payloadEdit");
     let tmp = [...cartListData];
     tmp.splice(ind, 1);
-    // let cartdata = cartListData.filter((item) => item.id !== deleteItemId);
-    console.log(cartdata, "payloadEdit");
     dispatch(addToCart([...tmp]));
     toast.error("Item deleted successfully");
   };
-
   useEffect(() => {
-    console.log("cartdata", cartdata);
     setCartListData(cartdata);
   }, [cartdata]);
 
@@ -106,16 +97,10 @@ const Cart = ({ payloadEdit, setPayloadEdit, onProductClick }) => {
                 </span>
                 <span
                   className='btn  mx-3'
-                  onClick={
-                    () => {
-                      console.log(cartdata[index], "clickedProductType");
-
-                      setPayloadEdit(cartdata[index]);
-                      console.log(cartdata[index].productType, "typeofproduct");
-                      onProductClick(cartdata[index].productType);
-                    }
-                    // handleEditCartItem(e, data.code, cartListData?.code)
-                  }
+                  onClick={() => {
+                    setPayloadEdit(cartdata[index]);
+                    onProductClick(cartdata[index].productType);
+                  }}
                 >
                   <i
                     className='fa fa-pencil-square-o'

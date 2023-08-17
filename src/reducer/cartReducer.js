@@ -11,7 +11,6 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addToCart: (state, action) => {
-      console.log(state.cart, "newww");
       state.cart = action.payload;
     },
     setDisplaySpecialForm: (state, action) => {

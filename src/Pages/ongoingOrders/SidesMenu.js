@@ -23,12 +23,10 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
   const handleQuantity = (e, side) => {
     const inputValue = e.target.value;
     let index = sidesArr?.findIndex((item) => item.sideCode === side.sideCode);
-    console.log("edit ss", index);
     if (index !== -1) {
       let arr = [...sidesArr];
       arr[index].qty = e.target.value;
       setSidesArr(arr);
-      console.log(e.target.value, "edit ss : ");
     } else {
       setSidesArr([...sidesArr, { ...side, qty: inputValue }]);
     }
@@ -114,7 +112,6 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     );
 
     if (payloadEdit !== undefined && payloadEdit.productType === "side") {
-      console.log("editt", payloadEdit);
       const payloadForEdit = {
         id: payloadEdit?.id,
         customerCode: customerCode ? customerCode : "#NA",
@@ -224,7 +221,12 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
         style={{ overflowY: "scroll", height: "30rem" }}
       >
         {sidesData?.map((data, index) => {
+          let comm = sidesArr?.findIndex(
+            (item) => item.sideCode === data.sideCode
+          );
           let obj = sidesArr?.find((item) => item.sideCode === data.sideCode);
+          console.log(data);
+          console.log(obj);
           return (
             <li className='list-group-item' key={data.sideCode}>
               <div className='d-flex justify-content-between align-items-end py-2 px-1'>
@@ -246,6 +248,10 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                       className='form-select'
                       style={{ width: "35%" }}
                       id={"combination-" + data.sideCode}
+                      onChange={() => {}}
+                      // value={
+                      //   comm !== -1 ? sidesArr[comm].combination[0].lineCode : 0
+                      // }
                     >
                       {data?.combination?.map((combinationData) => {
                         return (
@@ -254,6 +260,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                               key={combinationData.lineCode}
                               data-key={combinationData.lineCode}
                               data-price={combinationData.price}
+                              value={combinationData.lineCode}
                             >
                               {combinationData.size} - $ {combinationData.price}
                             </option>
@@ -268,7 +275,6 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                       onChange={(e) => handleQuantity(e, data)}
                       step={1}
                       min={1}
-                      // value={data?.qty}
                       value={obj !== undefined ? obj.qty : data.qty}
                       max={100}
                       defaultValue={1}

@@ -16,3 +16,6 @@ export const changeDeliveryExecutive = async (payload) => {
 export const allDeliveryExecutiveApi = async () => {
   return await privateAPi.get("/delivery-executive");
 };
+export const statusChange = async (payload) => {
+  return await privateAPi.post("/cashier/order/statuschange", payload);
+};
