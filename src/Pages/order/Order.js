@@ -10,6 +10,8 @@ import {
   statusChange,
 } from "../../API/order";
 import { ToastContainer, toast } from "react-toastify";
+import Print from "./Print";
+import { useSelector } from "react-redux";
 
 function Order() {
   const [listData, setListData] = useState();
@@ -20,7 +22,8 @@ function Order() {
   const [orderByStatus, setOrderByStatus] = useState("");
   const [allDeliveryExecutiveData, setAllDeliveryExecutiveData] = useState();
   const [updatedDeliveryExecutive, setUpdatedDeliveryExecutive] = useState();
-  const componentRef = useRef();
+  const printRef = useRef();
+  // const printRef = useSelector((state) => state.cart.printRef);
 
   const orderList = async () => {
     let cashierCode = localStorage.getItem("cashierCode");
@@ -92,7 +95,9 @@ function Order() {
       })
       .catch((err) => console.log(err));
   };
-  useEffect(() => {}, [orderDetail]);
+  useEffect(() => {
+    console.log(orderDetail, "place order payload after placed");
+  }, [orderDetail]);
 
   useEffect(() => {
     if (orderId !== undefined) {
@@ -188,38 +193,42 @@ function Order() {
                             {data?.deliveryType === "pickup" ? (
                               <div className='d-flex flex-wrap'>
                                 {" "}
-                                <div className='d-flex  my-1 justify-content-end '>
-                                  <span
-                                    className='mx-2 py-2 badge bg-secondary'
-                                    style={{ fontSize: "12px" }}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleStatusChange({
-                                        orderCode: data.code,
-                                        orderCurrentStatus: data.orderStatus,
-                                        orderStatus: "pickedup",
-                                      });
-                                    }}
-                                  >
-                                    Pickedup
-                                  </span>
-                                </div>
-                                <div className='d-flex my-1 justify-content-end'>
-                                  <span
-                                    className='mx-2 py-2 badge bg-danger'
-                                    style={{ fontSize: "12px" }}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleStatusChange({
-                                        orderCode: data.code,
-                                        orderCurrentStatus: data.orderStatus,
-                                        orderStatus: "cancelled",
-                                      });
-                                    }}
-                                  >
-                                    Cancel
-                                  </span>
-                                </div>
+                                {data?.orderStatus !== "cancelled" && (
+                                  <div className='d-flex  my-1 justify-content-end '>
+                                    <span
+                                      className='mx-2 py-2 badge bg-secondary'
+                                      style={{ fontSize: "12px" }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleStatusChange({
+                                          orderCode: data.code,
+                                          orderCurrentStatus: data.orderStatus,
+                                          orderStatus: "pickedup",
+                                        });
+                                      }}
+                                    >
+                                      Pickedup
+                                    </span>
+                                  </div>
+                                )}
+                                {data?.orderStatus !== "cancelled" && (
+                                  <div className='d-flex my-1 justify-content-end'>
+                                    <span
+                                      className='mx-2 py-2 badge bg-danger'
+                                      style={{ fontSize: "12px" }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleStatusChange({
+                                          orderCode: data.code,
+                                          orderCurrentStatus: data.orderStatus,
+                                          orderStatus: "cancelled",
+                                        });
+                                      }}
+                                    >
+                                      Cancel
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                             ) : (
                               <div className='d-flex flex-wrap'>
@@ -334,15 +343,6 @@ function Order() {
                         Change Delivery Person
                       </button>
                     )}
-
-                    {/* <button
-                      className='btn text-white  mx-3'
-                      style={{ backgroundColor: "#ff8c00" }}
-                      data-bs-toggle='modal'
-                      data-bs-target='#exampleModalStatus'
-                    >
-                      Change Order Status
-                    </button> */}
                     <ReactToPrint
                       trigger={() => (
                         <button
@@ -353,7 +353,7 @@ function Order() {
                           Print
                         </button>
                       )}
-                      content={() => componentRef.current}
+                      content={() => printRef?.current}
                       onBeforePrint={() => {}}
                     ></ReactToPrint>
                   </div>
@@ -473,94 +473,7 @@ function Order() {
                     </tr>
                   </tbody>
                 </table>
-                <div className='d-none'>
-                  <div
-                    className='col-12 m-1'
-                    style={{ width: "132mm" }}
-                    ref={componentRef}
-                  >
-                    <div className='row'>
-                      <h3 className='text-center'>Mr Singh's Pizza</h3>
-                      <p className='text-center'>
-                        2120 N Park Dr Unit #25, Brampton, ON L6S 0C9{" "}
-                      </p>
-                      <p className='text-center'>905-500-4000</p>
-                    </div>
-                    <div className='row d-flex mx-1'>
-                      <div className='d-flex justify-content-between'>
-                        <p className='m-0'>
-                          {" "}
-                          Date :{" "}
-                          {
-                            new Date(orderDetail?.created_at)
-                              .toISOString()
-                              .replace(/T/, " ")
-                              .replace(/\.\d+Z$/, "")
-                              .split(" ")[0]
-                          }
-                        </p>
-                        <p className='m-0'>
-                          Time :{" "}
-                          {
-                            new Date(orderDetail?.created_at)
-                              .toISOString()
-                              .replace(/T/, " ")
-                              .replace(/\.\d+Z$/, "")
-                              .split(" ")[1]
-                          }
-                        </p>
-                      </div>
-                      <div>{orderDetail?.cashierName}</div>
-                    </div>
-                    <div className='d-flex col-12 row mx-1'>
-                      <div className='col-1'>Qty</div>
-                      <div className='col-8'>Item</div>
-                      <div className='col-3 text-end '>Amount</div>
-                      {orderDetail?.orderItems?.map((order, index) => {
-                        const objectToArray = Object.entries(order?.config).map(
-                          ([key, value]) => ({ key, value })
-                        );
-                        return (
-                          <p
-                            key={index + order?.productName}
-                            className='d-flex m-0  '
-                          >
-                            <div className='col-1'>
-                              <p className='m-0'>{order.quantity}</p>
-                            </div>
-                            <div className='col-8'>
-                              {order.productName}
-                              {objectToArray?.map((item, index) => {
-                                if (item?.key === "pizza") {
-                                  return (
-                                    <>
-                                      <p className='m-0'>{item.key}</p>
-                                      <PizzaDetails pizzaData={item} />
-                                    </>
-                                  );
-                                }
-                              })}
-                            </div>
-                            <div className='text-end col-3'>
-                              $ {order.amount}
-                            </div>
-
-                            <hr />
-                          </p>
-                        );
-                      })}
-                    </div>
-                    <div className='d-flex col-12 row mx-1 text-end'>
-                      <div className='col-12'>
-                        <p>Sub Total : $ {orderDetail?.subTotal}</p>
-                        <p>
-                          Delivery Charges : $ {orderDetail?.deliveryCharges}
-                        </p>
-                        <p>Grand Total : $ {orderDetail?.grandTotal}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <Print printRef={printRef} orderDetail={orderDetail} />
               </div>
             </div>
           )}
@@ -682,7 +595,7 @@ function Order() {
     </>
   );
 }
-const PizzaDetails = ({ pizzaData }) => {
+export const PizzaDetails = ({ pizzaData }) => {
   const pizzaItems = pizzaData.value[0];
 
   const renderItemNames = (item) => {
@@ -705,7 +618,7 @@ const PizzaDetails = ({ pizzaData }) => {
     </div>
   );
 };
-const ToppingsList = ({ toppingsData }) => {
+export const ToppingsList = ({ toppingsData }) => {
   console.log(toppingsData, "toppingsData");
   console.log(toppingsData);
   const allToppings = [].concat(

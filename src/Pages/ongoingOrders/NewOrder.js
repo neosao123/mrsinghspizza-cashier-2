@@ -41,8 +41,11 @@ import { addToCart, setDisplaySpecialForm } from "../../reducer/cartReducer";
 import { getSpecialDetails } from "./specialMenu/specialMenuCustomApiHandler";
 import { useDebounce } from "./newOrder/newOrderFunctions";
 import NotDeliverableModel from "./newOrder/model";
+import { orderDetails } from "../../API/order";
+import Print from "../order/Print";
+import ReactToPrint from "react-to-print";
 
-function NewOrder() {
+function NewOrder({ printRef }) {
   // const [show, setShow] = useState(false);
   const [allIngredients, setAllIngredients] = useState();
   const [sidesData, setSidesData] = useState();
@@ -60,8 +63,8 @@ function NewOrder() {
   const [cartCode, setCartCode] = useState();
   const [cartLineCode, setCartLineCode] = useState();
   const [settingsData, setSettingsData] = useState();
-  const globalCtx = useContext(GlobalContext);
-  const [cartItemDetails, setCartItemDetails] = globalCtx.cartItem;
+  const [isOrderSubmittedSuccessfully, setIsOrderSubmittedSuccessfully] =
+    useState(false);
   const [orderData, setOrderData] = useState();
   const [ispostalcodeAvailable, setIspostalcodeAvailable] = useState(true);
   const [extraDeliveryCharges, setExtraDeliveryCharges] = useState(0);
@@ -72,7 +75,10 @@ function NewOrder() {
   const dispatch = useDispatch();
   const sidesRef = useRef(null);
   const drinksRef = useRef(null);
+  const printRef2 = useRef();
+  const btnRef = useRef();
   const [isOpen, setIsOpen] = useState(false);
+  const [orderDetail, setOrderDetail] = useState();
 
   const handleProductClick = (productType) => {
     switch (productType) {
@@ -96,6 +102,8 @@ function NewOrder() {
         break;
     }
   };
+
+  console.log(orderDetail, "placed order res");
 
   let cartdata = useSelector((state) => state.cart.cart);
   let totalPrice = 0;
@@ -144,6 +152,12 @@ function NewOrder() {
       deliveryExecutive(storesLocationData[0]?.code);
     }
   }, [storesLocationData]);
+  useEffect(() => {
+    if (isOrderSubmittedSuccessfully) {
+      btnRef.current.click();
+      setIsOrderSubmittedSuccessfully(false);
+    }
+  }, [isOrderSubmittedSuccessfully]);
 
   const deliveryExecutive = async (payload) => {
     await deliveryExecutiveApi(payload).then((res) => {
@@ -242,19 +256,27 @@ function NewOrder() {
           extraDeliveryCharges: extraDeliveryCharges ? extraDeliveryCharges : 0,
           grandTotal: grandTotal,
         };
-        console.log(payload);
-
+        console.log(payload, "place order payload");
         const response = await orderPlaceApi(payload);
-
+        console.log(response, "placed order res");
         if (response.status === 200) {
           resetForm();
           dispatch(addToCart([]));
+          console.log(response.data.orderCode, "placed order res orderdetail");
+          orderDetails({ orderCode: response.data.orderCode }).then((data) => {
+            setOrderDetail(data.data.data);
+            setIsOrderSubmittedSuccessfully(true);
+          });
           toast.success("order placed successfully");
         } else {
           toast.error("Failed to place the order");
         }
       } catch (error) {
-        toast.error("Error placing the order:" + error);
+        if (cartdata?.length === 0 || cartdata == undefined) {
+          toast.error("Add something to cart");
+        } else {
+          toast.error("Error placing the order:" + error);
+        }
       }
     },
   });
@@ -303,9 +325,9 @@ function NewOrder() {
       <Nav />
       <div className='container-fluid orderContainer'>
         <form onSubmit={formik.handleSubmit}>
-          <div className='row gx-4 orderContainer'>
+          <div className='row gx-4 orderContainer '>
             {/* Section 1 */}
-            <div className='col-lg-2'>
+            <div className='col-lg-2 sectionOne'>
               <label className='form-label mt-2 mb-1'>
                 Phone <small className='text-danger'>*</small>{" "}
               </label>
@@ -418,7 +440,7 @@ function NewOrder() {
                     id='postalcode'
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    value={formik.values.zipcode}
+                    value={formik.values.postalcode}
                   />
                   {formik.touched.postalcode && formik.errors.postalcode ? (
                     <div className='text-danger my-1'>
@@ -824,6 +846,7 @@ function NewOrder() {
                     </div>
 
                     {/* Submit Order */}
+
                     <div className='d-flex flex-row justify-content-end align-items-center'>
                       <button
                         type='button'
@@ -835,6 +858,22 @@ function NewOrder() {
                           ? "Please wait..."
                           : "Submit Order"}
                       </button>
+                      <div className='d-none'>
+                        <ReactToPrint
+                          trigger={() => (
+                            <button
+                              ref={btnRef}
+                              type='button'
+                              disabled={formik.isSubmitting}
+                              className='submitOrderbtn btn btn-sm mx-3 my-3 px-4 py-2'
+                            >
+                              {formik.isSubmitting ? "Please wait..." : "Print"}
+                            </button>
+                          )}
+                          content={() => printRef2?.current}
+                          onBeforePrint={() => {}}
+                        ></ReactToPrint>
+                      </div>
                     </div>
                   </form>
                 </div>
@@ -843,6 +882,7 @@ function NewOrder() {
           </div>
         </form>
       </div>
+      <Print printRef={printRef2} orderDetail={orderDetail} />
       <ToastContainer position='top-center' />
     </>
   );

@@ -25,12 +25,41 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     let index = sidesArr?.findIndex((item) => item.sideCode === side.sideCode);
     if (index !== -1) {
       let arr = [...sidesArr];
-      arr[index].qty = e.target.value;
+      arr[index].qty = e.target.value < 0 ? 1 : e.target.value;
       setSidesArr(arr);
     } else {
-      setSidesArr([...sidesArr, { ...side, qty: inputValue }]);
+      setSidesArr([
+        ...sidesArr,
+        { ...side, qty: e.target.value < 0 ? 1 : e.target.value },
+      ]);
     }
   };
+  const handleSidesLineChange = (e, data) => {
+    console.log(e.target.value, "sidelinechange");
+    console.log(data, "sidelinechange");
+    let index = sidesArr?.findIndex((item) => item.sideCode === data.sideCode);
+    let selectedSideLine = sidesArr[index]?.combination?.filter(
+      (item) => item.lineCode === e.target.value
+    );
+    let obj = sidesData.find((item) => item.sideCode === data.sideCode);
+    if (index !== -1) {
+      let arr = [...sidesArr];
+
+      arr[index].combination = obj.combination.filter(
+        (item) => item.lineCode === e.target.value
+      );
+      setSidesArr(arr);
+    } else {
+      let selectedSideLine = data?.combination?.filter(
+        (item) => item.lineCode === e.target.value
+      );
+      console.log(selectedSideLine, "sidelinechange");
+      setSidesArr([{ ...data, combination: selectedSideLine }]);
+    }
+  };
+  useEffect(() => {
+    console.log(sidesArr, "sidelinechange");
+  }, [sidesArr]);
 
   // Onclick handle Add To Cart & API - Add To Cart
   const handleAddToCart = async (e, sideCode, Obj) => {
@@ -110,6 +139,8 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     const selectedSide = sidesArr?.filter(
       (sides) => sides.sideCode === sideCode
     );
+    console.log(selectedSide, "selectedSide");
+    console.log(selectedSide[0].combination, "selectedSide");
 
     if (payloadEdit !== undefined && payloadEdit.productType === "side") {
       const payloadForEdit = {
@@ -119,11 +150,11 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
         productName: selectedSide[0].sideName,
         productType: "side",
         config: {
-          lineCode: selectedSideForNewItem[0].lineCode,
-          sidesSize: selectedSideForNewItem[0].size,
+          lineCode: selectedSide[0].combination[0].lineCode,
+          sidesSize: selectedSide[0].combination[0].size,
         },
         quantity: selectedSide[0].qty,
-        price: selectedSideForNewItem[0].price,
+        price: selectedSide[0].price,
         amount: totalAmount.toFixed(2),
         discountAmount: discount,
         taxPer: taxPer,
@@ -183,6 +214,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     }
   };
   useEffect(() => {
+    console.log(payloadEdit, "sidelinechange");
     if (payloadEdit !== undefined && payloadEdit.productType === "side") {
       setSidesArr([
         ...sidesArr,
@@ -191,6 +223,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
           sideName: payloadEdit?.productName,
           price: payloadEdit?.price,
           qty: payloadEdit?.quantity,
+          combination: [payloadEdit?.config],
         },
       ]);
     }
@@ -248,10 +281,14 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                       className='form-select'
                       style={{ width: "35%" }}
                       id={"combination-" + data.sideCode}
-                      onChange={() => {}}
-                      // value={
-                      //   comm !== -1 ? sidesArr[comm].combination[0].lineCode : 0
-                      // }
+                      onChange={(e) => {
+                        handleSidesLineChange(e, data);
+                      }}
+                      value={
+                        comm !== -1
+                          ? sidesArr[comm]?.combination[0]?.lineCode
+                          : null
+                      }
                     >
                       {data?.combination?.map((combinationData) => {
                         return (

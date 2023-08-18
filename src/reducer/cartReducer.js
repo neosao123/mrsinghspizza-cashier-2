@@ -4,6 +4,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   cart: [],
   displaySpecialForm: false,
+  printRef: null,
+  orderDetail: null,
 };
 
 const cartSlice = createSlice({
@@ -16,8 +18,15 @@ const cartSlice = createSlice({
     setDisplaySpecialForm: (state, action) => {
       state.displaySpecialForm = action.payload;
     },
+    setPrintRef: (state, action) => {
+      state.printRef = action.payload;
+    },
+    setOrderDetail: (state, action) => {
+      state.orderDetail = action.payload;
+    },
   },
 });
 
-export const { addToCart, setDisplaySpecialForm } = cartSlice.actions;
+export const { addToCart, setOrderDetail, setPrintRef, setDisplaySpecialForm } =
+  cartSlice.actions;
 export default cartSlice.reducer;

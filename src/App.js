@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import ForgetPass from "./Pages/auth/ForgetPass";
 import Login from "./Pages/auth/Login";
@@ -14,10 +14,12 @@ import AuthLayout from "./layout/AuthLayout";
 import { cashierDetails } from "./API/ongoingOrder";
 import { Helmet } from "react-helmet";
 import { GlobalProvider } from "./context/GlobalContext";
+import { setPrintRef } from "./reducer/cartReducer";
 
 function App() {
   const dispatch = useDispatch();
-
+  const printRef = useRef();
+  dispatch(setPrintRef(printRef));
   const [hasToken, setHasToken] = useState(false);
   // useEffect(() => {
   //   // window.addEventListener("resize", restrictedPage);
@@ -147,11 +149,11 @@ function App() {
             path='/ongoing-orders'
             element={
               <AuthLayout>
-                <OngoingOrder />
+                <OngoingOrder printRef={printRef} />
               </AuthLayout>
             }
           />
-          <Route path='/orders' element={<Order />} />
+          <Route path='/orders' element={<Order printRef={printRef} />} />
           <Route path='/invoices' element={<Invoices />} />
           <Route path='/reports' element={<Report />} />
 

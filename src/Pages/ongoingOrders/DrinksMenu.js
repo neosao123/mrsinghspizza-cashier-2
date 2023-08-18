@@ -35,7 +35,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       let arr = [...drinksArr];
       arr[itemToUpdate] = {
         ...data,
-        qty: inputValue,
+        qty: inputValue < 0 ? 1 : inputValue,
       };
       setDrinksArr(arr);
     } else {
@@ -43,7 +43,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         ...drinksArr,
         {
           ...data,
-          qty: inputValue,
+          qty: inputValue < 0 ? 1 : inputValue,
         },
       ]);
     }

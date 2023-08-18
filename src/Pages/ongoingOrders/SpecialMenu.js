@@ -220,7 +220,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             setTotalPriceOfToppings((prev) => {
               return prev - 1;
             });
-            // setPrice((prev) => prev - Number(countAsTwoToppings.price));
+            setPrice((prev) => prev - Number(countAsTwoToppings.price));
           } else {
             if (offeredFreeToppings === 0) {
               setOfferedFreeToppings((prev) => prev + 2);
@@ -241,6 +241,23 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setPizzaState(arr);
     }
   };
+  const calculateTotalPrice = () => {
+    let sum = 0;
+    if (pizzaState?.length > 0) {
+      pizzaState[0]?.toppings?.countAsTwoToppings?.forEach(
+        (item) => (sum += Number(item.price))
+      );
+    }
+
+    return sum;
+  };
+  // useEffect(() => {
+  //   let sum =
+  //     calculateTotalPrice() >= getSpecialData?.noofToppings
+  //       ? calculateTotalPrice() - getSpecialData?.noofToppings
+  //       : 0;
+  //   setTotalPriceOfToppings((prev) => prev + sum);
+  // }, [pizzaState]);
 
   const handleOneToppings = (e, count, countAsOneToppings) => {
     const { checked } = e.target;

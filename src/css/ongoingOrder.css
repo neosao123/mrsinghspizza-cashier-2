@@ -85,3 +85,7 @@ h6 {
   height: calc(100vh - 128px);
   justify-content: space-between;
 }
+.sectionOne {
+  height: calc(100vh - 128px);
+  overflow-y: scroll;
+}

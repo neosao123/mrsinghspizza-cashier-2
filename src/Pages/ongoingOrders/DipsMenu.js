@@ -30,7 +30,7 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       let arr = [...dipsArr];
       arr[itemToUpdate] = {
         ...data,
-        qty: inputValue,
+        qty: inputValue < 0 ? 1 : inputValue,
       };
       setDipsArr(arr);
     } else {
@@ -38,7 +38,7 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         ...dipsArr,
         {
           ...data,
-          qty: inputValue,
+          qty: inputValue < 0 ? 1 : inputValue,
         },
       ]);
     }
