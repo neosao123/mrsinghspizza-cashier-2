@@ -68,10 +68,8 @@ function Order() {
   const handleStatusChange = async (payload) => {
     console.log(payload, "status payload");
     if (
-      payload?.orderCurrentStatus === "placed" &&
-      payload?.orderCurrentStatus !== "cancelled" &&
-      payload?.orderCurrentStatus === "shipping" &&
-      payload?.orderCurrentStatus !== "completed"
+      payload?.orderCurrentStatus === "placed" ||
+      payload?.orderCurrentStatus === "shipping"
     ) {
       console.log("status payload INSIDE ");
       await statusChange({
@@ -141,8 +139,8 @@ function Order() {
                   <option value='pickedup' className='options'>
                     Pickedup
                   </option>
-                  <option value='completed' className='options'>
-                    Completed
+                  <option value='delivered' className='options'>
+                    Delivered
                   </option>
                   <option value='cancelled' className='options'>
                     Cancelled
@@ -211,7 +209,8 @@ function Order() {
                                     </span>
                                   </div>
                                 )}
-                                {data?.orderStatus !== "cancelled" && (
+                                {data?.orderStatus !== "cancelled" &&
+                                data?.orderStatus !== "delivered" ? (
                                   <div className='d-flex my-1 justify-content-end'>
                                     <span
                                       className='mx-2 py-2 badge bg-danger'
@@ -228,58 +227,66 @@ function Order() {
                                       Cancel
                                     </span>
                                   </div>
-                                )}
+                                ) : null}
                               </div>
                             ) : (
                               <div className='d-flex flex-wrap'>
-                                <div className='d-flex  my-1 justify-content-end '>
-                                  <span
-                                    className='mx-2 py-2 badge bg-secondary'
-                                    style={{ fontSize: "12px" }}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleStatusChange({
-                                        orderCode: data.code,
-                                        orderCurrentStatus: data.orderStatus,
-                                        orderStatus: "shipping",
-                                      });
-                                    }}
-                                  >
-                                    Shipping
-                                  </span>
-                                </div>
-                                <div className='d-flex my-1 justify-content-end'>
-                                  <span
-                                    className='mx-2 py-2 badge bg-success'
-                                    style={{ fontSize: "12px" }}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleStatusChange({
-                                        orderCode: data.code,
-                                        orderCurrentStatus: data.orderStatus,
-                                        orderStatus: "delivered",
-                                      });
-                                    }}
-                                  >
-                                    Delivered
-                                  </span>
-                                </div>
-                                <div className='d-flex my-1 justify-content-end'>
-                                  <span
-                                    className='mx-2  py-2 badge bg-danger'
-                                    style={{ fontSize: "12px" }}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleStatusChange({
-                                        orderCode: data.code,
-                                        orderCurrentStatus: data.orderStatus,
-                                        orderStatus: "cancelled",
-                                      });
-                                    }}
-                                  >
-                                    Cancel
-                                  </span>
-                                </div>
+                                {console.log(data, "status payload")}
+                                {data.orderStatus === "placed" && (
+                                  <div className='d-flex  my-1 justify-content-end '>
+                                    <span
+                                      className='mx-2 py-2 badge bg-secondary'
+                                      style={{ fontSize: "12px" }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleStatusChange({
+                                          orderCode: data.code,
+                                          orderType: data.deliveryType,
+                                          orderCurrentStatus: data.orderStatus,
+                                          orderStatus: "shipping",
+                                        });
+                                      }}
+                                    >
+                                      Shipping
+                                    </span>
+                                  </div>
+                                )}
+                                {data.orderStatus === "shipping" && (
+                                  <div className='d-flex my-1 justify-content-end'>
+                                    <span
+                                      className='mx-2 py-2 badge bg-success'
+                                      style={{ fontSize: "12px" }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleStatusChange({
+                                          orderCode: data.code,
+                                          orderCurrentStatus: data.orderStatus,
+                                          orderStatus: "delivered",
+                                        });
+                                      }}
+                                    >
+                                      Delivered
+                                    </span>
+                                  </div>
+                                )}
+                                {data.orderStatus === "placed" ? (
+                                  <div className='d-flex my-1 justify-content-end'>
+                                    <span
+                                      className='mx-2  py-2 badge bg-danger'
+                                      style={{ fontSize: "12px" }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleStatusChange({
+                                          orderCode: data.code,
+                                          orderCurrentStatus: data.orderStatus,
+                                          orderStatus: "cancelled",
+                                        });
+                                      }}
+                                    >
+                                      Cancel
+                                    </span>
+                                  </div>
+                                ) : null}
                               </div>
                             )}
                           </div>
@@ -333,6 +340,7 @@ function Order() {
                   <div className='col-6 h5'>Order Details</div>
 
                   <div className=' d-flex pe-4'>
+                    {console.log(orderDetail?.orderStatus, "statusss")}
                     {orderDetail?.deliveryType === "delivery" && (
                       <button
                         className='btn text-white mx-3'
@@ -394,7 +402,7 @@ function Order() {
                 </div>
 
                 <div className='col-12'>
-                  <h5>Product Detail :</h5>
+                  <h5>Product Details :</h5>
                 </div>
 
                 <table class='table'>
@@ -416,6 +424,9 @@ function Order() {
                           <td className='text-capitalize'>
                             {order.productName}
                             {objectToArray?.map((item, index) => {
+                              if (item.key === "sidesSize") {
+                                return <p className='m-0'>{item.value}</p>;
+                              }
                               if (item?.key === "pizza") {
                                 return (
                                   <>
@@ -455,15 +466,23 @@ function Order() {
                       <td></td>
                       <td></td>
                       <th>Tax :</th>
-                      <td>{orderDetail?.taxPer} %</td>
+                      <td>$ {orderDetail?.taxAmount} </td>
                     </tr>
-                    <tr>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <th>Delivery Charges:</th>
-                      <td>$ {orderDetail?.deliveryCharges}</td>
-                    </tr>
+                    {orderDetail?.deliveryType === "delivery" && (
+                      <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <th>Delivery Charges:</th>
+                        <td>$ {orderDetail?.deliveryCharges}</td>
+                      </tr>
+                    )}
+                    {Number(orderDetail?.extraDeliveryCharges) > 0 ? (
+                      <p className='m-0 p-0'>
+                        Extra Delivery Charges : ${" "}
+                        {Number(orderDetail?.extraDeliveryCharges)}
+                      </p>
+                    ) : null}
                     <tr>
                       <td></td>
                       <td></td>
@@ -619,8 +638,6 @@ export const PizzaDetails = ({ pizzaData }) => {
   );
 };
 export const ToppingsList = ({ toppingsData }) => {
-  console.log(toppingsData, "toppingsData");
-  console.log(toppingsData);
   const allToppings = [].concat(
     toppingsData.countAsTwoToppings,
     toppingsData.countAsOneToppings,
@@ -630,15 +647,15 @@ export const ToppingsList = ({ toppingsData }) => {
   return (
     <span>
       {allToppings.map((topping, index) => (
-        <span key={index}>
+        <p className='m-0' key={index}>
           {topping.toppingsName} (
           {topping.toppingsPlacement === "whole"
             ? "W"
             : topping.toppingsPlacement === "lefthalf"
             ? "L"
             : "R"}
-          ) ,{" "}
-        </span>
+          ) {index == allToppings.length - 1 ? "" : ","}
+        </p>
       ))}
     </span>
   );

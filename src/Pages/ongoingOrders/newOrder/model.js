@@ -48,7 +48,9 @@ const NotDeliverableModel = ({
               step='1'
               defaultValue={0}
               value={extraDeliveryCharges}
-              onChange={(e) => setExtraDeliveryCharges(e.target.value)}
+              onChange={(e) =>
+                setExtraDeliveryCharges(e.target.value < 0 ? 0 : e.target.value)
+              }
             ></input>
             <div className='input-group-append'>
               <span className='input-group-text inputGroupTxt'>CAD</span>

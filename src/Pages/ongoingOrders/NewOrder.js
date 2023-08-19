@@ -208,7 +208,12 @@ function NewOrder({ printRef }) {
     customername:
       deliveryType === "pickup"
         ? null
-        : Yup.string().required("Customer Name is Required."),
+        : Yup.string()
+            .required("Customer Name is Required.")
+            .matches(
+              /^[A-Za-z\s]+$/,
+              "Customer Name must contain only letters and spaces"
+            ),
     address:
       deliveryType === "pickup"
         ? null
@@ -246,7 +251,7 @@ function NewOrder({ printRef }) {
           subTotal: totalPrice,
           discountAmount: discount,
           taxPer: taxPer,
-          taxAmount: 0,
+          taxAmount: ((discountedTotalPrice * taxPer) / 100).toFixed(2),
           deliveryCharges:
             cartdata.length !== 0 && deliveryType !== "pickup"
               ? settingsData?.filter(
@@ -262,6 +267,7 @@ function NewOrder({ printRef }) {
         if (response.status === 200) {
           resetForm();
           dispatch(addToCart([]));
+          setDiscount(0);
           console.log(response.data.orderCode, "placed order res orderdetail");
           orderDetails({ orderCode: response.data.orderCode }).then((data) => {
             setOrderDetail(data.data.data);
@@ -739,11 +745,20 @@ function NewOrder({ printRef }) {
                           placeholder='0.00'
                           min='0'
                           step='1'
-                          max={totalPrice.toFixed(2) - 1}
+                          max={totalPrice.toFixed(2)}
                           defaultValue={0}
                           value={discount}
-                          onChange={(e) => setDiscount(e.target.value)}
+                          onChange={(e) => {
+                            let inputValue = parseFloat(e.target.value);
+                            if (inputValue < 0) {
+                              inputValue = 0;
+                            } else if (inputValue > totalPrice) {
+                              inputValue = totalPrice;
+                            }
+                            setDiscount(inputValue.toFixed(2));
+                          }}
                         ></input>
+
                         <div className='input-group-append'>
                           <span className='input-group-text inputGroupTxt'>
                             CAD
@@ -758,6 +773,12 @@ function NewOrder({ printRef }) {
                       <div className='input-group w-75'>
                         <div className='input-group-prepend'>
                           <span className='input-group-text inputGroupTxt px-2'>
+                            {cartdata.length !== 0
+                              ? settingsData?.filter(
+                                  (item) =>
+                                    item.settingName === "Tax Percentage"
+                                )[0].settingValue
+                              : 0}{" "}
                             %
                           </span>
                         </div>
@@ -771,10 +792,9 @@ function NewOrder({ printRef }) {
                           defaultValue={0}
                           value={
                             cartdata.length !== 0
-                              ? settingsData?.filter(
-                                  (item) =>
-                                    item.settingName === "Tax Percentage"
-                                )[0].settingValue
+                              ? ((discountedTotalPrice * taxPer) / 100).toFixed(
+                                  2
+                                )
                               : 0
                           }
                         ></input>
@@ -787,39 +807,74 @@ function NewOrder({ printRef }) {
                     </div>
 
                     {/* Grand Total / Total Price */}
-                    <div className='d-flex flex-wrap my-2 justify-content-end align-items-center'>
-                      <label className='form-label w-25'>
-                        Delivery Charges
-                      </label>
-                      <div className='input-group w-75'>
-                        <div className='input-group-prepend'>
-                          <span className='input-group-text inputGroupTxt px-2'>
-                            $
-                          </span>
-                        </div>
-                        <input
-                          className='form-control w-25 text-end'
-                          type='number'
-                          placeholder='0.00'
-                          min='0'
-                          step='0.01'
-                          value={
-                            cartdata.length === 0 || deliveryType == "pickup"
-                              ? 0
-                              : settingsData?.filter(
-                                  (item) =>
-                                    item.settingName === "Delivery Charges"
-                                )[0].settingValue
-                          }
-                          readOnly
-                        ></input>
-                        <div className='input-group-append'>
-                          <span className='input-group-text inputGroupTxt'>
-                            CAD
-                          </span>
+                    {deliveryType === "delivery" ? (
+                      <div className='d-flex flex-wrap my-2 justify-content-end align-items-center'>
+                        <label className='form-label w-25'>
+                          Delivery Charges
+                        </label>
+                        <div className='input-group w-75'>
+                          <div className='input-group-prepend'>
+                            <span className='input-group-text inputGroupTxt px-2'>
+                              $
+                            </span>
+                          </div>
+                          <input
+                            className='form-control w-25 text-end'
+                            type='number'
+                            placeholder='0.00'
+                            min='0'
+                            step='0.01'
+                            value={
+                              cartdata.length === 0 || deliveryType == "pickup"
+                                ? 0
+                                : settingsData?.filter(
+                                    (item) =>
+                                      item.settingName === "Delivery Charges"
+                                  )[0].settingValue
+                            }
+                            readOnly
+                          ></input>
+                          <div className='input-group-append'>
+                            <span className='input-group-text inputGroupTxt'>
+                              CAD
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    ) : null}
+                    {deliveryType === "delivery" && !ispostalcodeAvailable ? (
+                      <div className='d-flex flex-wrap my-2 justify-content-end align-items-center'>
+                        <label className='form-label w-25'>
+                          Extra Delivery Charges
+                        </label>
+                        <div className='input-group w-75'>
+                          <div className='input-group-prepend'>
+                            <span className='input-group-text inputGroupTxt px-2'>
+                              $
+                            </span>
+                          </div>
+                          <input
+                            className='form-control w-25 text-end'
+                            type='number'
+                            placeholder='0.00'
+                            min='0'
+                            step='1'
+                            value={extraDeliveryCharges}
+                            onChange={(e) =>
+                              setExtraDeliveryCharges(
+                                e.target.value < 0 ? 0 : e.target.value
+                              )
+                            }
+                          ></input>
+                          <div className='input-group-append'>
+                            <span className='input-group-text inputGroupTxt'>
+                              CAD
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+
                     <div className='d-flex flex-wrap my-2 justify-content-end align-items-center'>
                       <label className='form-label w-25'>Total Price</label>
                       <div className='input-group w-75'>

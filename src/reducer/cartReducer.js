@@ -26,7 +26,6 @@ const cartSlice = createSlice({
     },
   },
 });
-
 export const { addToCart, setOrderDetail, setPrintRef, setDisplaySpecialForm } =
   cartSlice.actions;
 export default cartSlice.reducer;

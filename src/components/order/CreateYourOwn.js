@@ -143,6 +143,7 @@ function CreateYourOwn({
       setCountOneToppingsArr([]);
       setFreeToppingsArr([]);
       setPrice(0);
+      setComments("");
 
       uncheckAllCheckboxes();
 
@@ -191,6 +192,7 @@ function CreateYourOwn({
         setSpecialBasesSelected();
         setDips([]);
         setDrinks([]);
+        setComments();
         setSideArr([]);
         setCountTwoToppingsArr([]);
         setCountOneToppingsArr([]);
@@ -224,6 +226,8 @@ function CreateYourOwn({
       setSideArr(payloadEdit?.config?.sides);
       setDips(payloadEdit?.config?.dips);
       setDrinks(payloadEdit?.config?.drinks);
+      console.log(payloadEdit?.comments, "payloadEdit");
+      setComments(payloadEdit?.comments);
     }
   }, [payloadEdit]);
   // handle Two Toppings
@@ -1124,6 +1128,7 @@ function CreateYourOwn({
                 className='form-control'
                 rows='2'
                 cols='50'
+                value={comments}
                 onChange={(e) => setComments(e.target.value)}
               />
             </div>
