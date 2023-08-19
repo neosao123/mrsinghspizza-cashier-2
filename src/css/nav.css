@@ -36,3 +36,6 @@
 .orderDrop:hover {
   background-color: #e2e2e2;
 }
+.dropdown-item {
+  cursor: pointer;
+}
