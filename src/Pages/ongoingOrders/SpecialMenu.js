@@ -39,6 +39,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   const [price, setPrice] = useState(0);
   const [additionalToppingsCount, setAdditionalToppingsCount] = useState(0);
   const [noOfFreeDips, setNoOfFreeDips] = useState(0);
+  const [noofFreeDrinks, setNoofFreeDrinks] = useState(0);
+  const [allToppings, setAllToppings] = useState([]);
   const [totalPriceOfToppings, setTotalPriceOfToppings] = useState(0);
   const [totalPriceOfDips, setTotalPriceOfDips] = useState(0);
   const [totalPriceOfDipsFinal, setTotalPriceOfDipsFinal] = useState(0);
@@ -156,7 +158,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         },
       };
     }
-    console.log(arr[count - 1], "console array");
     setPizzaState(arr);
   };
   useEffect(() => {
@@ -187,21 +188,22 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           countAsTwoToppings: tempCountAsTwo,
         },
       };
-      if (offeredFreeToppings > 0) {
-        if (offeredFreeToppings - 2 === -1) {
-          setTotalPriceOfToppings(
-            (prev) => prev + Number(countAsTwoToppings.price) / 2
-          );
-          setAdditionalToppingsCount(1);
-          setOfferedFreeToppings(0);
-        }
-        setOfferedFreeToppings((prev) => prev - 2);
-      } else {
-        console.log(countAsTwoToppings.price);
-        setTotalPriceOfToppings(
-          (prev) => prev + Number(countAsTwoToppings.price)
-        );
-      }
+      // if (offeredFreeToppings > 0) {
+      //   if (offeredFreeToppings - 2 === -1) {
+      //     setTotalPriceOfToppings(
+      //       (prev) => prev + Number(countAsTwoToppings.price) / 2
+      //     );
+      //     setAdditionalToppingsCount(1);
+      //     setOfferedFreeToppings(0);
+      //   }
+      //   setOfferedFreeToppings((prev) => prev - 2);
+      // } else {
+      //   console.log(countAsTwoToppings.price);
+      //   setTotalPriceOfToppings(
+      //     (prev) => prev + Number(countAsTwoToppings.price)
+      //   );
+      // }
+      setAllToppings([...allToppings, Number(countAsTwoToppings.countAs)]);
       setPizzaState(arr);
       console.log(offeredFreeToppings);
       if (offeredFreeToppings <= 0) {
@@ -215,6 +217,13 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       const index = arr[count - 1]?.toppings?.countAsTwoToppings.findIndex(
         (item) => item.toppingsCode === countAsTwoToppings.toppingsCode
       );
+      // const index2 = allToppings?.findIndex(
+      //   (item) => item.toppingsCode === countAsTwoToppings.toppingsCode
+      // );
+      let updatedAll = allToppings.filter(
+        (item) => item.toppingsCode !== countAsTwoToppings.toppingsCode
+      );
+      setAllToppings(updatedAll);
 
       if (index !== -1 && arr[count - 1]?.toppings?.countAsTwoToppings) {
         if (offeredFreeToppings <= 0) {
@@ -223,18 +232,18 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
               return val - 2 === -1 ? 0 : val - 2;
             });
             setOfferedFreeToppings(1);
-            setTotalPriceOfToppings((prev) => {
-              return prev - 1;
-            });
-            setPrice((prev) => prev - Number(countAsTwoToppings.price));
+            // setTotalPriceOfToppings((prev) => {
+            //   return prev - 1;
+            // });
+            // setPrice((prev) => prev - Number(countAsTwoToppings.price));
           } else {
             if (offeredFreeToppings === 0) {
               setOfferedFreeToppings((prev) => prev + 2);
             }
             setAdditionalToppingsCount((prev) => prev - 2);
-            setTotalPriceOfToppings(
-              (prev) => prev - Number(countAsTwoToppings.price)
-            );
+            // setTotalPriceOfToppings(
+            //   (prev) => prev - Number(countAsTwoToppings.price)
+            // );
           }
         } else if (offeredFreeToppings <= getSpecialData?.noofToppings) {
           setOfferedFreeToppings((prev) => prev + 2);
@@ -292,6 +301,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         ...arr[count - 1].toppings,
         countAsOneToppings: tempCountAsOne,
       };
+
+      setAllToppings([...allToppings, Number(countAsOneToppings.countAs)]);
+
       setPizzaState(arr);
 
       console.log(offeredFreeToppings, "j");
@@ -299,9 +311,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         setAdditionalToppingsCount((val) => {
           return val + 1;
         });
-        setTotalPriceOfToppings(
-          (prev) => prev + Number(countAsOneToppings.price)
-        );
+        // setTotalPriceOfToppings(
+        //   (prev) => prev + Number(countAsOneToppings.price)
+        // );
       } else {
         setOfferedFreeToppings((prev) => prev - 1);
       }
@@ -310,6 +322,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       const index = arr[count - 1].toppings?.countAsOneToppings.findIndex(
         (item) => item.toppingsCode == countAsOneToppings.toppingsCode
       );
+      let updatedAll = allToppings.filter(
+        (item) => item.toppingsCode !== countAsOneToppings.toppingsCode
+      );
+      setAllToppings(updatedAll);
       if (index !== -1) {
         let updatedArr = arr[count - 1]?.toppings?.countAsOneToppings.filter(
           (item) => item.toppingsCode !== countAsOneToppings.toppingsCode
@@ -328,9 +344,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           setAdditionalToppingsCount((val) => {
             return val - 1;
           });
-          setTotalPriceOfToppings(
-            (prev) => prev - Number(countAsOneToppings.price)
-          );
+          // setTotalPriceOfToppings(
+          //   (prev) => prev - Number(countAsOneToppings.price)
+          // );
         } else {
           setOfferedFreeToppings((prev) => prev + 1);
         }
@@ -496,6 +512,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     if (getSpecialData?.noofDips !== undefined) {
       setNoOfFreeDips(Number(getSpecialData?.noofDips));
     }
+    if (getSpecialData?.noofDrinks !== undefined) {
+      setNoofFreeDrinks(Number(getSpecialData?.noofDrinks));
+    }
     if (payloadEdit === undefined) {
       createEmptyObjects(Number(getSpecialData?.noofPizzas));
     }
@@ -541,7 +560,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         prevQty: 0,
       };
       setDipsArr([...dipsArr, obj]);
-      calculateDipsPrice(obj, noOfFreeDips);
+      // calculateDipsPrice(obj, noOfFreeDips);
       // if (noOfFreeDips <= 0) {
       //   console.log(dips.qty, "price at dips");
       //   let tempQty = dips.qty === undefined ? 1 : Number(dips.qty);
@@ -563,12 +582,12 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setDipsArr(filteredDips);
       // setNoOfFreeDips((prev) => prev + 1);
       console.log(noOfFreeDips, "price at dips");
-      if (noOfFreeDips - 1 <= 0) {
-        setTotalPriceOfDips((prev) => {
-          return prev - tempDips[0].price * tempDips[0].qty;
-        });
-        setNoOfFreeDips((prev) => prev + 1);
-      }
+      // if (noOfFreeDips - 1 <= 0) {
+      //   setTotalPriceOfDips((prev) => {
+      //     return prev - tempDips[0].price * tempDips[0].qty;
+      //   });
+      //   setNoOfFreeDips((prev) => prev + 1);
+      // }
     }
   };
   const handleDipsCount = (e, dips) => {
@@ -580,17 +599,17 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         qty: e.target.value,
       };
       console.log(dips, "price at dips");
-      calculateDipsPrice(
-        {
-          ...tempDips,
-          qty:
-            dips.qty < e.target.value
-              ? e.target.value - dips.qty
-              : e.target.value,
-          prevQty: tempDips.qty,
-        },
-        noOfFreeDips
-      );
+      // calculateDipsPrice(
+      //   {
+      //     ...tempDips,
+      //     qty:
+      //       dips.qty < e.target.value
+      //         ? e.target.value - dips.qty
+      //         : e.target.value,
+      //     prevQty: tempDips.qty,
+      //   },
+      //   noOfFreeDips
+      // );
       let temp = [...dipsArr];
       temp[ind] = updatedDips;
       setDipsArr(temp);
@@ -786,62 +805,98 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       totalPrice += item?.specialbases?.price
         ? Number(item?.specialbases?.price)
         : 0;
-      // Add prices for countAsTwoToppings
+
+      let totalToppingsCount = 0;
+      totalToppingsCount = allToppings?.reduce(
+        (accumulator, currentValue) => accumulator + currentValue,
+        0
+      );
+      // console.log(totalToppingsCount, "updatedAll sum");
+      let tempToppingsPrice = 0;
+      let remainingItemCount = 0;
+
+      // console.log("topping sum i", allToppings[1], allToppings[2]);
+      let sum = 0;
+      for (let i = 0; i < allToppings.length; i++) {
+        console.log("topping sum i", allToppings[i], allToppings[i + 1]);
+        sum = allToppings[i] + allToppings[i + 1];
+        console.log("topping sum", sum);
+        if (sum > offeredFreeToppings) {
+          tempToppingsPrice += sum - offeredFreeToppings;
+          console.log(
+            allToppings.length - (i + 1),
+            "topping sum restSum updatedAll"
+          );
+          // if (allToppings.length - (i + 1) > 0) {
+          //   let restSum = allToppings.length - (i + 1);
+          //   console.log(allToppings, "topping sum restSum updatedAll");
+          //   console.log("topping sum restSum", restSum);
+          //   tempToppingsPrice += restSum * 2;
+          //   console.log("topping sum tempToppingsPrice if", tempToppingsPrice);
+          // }
+
+          // break;
+        } else if (sum > 0) {
+          // Otherwise, increment the remainingItemCount
+          remainingItemCount++;
+        }
+        // if (sum == offeredFreeToppings) {
+        //   let restSum = allToppings.length - (i + 1);
+        //   tempToppingsPrice += restSum * 2;
+        // }
+      }
+      console.log("topping sum remainingItemCount", remainingItemCount);
+      console.log("topping sum tempToppingsPrice", tempToppingsPrice);
+      // console.log(tempToppingsPrice, "updatedAll tempToppingsPrice");
+
+      // totalToppingsCount = ;
       // item?.toppings?.countAsTwoToppings?.forEach((toppings) => {
-      //   if (offeredFreeToppings <= 0) {
-      //     totalPrice += Number(toppings?.price);
-      //   }
+      //   totalToppingsCount += 2;
       // });
       // item?.toppings?.countAsOneToppings?.forEach((toppings) => {
+      //   totalToppingsCount += 1;
+      // });
+      // if (totalToppingsCount >= offeredFreeToppings) {
+      //   console.log("Total Toppings Count", totalToppingsCount);
+      //   let paidToppings = Number(totalToppingsCount) - offeredFreeToppings;
+      //   // let priceOfOneTopping = item?.toppings?.countAsTwoToppings[0]?.price
+      //   //   ? item?.toppings?.countAsTwoToppings[0]?.price
+      //   //   : null
+      //   //   ? Number(dipsArr[0]?.price)
+      //   //   : null;
+      //   let priceOfOneTopping = 1;
+      //   let paidPrice = paidToppings * priceOfOneTopping;
+      //   totalPrice += paidPrice;
+      // }
+
+      // // Add prices for freeToppings
+
+      // item?.toppings?.freeToppings?.forEach((toppings) => {
       //   totalPrice += Number(toppings?.price);
       // });
-
-      // Add prices for freeToppings
-
-      item?.toppings?.freeToppings?.forEach((toppings) => {
-        totalPrice += Number(toppings?.price);
-      });
     });
 
     // Iterate through dipsArr
-    dipsArr?.forEach((item, index) => {
-      /* console.log("item", item);
-      console.log("index", index); */
-      // console.log("dipsCalc top", noOfFreeDips);
-      // if (Number(item?.qty) >= noOfFreeDips) {
-      //   console.log("dipsCalc fisrt if");
-      //    totalPrice += Number(item?.price) * (Number(item?.qty) - noOfFreeDips);
-      //   setNoOfFreeDips(0);
-      // } else if (noOfFreeDips === 0) {
-      //   console.log("dipsCalc second if");
-      //   totalPrice += Number(item?.price) * Number(item?.qty);
-      // } else {
-      //   console.log("dipsCalc else if");
-      //   setNoOfFreeDips((prev) => {
-      //     return prev - Number(item?.qty);
-      //   });
-      // }
-      // if (noOfFreeDips <= 0 || Number(item?.qty) > noOfFreeDips) {
-      //   if (index + 1 > noOfFreeDips || Number(item?.qty) > noOfFreeDips) {
-      //     totalPrice +=
-      //       Number(item?.price) * (Number(item?.qty) - noOfFreeDips);
-      //     setNoOfFreeDips(0);
-      //   }
-      // }
+    let totalQtyDips = 0;
+    dipsArr?.forEach((item) => {
+      totalQtyDips += Number(item.qty);
     });
+    if (totalQtyDips >= noOfFreeDips) {
+      let paidDips = Number(totalQtyDips) - noOfFreeDips;
+      let priceOfOneDips = dipsArr[0]?.price ? Number(dipsArr[0]?.price) : null;
+      let paidPrice = paidDips * priceOfOneDips;
+      totalPrice += paidPrice;
+    }
 
-    // // Iterate through sidesArr
     sidesArr?.forEach((item) => {
       totalPrice += Number(item?.lineEntries[0]?.price);
     });
 
-    // Iterate through drinksArr
-
-    drinksArr?.forEach((drinks) => {
-      totalPrice += Number(drinks?.price);
+    drinksArr?.forEach((drinks, index) => {
+      if (noofFreeDrinks < index + 1) {
+        totalPrice += Number(drinks?.price);
+      }
     });
-
-    // Set the calculated price
 
     const formattedPrice = (
       Number(totalPrice) +
@@ -849,24 +904,29 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       Number(totalPriceOfDips)
     ).toFixed(2);
     setPrice(formattedPrice);
-    // Now 'formattedPrice' contains the desired formatted price.
   };
-  const calculateDipsPrice = (dips, noOfFreeDips) => {
-    console.log(dips.prevQty, "price at dips");
-    if (noOfFreeDips <= 0) {
-      console.log(dips.qty, "price at dips");
-      let tempQty = dips.qty === undefined ? 1 : Number(dips.qty);
-      console.log(tempQty, "price at dips");
-      setTotalPriceOfDips((prev) => {
-        let sum = prev - Number(dips.price) * Number(dips.prevQty);
-        console.log(sum, "price at dips");
+  useEffect(() => {
+    console.log(dipsArr, "qty dips");
+  }, [dipsArr]);
 
-        return Number(sum) + Number(dips.price) * Number(tempQty);
-      });
-    } else {
-      setNoOfFreeDips((prev) => prev - 1);
-    }
+  const calculateDipsPrice = (dips, noOfFreeDips) => {
+    // console.log(dips.prevQty, "price at dips");
+    // if (noOfFreeDips <= 0) {
+    //   // console.log(dips.qty, "price at dips");
+    //   let tempQty = dips.qty === undefined ? 1 : Number(dips.qty);
+    //   // console.log(tempQty, "price at dips");
+    //   setTotalPriceOfDips((prev) => {
+    //     let sum = prev - Number(dips.price) * Number(dips.prevQty);
+    //     // console.log(sum, "price at dips");
+    //     return Number(sum) + Number(dips.price) * Number(tempQty);
+    //   });
+    // } else {
+    //   setNoOfFreeDips((prev) => prev - 1);
+    // }
   };
+  useEffect(() => {
+    console.log(price, "pricefinal");
+  }, [price]);
 
   useEffect(() => {
     // calculateDipsPrice();
