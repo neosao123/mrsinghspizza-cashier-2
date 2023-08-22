@@ -11,16 +11,23 @@ function Nav() {
   const navigate = useNavigate();
 
   //logout
-  const Logout = () => {
+  const handleLogout = () => {
     console.log("logout");
     localStorage.removeItem("token");
-
     dispatch({
       type: "LOGOUT",
       payload: null,
     });
     navigate("/");
   };
+
+  const handleProfileUdpate = () => {
+
+  }
+
+  const handlePasswordChange = () => {
+
+  }
 
   return (
     <>
@@ -124,7 +131,7 @@ function Nav() {
               aria-labelledby="profile-update"
             >
               <div className="d-flex justify-content-left align-items-center p-3 profileDiv text-white">
-                <div className="border rounded-circle border-2 border-white imgDiv mx-2">
+                <div className="border rounded-circle border-2 border-white imgDiv me-2">
                   <img
                     src={`${profileImg}`}
                     alt=""
@@ -133,23 +140,23 @@ function Nav() {
                 </div>
                 <div className="d-flex justify-content-center flex-column align-items-left p-1">
                   <h6>ABC</h6>
-                  <a style={{ fontSize: ".75rem" }}>abc@example.com</a>
+                  <p className="mb-0">abc@example.com</p>
                 </div>
               </div>
-              <a className="dropdown-item p-2 px-3" href="#">
+              <div className="dropdown-item p-2 px-3" onClick={handleProfileUdpate}>
                 <i className="fa fa-user" aria-hidden="true"></i>
                 <span className="mx-3">Profile Update</span>
-              </a>
-              <a className="dropdown-item p-2 px-3" href="#">
+              </div>
+              <div className="dropdown-item p-2 px-3" onClick={handlePasswordChange}>
                 <i className="fa fa-key" aria-hidden="true"></i>
                 <span className="mx-3">Password Change</span>
-              </a>
-              <a className="dropdown-item p-2 px-3 mb-2">
+              </div>
+              <div className="dropdown-item p-2 px-3" onClick={handleLogout}>
                 <i className="fa fa-sign-out" aria-hidden="true"></i>
-                <span onClick={() => Logout} className="mx-3">
+                <span className="mx-3">
                   Logout
                 </span>
-              </a>
+              </div>
             </div>
           </div>
         </div>
