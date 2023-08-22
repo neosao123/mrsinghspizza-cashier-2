@@ -150,7 +150,6 @@ function CreateYourOwn({
       toast.success(`Custom Pizza edited Successfully...`);
     } else {
       if (crustSelected && cheeseSelected) {
-        console.log(crustSelected, "crustSelectedcrustSelected");
         const payload = {
           id: uuidv4(),
           productCode: "#NA",
@@ -181,6 +180,8 @@ function CreateYourOwn({
           discountAmount: discount,
           taxPer: taxPer,
         };
+        console.log(payload, "crustSelectedcrustSelected");
+
         dispatch(addToCart([...cartdata, payload]));
         toast.success(`Custom Pizza Added Successfully...`);
         setCrustSelected({
@@ -611,6 +612,40 @@ function CreateYourOwn({
       setFreeToppingsArr([]);
     }
   };
+  const handleFreeToppingsPlacementChange = (event, toppingsCode) => {
+    const selectedValue = event.target.value;
+    let arr = [...freeToppingsArr];
+    let selectedObject = freeToppingsArr?.find(
+      (option) => option.toppingsCode === toppingsCode
+    );
+    selectedObject = {
+      ...selectedObject,
+      placement: selectedValue,
+    };
+    let indexOfSelectedObject = freeToppingsArr?.findIndex(
+      (option) => option.toppingsCode === toppingsCode
+    );
+    if (indexOfSelectedObject !== -1) {
+      arr[indexOfSelectedObject] = selectedObject;
+      // arr[count - 1] = {
+      //   ...arr[count - 1],
+      //   toppings: {
+      //     ...arr[count - 1]?.toppings,
+      //     freeToppings: [
+      //       ...arr[count - 1]?.toppings?.freeToppings.slice(
+      //         0,
+      //         indexOfSelectedObject
+      //       ),
+      //       selectedObject,
+      //       ...arr[count - 1]?.toppings?.freeToppings.slice(
+      //         indexOfSelectedObject + 1
+      //       ),
+      //     ],
+      //   },
+      // };
+    }
+    setFreeToppingsArr(arr);
+  };
 
   useEffect(() => {
     setCrustSelected({
@@ -927,10 +962,15 @@ function CreateYourOwn({
                   {allIngredients?.toppings?.freeToppings?.map(
                     (freeToppings, index) => {
                       const toppingCode = freeToppings.toppingsCode;
-                      const comm = freeToppingsArr.findIndex(
+                      console.log(
+                        freeToppings.toppingsCode,
+                        "freeToppings.toppingsCode"
+                      );
+                      const comm = freeToppingsArr?.findIndex(
                         (item) =>
                           item.toppingsCode === freeToppings.toppingsCode
                       );
+                      console.log(comm, "freeToppings.toppingsCode");
 
                       return (
                         <>
@@ -963,21 +1003,25 @@ function CreateYourOwn({
                                 data-topping-area={toppingCode}
                                 className='form-select d-inline-block'
                                 style={{ width: "65%" }}
-                                value={
-                                  freeToppingsArr[index]?.toppingsPlacement
-                                }
+                                value={freeToppingsArr[comm]?.placement}
                                 id={"placement-" + toppingCode}
+                                // onChange={(e) => {
+                                //   if (comm !== -1) {
+                                //     const selectedPlacement = e.target.value;
+                                //     const updatedTopping = {
+                                //       ...freeToppingsArr[index],
+                                //       toppingsPlacement: selectedPlacement,
+                                //     };
+                                //     const updatedArray = [...freeToppingsArr];
+                                //     updatedArray[index] = updatedTopping;
+                                //     setFreeToppingsArr(updatedArray);
+                                //   }
+                                // }}
                                 onChange={(e) => {
-                                  if (comm !== -1) {
-                                    const selectedPlacement = e.target.value;
-                                    const updatedTopping = {
-                                      ...freeToppingsArr[index],
-                                      toppingsPlacement: selectedPlacement,
-                                    };
-                                    const updatedArray = [...freeToppingsArr];
-                                    updatedArray[index] = updatedTopping;
-                                    setFreeToppingsArr(updatedArray);
-                                  }
+                                  handleFreeToppingsPlacementChange(
+                                    e,
+                                    freeToppings.toppingsCode
+                                  );
                                 }}
                               >
                                 <option

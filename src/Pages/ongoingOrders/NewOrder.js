@@ -197,6 +197,15 @@ function NewOrder({ printRef }) {
         console.log("Error From Settings API: ", err);
       });
   };
+  const canadianPostalCode = Yup.string().test(
+    "is-canadian-postal-code",
+    "Invalid Canadian Postal Code",
+    (value) => {
+      if (!value) return true;
+      const postalCodeRegex = /^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$/;
+      return postalCodeRegex.test(value);
+    }
+  );
 
   const validateSchema = Yup.object({
     phoneno: Yup.string()
@@ -221,7 +230,7 @@ function NewOrder({ printRef }) {
     postalcode:
       deliveryType === "pickup"
         ? null
-        : Yup.string().required("postalcode is Required"),
+        : canadianPostalCode.required("Postal Code is Required"),
     deliveryExecutive:
       deliveryType === "pickup"
         ? null
@@ -268,6 +277,7 @@ function NewOrder({ printRef }) {
           resetForm();
           dispatch(addToCart([]));
           setDiscount(0);
+          setExtraDeliveryCharges(0);
           console.log(response.data.orderCode, "placed order res orderdetail");
           orderDetails({ orderCode: response.data.orderCode }).then((data) => {
             setOrderDetail(data.data.data);

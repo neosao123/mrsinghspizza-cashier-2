@@ -40,6 +40,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   const [additionalToppingsCount, setAdditionalToppingsCount] = useState(0);
   const [noOfFreeDips, setNoOfFreeDips] = useState(0);
   const [totalPriceOfToppings, setTotalPriceOfToppings] = useState(0);
+  const [totalPriceOfDips, setTotalPriceOfDips] = useState(0);
+  const [totalPriceOfDipsFinal, setTotalPriceOfDipsFinal] = useState(0);
   const dispatch = useDispatch();
   let cartdata = useSelector((state) => state.cart.cart);
   //  const
@@ -157,6 +159,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     console.log(arr[count - 1], "console array");
     setPizzaState(arr);
   };
+  useEffect(() => {
+    console.log(totalPriceOfToppings, "totalPriceOfToppings");
+  }, [totalPriceOfToppings]);
+
   const handleTwoToppings = (e, count, countAsTwoToppings) => {
     const { checked } = e.target;
     if (checked) {
@@ -522,30 +528,69 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       />
     );
   }
+  useEffect(() => {
+    console.log(price, "price at dips");
+  }, [price]);
+
   const handleDips = (e, dips) => {
     let { checked } = e.target;
     if (checked) {
       let obj = {
         ...dips,
         qty: 1,
+        prevQty: 0,
       };
       setDipsArr([...dipsArr, obj]);
-      // setNoOfFreeDips((prev) => prev - 1);
+      calculateDipsPrice(obj, noOfFreeDips);
+      // if (noOfFreeDips <= 0) {
+      //   console.log(dips.qty, "price at dips");
+      //   let tempQty = dips.qty === undefined ? 1 : Number(dips.qty);
+      //   setTotalPriceOfDips(
+      //     (prev) => prev + Number(dips.price) * Number(tempQty)
+      //   );
+      // } else {
+      //   console.log(noOfFreeDips, "price at dips");
+      //   setNoOfFreeDips((prev) => prev - 1);
+      // }
+      // console.log(noOfFreeDips, "price at dips parent");
+
+      // calculateDipsPrice(dips, noOfFreeDips);
     } else {
       let filteredDips = dipsArr?.filter(
         (item) => item.dipsCode !== dips.dipsCode
       );
+      let tempDips = dipsArr?.filter((item) => item.dipsCode === dips.dipsCode);
       setDipsArr(filteredDips);
       // setNoOfFreeDips((prev) => prev + 1);
+      console.log(noOfFreeDips, "price at dips");
+      if (noOfFreeDips - 1 <= 0) {
+        setTotalPriceOfDips((prev) => {
+          return prev - tempDips[0].price * tempDips[0].qty;
+        });
+        setNoOfFreeDips((prev) => prev + 1);
+      }
     }
   };
   const handleDipsCount = (e, dips) => {
     let ind = dipsArr?.findIndex((item) => item.dipsCode === dips.dipsCode);
+    let tempDips = dipsArr?.find((item) => item.dipsCode === dips.dipsCode);
     if (ind !== -1) {
       let updatedDips = {
         ...dips,
         qty: e.target.value,
       };
+      console.log(dips, "price at dips");
+      calculateDipsPrice(
+        {
+          ...tempDips,
+          qty:
+            dips.qty < e.target.value
+              ? e.target.value - dips.qty
+              : e.target.value,
+          prevQty: tempDips.qty,
+        },
+        noOfFreeDips
+      );
       let temp = [...dipsArr];
       temp[ind] = updatedDips;
       setDipsArr(temp);
@@ -776,13 +821,13 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       //     return prev - Number(item?.qty);
       //   });
       // }
-      if (noOfFreeDips <= 0 || Number(item?.qty) > noOfFreeDips) {
-        if (index + 1 > noOfFreeDips || Number(item?.qty) > noOfFreeDips) {
-          totalPrice +=
-            Number(item?.price) * (Number(item?.qty) - noOfFreeDips);
-          setNoOfFreeDips(0);
-        }
-      }
+      // if (noOfFreeDips <= 0 || Number(item?.qty) > noOfFreeDips) {
+      //   if (index + 1 > noOfFreeDips || Number(item?.qty) > noOfFreeDips) {
+      //     totalPrice +=
+      //       Number(item?.price) * (Number(item?.qty) - noOfFreeDips);
+      //     setNoOfFreeDips(0);
+      //   }
+      // }
     });
 
     // // Iterate through sidesArr
@@ -798,10 +843,33 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
     // Set the calculated price
 
-    setPrice(Number(totalPrice.toFixed(2)) + Number(totalPriceOfToppings));
+    const formattedPrice = (
+      Number(totalPrice) +
+      Number(totalPriceOfToppings) +
+      Number(totalPriceOfDips)
+    ).toFixed(2);
+    setPrice(formattedPrice);
+    // Now 'formattedPrice' contains the desired formatted price.
+  };
+  const calculateDipsPrice = (dips, noOfFreeDips) => {
+    console.log(dips.prevQty, "price at dips");
+    if (noOfFreeDips <= 0) {
+      console.log(dips.qty, "price at dips");
+      let tempQty = dips.qty === undefined ? 1 : Number(dips.qty);
+      console.log(tempQty, "price at dips");
+      setTotalPriceOfDips((prev) => {
+        let sum = prev - Number(dips.price) * Number(dips.prevQty);
+        console.log(sum, "price at dips");
+
+        return Number(sum) + Number(dips.price) * Number(tempQty);
+      });
+    } else {
+      setNoOfFreeDips((prev) => prev - 1);
+    }
   };
 
   useEffect(() => {
+    // calculateDipsPrice();
     calculatePrice();
   }, [
     pizzaState,

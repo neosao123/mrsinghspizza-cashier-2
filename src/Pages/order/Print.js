@@ -19,29 +19,43 @@ const Print = ({ orderDetail, printRef }) => {
         </div>
         <div className='row d-flex '>
           {orderDetail?.created_at !== undefined && (
-            <div className='d-flex justify-content-between'>
-              <p className='m-0'>
-                {" "}
-                Date :{" "}
-                {
-                  new Date(orderDetail?.created_at)
-                    .toISOString()
-                    .replace(/T/, " ")
-                    .replace(/\.\d+Z$/, "")
-                    .split(" ")[0]
-                }
-              </p>
-              <p className='m-0'>
-                Time :{" "}
-                {
-                  new Date(orderDetail?.created_at)
-                    .toISOString()
-                    .replace(/T/, " ")
-                    .replace(/\.\d+Z$/, "")
-                    .split(" ")[1]
-                }
-              </p>
-            </div>
+            <>
+              <div className='d-flex justify-content-between'>
+                <p className='m-0'></p>
+                <p className='m-0'>#{orderDetail?.orderCode}</p>
+              </div>
+              <div className='d-flex justify-content-between'>
+                <p className='m-0'>
+                  {" "}
+                  Date :{" "}
+                  {
+                    new Date(orderDetail?.created_at)
+                      .toISOString()
+                      .replace(/T/, " ")
+                      .replace(/\.\d+Z$/, "")
+                      .split(" ")[0]
+                  }
+                </p>
+                <p className='m-0'>
+                  Time :{" "}
+                  {
+                    new Date(orderDetail?.created_at)
+                      .toISOString()
+                      .replace(/T/, " ")
+                      .replace(/\.\d+Z$/, "")
+                      .split(" ")[1]
+                  }
+                </p>
+              </div>
+              <div className='d-flex justify-content-between'>
+                <p className='m-0'>
+                  {orderDetail?.customerName} - Ph. {orderDetail?.mobileNumber}
+                </p>
+                <p className='m-0 fw-bold text-capitalize'>
+                  {orderDetail?.deliveryType}
+                </p>
+              </div>
+            </>
           )}
           <div>{orderDetail?.cashierName}</div>
         </div>
@@ -70,6 +84,9 @@ const Print = ({ orderDetail, printRef }) => {
                         <>
                           <p className='m-0 text-capitalize'>{item.key}</p>
                           <PizzaDetails pizzaData={item} />
+                          <p className='m-0 text-capitalize fst-italic'>
+                            Comment : {order?.comments}
+                          </p>
                         </>
                       );
                     }

@@ -418,6 +418,7 @@ function Order() {
                       const objectToArray = Object.entries(order?.config).map(
                         ([key, value]) => ({ key, value })
                       );
+                      console.log(objectToArray, "order");
                       return (
                         <tr key={index + order?.productName}>
                           <td scope='row'>{index + 1}</td>
@@ -427,6 +428,7 @@ function Order() {
                               if (item.key === "sidesSize") {
                                 return <p className='m-0'>{item.value}</p>;
                               }
+                              console.log(item, "itemds");
                               if (item?.key === "pizza") {
                                 return (
                                   <>
@@ -435,6 +437,36 @@ function Order() {
                                   </>
                                 );
                               }
+                              if (item.key === "dips") {
+                                return item?.value.length > 0 ? (
+                                  <span>
+                                    <strong> {item.key}</strong> :
+                                    {item?.value.map((dips, index) => (
+                                      <span className='text-capitalize'>
+                                        {dips.dipsName}{" "}
+                                        {item.value.length - 1 === index
+                                          ? ""
+                                          : ","}
+                                      </span>
+                                    ))}
+                                  </span>
+                                ) : null;
+                              }
+                              // if (item.key === "drinks") {
+                              //   return item?.value.length > 0 ? (
+                              //     <span>
+                              //       <strong> {item.key}</strong> :
+                              //       {item?.value.map((drinks, index) => (
+                              //         <span className='text-capitalize'>
+                              //           {drinks.drinksName}{" "}
+                              //           {item.value.length - 1 === index
+                              //             ? ""
+                              //             : ","}
+                              //         </span>
+                              //       ))}
+                              //     </span>
+                              //   ) : null;
+                              // }
                             })}
                           </td>
                           <td>{order.quantity}</td>
@@ -616,7 +648,7 @@ function Order() {
 }
 export const PizzaDetails = ({ pizzaData }) => {
   const pizzaItems = pizzaData.value[0];
-
+  console.log(pizzaData.value, "pizzaData.value");
   const renderItemNames = (item) => {
     return (
       <span> {item.cheeseName || item.specialbaseName || item.crustName}</span>
@@ -625,13 +657,23 @@ export const PizzaDetails = ({ pizzaData }) => {
 
   return (
     <div>
-      {Object.keys(pizzaItems).map((key, index) => (
+      {/* {pizzaData.value.map((item,index)=>{
+         item.
+      })} */}
+      {pizzaData.value.map((ele, index) => (
         <div key={index}>
-          <strong>{key} :</strong>
-          {renderItemNames(pizzaItems[key])}
-          {key === "toppings" ? (
-            <ToppingsList toppingsData={pizzaItems[key]} />
-          ) : null}
+          <p className='p-0 m-0'>
+            <strong>Cheese :</strong> {ele?.cheese?.cheeseName}
+          </p>
+          <p className='p-0 m-0'>
+            <strong>Crust :</strong> {ele?.crust?.crustName}
+          </p>
+          <p className='p-0 m-0'>
+            <strong>Specialbases :</strong> {ele?.specialbases?.specialbaseName}
+          </p>
+          {/* {renderItemNames(pizzaItems[key])} */}
+
+          <ToppingsList toppingsData={ele.toppings} />
         </div>
       ))}
     </div>
