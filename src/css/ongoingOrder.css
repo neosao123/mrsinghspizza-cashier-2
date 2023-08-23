@@ -89,3 +89,23 @@ h6 {
   height: calc(100vh - 128px);
   overflow-y: scroll;
 }
+.badge-poutine {
+  text-transform: capitalize;
+  color: #b1130be4;
+}
+.badge-side {
+  text-transform: capitalize;
+  color: #094f90e4;
+}
+.badge-plantbites {
+  text-transform: capitalize;
+  color: #1d9238e4;
+}
+.badge-tenders {
+  text-transform: capitalize;
+  color: #638d0ee4;
+}
+.badge-subs {
+  text-transform: capitalize;
+  color: #8b0b45e4;
+}

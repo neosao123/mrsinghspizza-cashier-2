@@ -272,9 +272,10 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                     alt=''
                   ></img> */}
                 </div>
-                <div className='d-flex justify-content-center flex-column mx-2 px-2 py-1 w-100'>
+                <div className='d-flex justify-content-center flex-column py-1 w-100'>
                   <div className='d-flex justify-content-between align-items-center'>
-                    <h6 className='mb-2'>{data.sideName}</h6>
+                    <h6 className='mb-2'>{data.sideName} <span className={"badge-" + data.type}>({data.type})</span></h6>
+                    
                   </div>
                   <div className='d-flex justify-content-between align-items-center'>
                     <select
@@ -323,8 +324,8 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                       onClick={(e) => handleAddToCart(e, data.sideCode, data)}
                     >
                       {payloadEdit !== undefined &&
-                      payloadEdit.productType === "side" &&
-                      obj !== undefined
+                        payloadEdit.productType === "side" &&
+                        obj !== undefined
                         ? "Edit"
                         : "Add To Cart"}
                     </button>

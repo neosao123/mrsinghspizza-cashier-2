@@ -114,8 +114,8 @@ function NewOrder({ printRef }) {
   const delivery_charges =
     cartdata.length !== 0 && deliveryType !== "pickup"
       ? settingsData?.filter(
-          (item) => item.settingName === "Delivery Charges"
-        )[0].settingValue
+        (item) => item.settingName === "Delivery Charges"
+      )[0].settingValue
       : 0;
 
   const discountedTotalPrice = totalPrice - discount;
@@ -218,11 +218,11 @@ function NewOrder({ printRef }) {
       deliveryType === "pickup"
         ? null
         : Yup.string()
-            .required("Customer Name is Required.")
-            .matches(
-              /^[A-Za-z\s]+$/,
-              "Customer Name must contain only letters and spaces"
-            ),
+          .required("Customer Name is Required.")
+          .matches(
+            /^[A-Za-z\s]+$/,
+            "Customer Name must contain only letters and spaces"
+          ),
     address:
       deliveryType === "pickup"
         ? null
@@ -264,8 +264,8 @@ function NewOrder({ printRef }) {
           deliveryCharges:
             cartdata.length !== 0 && deliveryType !== "pickup"
               ? settingsData?.filter(
-                  (item) => item.settingName === "Delivery Charges"
-                )[0].settingValue
+                (item) => item.settingName === "Delivery Charges"
+              )[0].settingValue
               : 0,
           extraDeliveryCharges: extraDeliveryCharges ? extraDeliveryCharges : 0,
           grandTotal: grandTotal,
@@ -534,7 +534,7 @@ function NewOrder({ printRef }) {
                   </select>
 
                   {formik.touched.deliveryExecutive &&
-                  formik.errors.deliveryExecutive ? (
+                    formik.errors.deliveryExecutive ? (
                     <div className='text-danger my-1'>
                       {formik.errors.deliveryExecutive}
                     </div>
@@ -575,7 +575,7 @@ function NewOrder({ printRef }) {
             <div className='col-lg-6 my-1 sectionTwo'>
               {/* Tabs Headings */}
               <ul
-                className='nav nav-tabs psTabsUl mt-2 d-flex justify-content-between mb-3'
+                className='nav nav-tabs nav-fill psTabsUl mt-2 mb-3'
                 role='tablist'
               >
                 <li className='nav-item'>
@@ -785,9 +785,9 @@ function NewOrder({ printRef }) {
                           <span className='input-group-text inputGroupTxt px-2'>
                             {cartdata.length !== 0
                               ? settingsData?.filter(
-                                  (item) =>
-                                    item.settingName === "Tax Percentage"
-                                )[0].settingValue
+                                (item) =>
+                                  item.settingName === "Tax Percentage"
+                              )[0].settingValue
                               : 0}{" "}
                             %
                           </span>
@@ -803,8 +803,8 @@ function NewOrder({ printRef }) {
                           value={
                             cartdata.length !== 0
                               ? ((discountedTotalPrice * taxPer) / 100).toFixed(
-                                  2
-                                )
+                                2
+                              )
                               : 0
                           }
                         ></input>
@@ -838,9 +838,9 @@ function NewOrder({ printRef }) {
                               cartdata.length === 0 || deliveryType == "pickup"
                                 ? 0
                                 : settingsData?.filter(
-                                    (item) =>
-                                      item.settingName === "Delivery Charges"
-                                  )[0].settingValue
+                                  (item) =>
+                                    item.settingName === "Delivery Charges"
+                                )[0].settingValue
                             }
                             readOnly
                           ></input>
@@ -936,7 +936,7 @@ function NewOrder({ printRef }) {
                             </button>
                           )}
                           content={() => printRef2?.current}
-                          onBeforePrint={() => {}}
+                          onBeforePrint={() => { }}
                         ></ReactToPrint>
                       </div>
                     </div>

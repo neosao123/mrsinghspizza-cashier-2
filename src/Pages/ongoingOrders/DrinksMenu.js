@@ -227,7 +227,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
                     alt=''
                   ></img> */}
                 </div>
-                <div className='d-flex justify-content-center flex-column mx-2 px-2 py-1 w-100'>
+                <div className='d-flex justify-content-center flex-column py-1 w-100'>
                   <div className='d-flex justify-content-between align-items-center'>
                     <h6 className='mb-2'>{data.softDrinksName}</h6>
                     <h6 className='mb-2'>$ {data.price}</h6>

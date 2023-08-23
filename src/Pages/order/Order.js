@@ -170,7 +170,7 @@ function Order() {
                           key={data.code}
                           onClick={() => setOrderId(data.code)}
                         >
-                          <div className='d-flex py-3 my-1 justify-content-between align-items-center'>
+                          <div className='d-flex my-1 justify-content-between align-items-center'>
                             <div>
                               <span>
                                 <strong>
@@ -182,10 +182,10 @@ function Order() {
                                   </span>
                                 </strong>
                               </span>
-                              <span className='mx-3'>{data.code}</span>
+                              <b className='mx-3'>#{data.orderCode}</b>
                             </div>
                             <div>
-                              <span className='mx-3'>$ {data.grandTotal}</span>
+                              <b className='mx-3 text-dark'>$ {data.grandTotal}</b>
                             </div>
                             {console.log(data)}
                             {data?.deliveryType === "pickup" ? (

@@ -203,7 +203,7 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           let obj = dipsArr?.find((item) => item.dipsCode === data.dipsCode);
           return (
             <li className='list-group-item' key={data.dipsCode}>
-              <div className='d-flex justify-content-between align-items-end py-2 px-1'>
+              <div className='d-flex justify-content-between align-items-end py-2'>
                 <div className='d-flex justify-content-center w-auto'>
                   {/* <img
                     className='rounded'
@@ -213,7 +213,7 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
                     alt=''
                   ></img> */}
                 </div>
-                <div className='d-flex justify-content-center flex-column mx-2 px-2 py-1 w-100'>
+                <div className='d-flex justify-content-center flex-column py-1 w-100'>
                   <div className='d-flex justify-content-between align-items-center'>
                     <h6 className='mb-2'>{data.dipsName}</h6>
                     <h6 className='mb-2'>$ {data.price}</h6>

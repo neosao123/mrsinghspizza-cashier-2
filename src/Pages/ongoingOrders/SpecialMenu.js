@@ -481,9 +481,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     }
   }, [payloadEdit]);
 
-  useEffect(() => {}, [pizzaState]);
+  useEffect(() => { }, [pizzaState]);
 
-  useEffect(() => {}, [pizzaState]);
+  useEffect(() => { }, [pizzaState]);
   useEffect(() => {
     specialIngredients();
     dispatch(setDisplaySpecialForm(false));
@@ -989,7 +989,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                     Additional Toppings Used :
                     <span className='mx-2'>
                       {offeredFreeToppings <= 0 ? additionalToppingsCount : 0}{" "}
-                      ($2.00)
                     </span>
                   </p>
                   <p className='mb-1 d-inline'>Size : </p>
@@ -1125,8 +1124,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   <>
                     {(getSpecialData?.pops.length > 0 ||
                       getSpecialData.bottle.length > 0) && (
-                      <h6 className='text-left mt-1 mb-2'>Drinks</h6>
-                    )}
+                        <h6 className='text-left mt-1 mb-2'>Drinks</h6>
+                      )}
 
                     <div id='drinks' className='mb-3'>
                       <ul className='list-group'>
@@ -1200,7 +1199,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                     onClick={handleAddToCart}
                   >
                     {payloadEdit !== undefined &&
-                    payloadEdit?.productType === "Special_Pizza"
+                      payloadEdit?.productType === "Special_Pizza"
                       ? "Edit"
                       : " Add to Cart"}
                   </button>
@@ -1217,7 +1216,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   <li className='list-group-item' key={speicalPizza.code}>
                     <div className='d-flex justify-content-between align-items-end py-2 px-1'>
                       <div className='d-flex align-items-center'>
-                        <div className='d-flex flex-column mx-4'>
+                        <div className='d-flex flex-column'>
                           <h6 className='mb-1'>{speicalPizza.name}</h6>
                           <span>{speicalPizza.noofToppings} Toppings</span>
                           <span>{speicalPizza.noofPizzas} Pizzas</span>
