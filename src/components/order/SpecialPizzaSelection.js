@@ -15,6 +15,7 @@ function SpecialPizzaSelection({
   handleTwoToppings,
   handleCountAsTwoToppingsPlacementChange,
   handleCountAsOneToppingsPlacementChange,
+  handleChangeAllIndianToppings,
 }) {
   return (
     <>
@@ -90,6 +91,28 @@ function SpecialPizzaSelection({
               })}
             </select>
           </div>
+          <div className='row my-2'>
+            <div className=' d-flex align-items-center mt-2'>
+              <input
+                className='my-2 form-check-input'
+                type='checkbox'
+                value=''
+                checked={
+                  pizzaState[count - 1]?.toppings?.freeToppings.length ===
+                  toppingsData?.toppings?.freeToppings?.length
+                    ? true
+                    : false
+                }
+                id='allIndianTps'
+                onChange={(e) => {
+                  handleChangeAllIndianToppings(e, count);
+                }}
+              />
+              <label className='m-2' htmlFor='allIndianTps'>
+                All Indian Style
+              </label>
+            </div>
+          </div>
           {/*  */}
           <div className='mt-3 mb-3'>
             {/* Tabs Headings */}
@@ -121,7 +144,7 @@ function SpecialPizzaSelection({
                   to={`#toppings-free-tab-special${count}`}
                   // to='#toppings-free-tab-special'
                 >
-                  Indian Toppings (Free)
+                  Indian Style (Free)
                 </Link>
               </li>
             </ul>

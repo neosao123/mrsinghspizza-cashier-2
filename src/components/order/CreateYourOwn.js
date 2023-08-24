@@ -47,6 +47,7 @@ function CreateYourOwn({
   // Calculate Price
   const calculatePrice = () => {
     let calculatePrice = 0;
+
     let crust_price = crustSelected?.crustPrice ? crustSelected?.crustPrice : 0;
     let cheese_price = cheeseSelected?.price ? cheeseSelected?.price : 0;
     let specialbase_price = specialBasesSelected?.price
@@ -79,6 +80,8 @@ function CreateYourOwn({
     calculatePrice += totalFreeToppings;
     calculatePrice += totalDips;
     calculatePrice += totalDrinks;
+    let priceBySize = sizesOfPizzaSelected === "Large" ? 11.49 : 16.49;
+    calculatePrice += priceBySize;
 
     setPrice(calculatePrice.toFixed(2));
   };
@@ -193,7 +196,7 @@ function CreateYourOwn({
         setSpecialBasesSelected();
         setDips([]);
         setDrinks([]);
-        setComments();
+        setComments("");
         setSideArr([]);
         setCountTwoToppingsArr([]);
         setCountOneToppingsArr([]);
@@ -743,7 +746,7 @@ function CreateYourOwn({
                 onChange={handleChangeAllIndianToppins}
               />
               <label className='m-2' htmlFor='allIndianTps'>
-                All Indians Toppings
+                All Indian Style
               </label>
             </div>
             {/* Tabs */}
@@ -774,7 +777,7 @@ function CreateYourOwn({
                     data-bs-toggle='tab'
                     to='#toppings-free-tab'
                   >
-                    Indian Toppings (Free)
+                    Indian Style (Free)
                   </Link>
                 </li>
                 <li className='nav-item'>
@@ -1050,6 +1053,7 @@ function CreateYourOwn({
                 >
                   {sidesData?.map((sidesData) => {
                     const sideCode = sidesData.sideCode;
+                    console.log(sidesData);
                     const comm = sidesArr.findIndex(
                       (item) => item.sideCode === sidesData.sideCode
                     );
@@ -1069,6 +1073,11 @@ function CreateYourOwn({
                               }}
                             />
                             {sidesData.sideName}
+                            <span
+                              className={"badge-" + sidesData.type + " mx-1"}
+                            >
+                              ( {sidesData.type} )
+                            </span>
                           </label>
                           <div style={{ width: "12rem" }}>
                             <select

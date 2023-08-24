@@ -2,16 +2,27 @@ import React from "react";
 import { PizzaDetails, ToppingsList } from "./Order";
 import { useSelector } from "react-redux";
 import Barcode from "../../assets/Barcode.jpg";
+import Logo from "../../assets/logo.png";
 
 const Print = ({ orderDetail, printRef }) => {
-  // let orderDetail = useSelector((state) => state.cart.orderDetail);
-  // console.log(orderDetail, "placed order res print orderdetail");
-
   return (
     <div className='d-none'>
       <div className='col-12 m-1' style={{ width: "273px" }} ref={printRef}>
         <div className='row'>
-          <h3 className='text-center'>Mr Singh's Pizza</h3>
+          <div className='d-flex justify-content-center'>
+            <img
+              src={Logo}
+              alt="Mr Singh's pizza logo"
+              width={"30px"}
+              height={"30px"}
+              className='m-1'
+            ></img>
+            <div className='d-flex flex-column'>
+              <h3 className='text-center m-0 '>Mr Singh's Pizza</h3>
+              <p className='text-center m-0 p-0'>Pure vegetarian</p>
+            </div>
+          </div>
+
           <p className='text-center mb-0'>
             2120 N Park Dr Unit #25, Brampton, ON L6S 0C9{" "}
           </p>
@@ -57,7 +68,16 @@ const Print = ({ orderDetail, printRef }) => {
               </div>
             </>
           )}
-          <div>{orderDetail?.cashierName}</div>
+          <div className='d-flex'>
+            <p className='p-0 m-0 col-6'>
+              OrderTakenBy: {orderDetail?.cashierName}
+            </p>
+            {orderDetail?.deliveryType === "delivery" && (
+              <span className='col-6 text-end'>
+                Delivery Executive : {orderDetail?.deliveryExecutiveName}
+              </span>
+            )}
+          </div>
         </div>
         <div className='d-flex col-12 row mx-1'>
           <div className='col-2'>Qty</div>
@@ -75,14 +95,15 @@ const Print = ({ orderDetail, printRef }) => {
                 <div className='col-7 text-capitalize'>
                   {order.productName}
                   {objectToArray?.map((item, index) => {
-                    console.log(item, "printlist");
                     if (item.key === "sidesSize") {
                       return <p className='m-0'>{item.value}</p>;
                     }
                     if (item?.key === "pizza") {
                       return (
                         <>
-                          <p className='m-0 text-capitalize'>{item.key}</p>
+                          <p className='m-0 text-capitalize'>
+                            {item.key} ({order?.pizzaSize})
+                          </p>
                           <PizzaDetails pizzaData={item} />
                           <p className='m-0 text-capitalize fst-italic'>
                             Comment : {order?.comments}
@@ -93,7 +114,6 @@ const Print = ({ orderDetail, printRef }) => {
                   })}
                 </div>
                 <div className='text-end col-3'>$ {order.amount}</div>
-
                 <hr />
               </p>
             );
@@ -101,12 +121,15 @@ const Print = ({ orderDetail, printRef }) => {
         </div>
         <div className='d-flex col-12 row  justify-content-between'>
           <div className='col-4 px-1 m-0'>
-            <img src={Barcode} width={"100px"} height={"100px"} />
+            <img
+              src={Barcode}
+              width={"100px"}
+              height={"100px"}
+              className='mt-1'
+            />
           </div>
-          {console.log(orderDetail, "orderDetail prinmt")}
           <div className='col-8 text-end p-0'>
             <p className='m-0 p-0'>Sub Total : $ {orderDetail?.subTotal}</p>
-
             <p className='m-0 p-0'>Tax : $ {orderDetail?.taxAmount}</p>
             {Number(orderDetail?.extraDeliveryCharges) > 0 ? (
               <p className='m-0 p-0'>

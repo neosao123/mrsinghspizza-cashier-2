@@ -173,25 +173,28 @@ function Order() {
                           <div className='d-flex my-1 justify-content-between align-items-center'>
                             <div>
                               <span>
-                                <strong>
+                                <b>
                                   <span
                                     className='text-capitalize'
-                                    style={{ fontSize: "14px" }}
+                                    style={{ fontSize: "12px" }}
                                   >
                                     {data?.orderFrom}
                                   </span>
-                                </strong>
+                                </b>
                               </span>
-                              <b className='mx-3'>#{data.orderCode}</b>
+                              <b className='mx-1'>Order #{data.orderCode}</b>
                             </div>
                             <div>
-                              <b className='mx-3 text-dark'>$ {data.grandTotal}</b>
+                              <b className='mx-3 text-dark'>
+                                $ {data.grandTotal}
+                              </b>
                             </div>
                             {console.log(data)}
                             {data?.deliveryType === "pickup" ? (
                               <div className='d-flex flex-wrap'>
                                 {" "}
-                                {data?.orderStatus !== "cancelled" && (
+                                {data?.orderStatus !== "cancelled" &&
+                                data?.orderStatus === "placed" ? (
                                   <div className='d-flex  my-1 justify-content-end '>
                                     <span
                                       className='mx-2 py-2 badge bg-secondary'
@@ -208,9 +211,10 @@ function Order() {
                                       Pickedup
                                     </span>
                                   </div>
-                                )}
+                                ) : null}
                                 {data?.orderStatus !== "cancelled" &&
-                                data?.orderStatus !== "delivered" ? (
+                                data?.orderStatus !== "delivered" &&
+                                data?.orderStatus === "placed" ? (
                                   <div className='d-flex my-1 justify-content-end'>
                                     <span
                                       className='mx-2 py-2 badge bg-danger'
@@ -392,9 +396,12 @@ function Order() {
                     <h6 className='py-2'>
                       Store Location : {orderDetail?.storeLocation}
                     </h6>
-                    <h6 className='py-2'>
-                      Delivery Executive : {orderDetail?.deliveryExecutiveName}
-                    </h6>
+                    {orderDetail?.deliveryType === "delivery" && (
+                      <h6 className='py-2'>
+                        Delivery Executive :{" "}
+                        {orderDetail?.deliveryExecutiveName}
+                      </h6>
+                    )}
                   </div>
                   <div className='col-4'>
                     <h6 className='py-2'>Type : {orderDetail?.orderFrom}</h6>
@@ -432,7 +439,9 @@ function Order() {
                               if (item?.key === "pizza") {
                                 return (
                                   <>
-                                    <p className='m-0'>{item.key}</p>
+                                    <p className='m-0'>
+                                      {item.key} ({order?.pizzaSize})
+                                    </p>
                                     <PizzaDetails pizzaData={item} />
                                   </>
                                 );
@@ -647,7 +656,6 @@ function Order() {
   );
 }
 export const PizzaDetails = ({ pizzaData }) => {
-  const pizzaItems = pizzaData.value[0];
   console.log(pizzaData.value, "pizzaData.value");
   const renderItemNames = (item) => {
     return (
@@ -680,27 +688,34 @@ export const PizzaDetails = ({ pizzaData }) => {
   );
 };
 export const ToppingsList = ({ toppingsData }) => {
-  const allToppings = [].concat(
-    toppingsData.countAsTwoToppings,
-    toppingsData.countAsOneToppings,
-    toppingsData.freeToppings
+  return (
+    <div>
+      <h6 className='p-0 m-0'>Count As Two Toppings:</h6>
+      {renderToppingsList(toppingsData.countAsTwoToppings)}
+      <h6 className='p-0 m-0'>Count As One Toppings:</h6>
+      {renderToppingsList(toppingsData.countAsOneToppings)}
+      <h6 className='p-0 m-0'>Indian Styles :</h6>
+      {renderToppingsList(toppingsData.freeToppings)}
+    </div>
   );
 
-  return (
-    <span>
-      {allToppings.map((topping, index) => (
-        <p className='m-0' key={index}>
-          {topping.toppingsName} (
-          {topping.toppingsPlacement === "whole"
-            ? "W"
-            : topping.toppingsPlacement === "lefthalf"
-            ? "L"
-            : "R"}
-          ) {index == allToppings.length - 1 ? "" : ","}
-        </p>
-      ))}
-    </span>
-  );
+  function renderToppingsList(toppingsList) {
+    return (
+      <span>
+        {toppingsList.map((topping, index) => (
+          <span className='m-0' key={index}>
+            {topping.toppingsName} (
+            {topping.toppingsPlacement === "whole"
+              ? "W"
+              : topping.toppingsPlacement === "lefthalf"
+              ? "L"
+              : "R"}
+            ) {index === toppingsList.length - 1 ? "" : ","}
+          </span>
+        ))}
+      </span>
+    );
+  }
 };
 
 export default Order;

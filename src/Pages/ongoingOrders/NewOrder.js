@@ -1,13 +1,11 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../../css/ongoingOrder.css";
 import Nav from "../../layout/Nav";
 import SpecialMenu from "./SpecialMenu";
 
 import CreateYourOwn from "../../components/order/CreateYourOwn";
 import {
-  deleteCartItemApi,
   getCartListApi,
-  getSpecialDetailsApi,
   orderPlaceApi,
   storeLocationApi,
   deliveryExecutiveApi,
@@ -17,10 +15,8 @@ import SidesMenu from "./SidesMenu";
 import DipsMenu from "./DipsMenu";
 import DrinksMenu from "./DrinksMenu";
 import $ from "jquery";
-import swal from "sweetalert";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import GlobalContext from "../../context/GlobalContext";
 import { Link } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -29,6 +25,7 @@ import "react-intl-tel-input/dist/main.css";
 import {
   allIngredientsApi,
   isZipCodeDelivarable,
+  prevOrderDetails,
   sidesApi,
 } from "./newOrder/newOrderApi";
 import {
@@ -38,24 +35,19 @@ import {
 import Cart from "./cart";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, setDisplaySpecialForm } from "../../reducer/cartReducer";
-import { getSpecialDetails } from "./specialMenu/specialMenuCustomApiHandler";
 import { useDebounce } from "./newOrder/newOrderFunctions";
 import NotDeliverableModel from "./newOrder/model";
 import { orderDetails } from "../../API/order";
 import Print from "../order/Print";
 import ReactToPrint from "react-to-print";
 
-function NewOrder({ printRef }) {
-  // const [show, setShow] = useState(false);
+function NewOrder() {
   const [allIngredients, setAllIngredients] = useState();
   const [sidesData, setSidesData] = useState();
-  const [customerName, setCustomerName] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [address, setAddress] = useState("");
   const [deliveryType, setDeliveryType] = useState("pickup");
   const [storesLocationData, setStoreLocationData] = useState();
   const [storesCode, setStoresCode] = useState();
-  const [discount, setDiscount] = useState(0);
+  const [discount, setDiscount] = useState();
   const [taxPer, setTaxPer] = useState(0);
   const [cartListData, setCartListData] = useState();
   const [deliverExectiveList, setDeliverExectiveList] = useState();
@@ -65,6 +57,8 @@ function NewOrder({ printRef }) {
   const [settingsData, setSettingsData] = useState();
   const [isOrderSubmittedSuccessfully, setIsOrderSubmittedSuccessfully] =
     useState(false);
+  const [prevOrderLoading, setPrevOrderLoading] = useState(false);
+  const [prevOrders, setPrevOrders] = useState([]);
   const [orderData, setOrderData] = useState();
   const [ispostalcodeAvailable, setIspostalcodeAvailable] = useState(true);
   const [extraDeliveryCharges, setExtraDeliveryCharges] = useState(0);
@@ -79,6 +73,7 @@ function NewOrder({ printRef }) {
   const btnRef = useRef();
   const [isOpen, setIsOpen] = useState(false);
   const [orderDetail, setOrderDetail] = useState();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleProductClick = (productType) => {
     switch (productType) {
@@ -102,9 +97,6 @@ function NewOrder({ printRef }) {
         break;
     }
   };
-
-  console.log(orderDetail, "placed order res");
-
   let cartdata = useSelector((state) => state.cart.cart);
   let totalPrice = 0;
   cartdata.forEach((item) => {
@@ -114,11 +106,11 @@ function NewOrder({ printRef }) {
   const delivery_charges =
     cartdata.length !== 0 && deliveryType !== "pickup"
       ? settingsData?.filter(
-        (item) => item.settingName === "Delivery Charges"
-      )[0].settingValue
+          (item) => item.settingName === "Delivery Charges"
+        )[0].settingValue
       : 0;
 
-  const discountedTotalPrice = totalPrice - discount;
+  const discountedTotalPrice = totalPrice - (discount ? discount : 0);
   const taxAmount = (discountedTotalPrice * taxPer) / 100;
   const grandTotal =
     discountedTotalPrice +
@@ -218,11 +210,11 @@ function NewOrder({ printRef }) {
       deliveryType === "pickup"
         ? null
         : Yup.string()
-          .required("Customer Name is Required.")
-          .matches(
-            /^[A-Za-z\s]+$/,
-            "Customer Name must contain only letters and spaces"
-          ),
+            .required("Customer Name is Required.")
+            .matches(
+              /^[A-Za-z\s]+$/,
+              "Customer Name must contain only letters and spaces"
+            ),
     address:
       deliveryType === "pickup"
         ? null
@@ -231,10 +223,7 @@ function NewOrder({ printRef }) {
       deliveryType === "pickup"
         ? null
         : canadianPostalCode.required("Postal Code is Required"),
-    deliveryExecutive:
-      deliveryType === "pickup"
-        ? null
-        : Yup.string().required("Delivery Executive is Required"),
+
     stores: Yup.string().required("Store Location is Required."),
   });
   const formik = useFormik({
@@ -264,21 +253,19 @@ function NewOrder({ printRef }) {
           deliveryCharges:
             cartdata.length !== 0 && deliveryType !== "pickup"
               ? settingsData?.filter(
-                (item) => item.settingName === "Delivery Charges"
-              )[0].settingValue
+                  (item) => item.settingName === "Delivery Charges"
+                )[0].settingValue
               : 0,
           extraDeliveryCharges: extraDeliveryCharges ? extraDeliveryCharges : 0,
           grandTotal: grandTotal,
         };
-        console.log(payload, "place order payload");
         const response = await orderPlaceApi(payload);
-        console.log(response, "placed order res");
         if (response.status === 200) {
           resetForm();
           dispatch(addToCart([]));
-          setDiscount(0);
+          setDiscount();
+          setPrevOrders([]);
           setExtraDeliveryCharges(0);
-          console.log(response.data.orderCode, "placed order res orderdetail");
           orderDetails({ orderCode: response.data.orderCode }).then((data) => {
             setOrderDetail(data.data.data);
             setIsOrderSubmittedSuccessfully(true);
@@ -297,14 +284,34 @@ function NewOrder({ printRef }) {
     },
   });
   const debouncedInputValue = useDebounce(formik.values.postalcode, 2000);
+  const debouncedInputValueForphoneNumber = useDebounce(
+    formik.values.phoneno,
+    2000
+  );
   const fetchpostalcodeIsDeliverable = async (postalcode) => {
-    // Make your API call here with searchTerm
+    setIsLoading(true);
     await isZipCodeDelivarable(postalcode)
       .then((res) => {
         setIspostalcodeAvailable(res.data.deliverable);
         res.data.deliverable ? setIsOpen(false) : setIsOpen(true);
+        setIsLoading(false);
       })
-      .catch((err) => toast.error(err?.response?.data?.message));
+      .catch((err) => {
+        setIsLoading(false);
+        toast.error(err?.response?.data?.message);
+      });
+  };
+  const fetchPrevOrder = async (phoneno) => {
+    setPrevOrderLoading(true);
+    await prevOrderDetails(phoneno)
+      .then((res) => {
+        setPrevOrders(res.data.data);
+        setPrevOrderLoading(false);
+      })
+      .catch((err) => {
+        setPrevOrderLoading(false);
+        toast.error(err?.response?.data?.message);
+      });
   };
 
   useEffect(() => {
@@ -312,6 +319,11 @@ function NewOrder({ printRef }) {
       fetchpostalcodeIsDeliverable(formik.values.postalcode);
     }
   }, [debouncedInputValue]);
+  useEffect(() => {
+    if (formik.values.phoneno.length > 9) {
+      fetchPrevOrder(formik.values.phoneno);
+    }
+  }, [debouncedInputValueForphoneNumber]);
 
   useEffect(() => {
     setTaxPer(
@@ -458,6 +470,18 @@ function NewOrder({ printRef }) {
                     onBlur={formik.handleBlur}
                     value={formik.values.postalcode}
                   />
+                  <div
+                    className={
+                      isLoading
+                        ? "spinner-border spinner-border-sm d-flex mt-1"
+                        : "d-none"
+                    }
+                    role='status'
+                  >
+                    {/* <span className='visually-hidden'>
+                      Checking availability...
+                    </span> */}
+                  </div>
                   {formik.touched.postalcode && formik.errors.postalcode ? (
                     <div className='text-danger my-1'>
                       {formik.errors.postalcode}
@@ -505,10 +529,7 @@ function NewOrder({ printRef }) {
               {deliveryType === "delivery" && (
                 <>
                   <label className='form-label mt-2 mb-1'>
-                    Delivery Executive{" "}
-                    {deliveryType === "delivery" && (
-                      <small className='text-danger'>*</small>
-                    )}
+                    Delivery Executive
                   </label>
                   <select
                     className='form-select'
@@ -534,7 +555,7 @@ function NewOrder({ printRef }) {
                   </select>
 
                   {formik.touched.deliveryExecutive &&
-                    formik.errors.deliveryExecutive ? (
+                  formik.errors.deliveryExecutive ? (
                     <div className='text-danger my-1'>
                       {formik.errors.deliveryExecutive}
                     </div>
@@ -551,22 +572,38 @@ function NewOrder({ printRef }) {
                       <th scope='col'>Order</th>
                     </tr>
                   </thead>
-                  {/* <tbody>
-                  <tr>
-                    <th scope="row">
-                      <input type="checkbox" />
-                    </th>
-                    <td>10-01-2023</td>
-                    <td>Large Pizza</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      <input type="checkbox" />
-                    </th>
-                    <td>04-07-2023</td>
-                    <td>Extra Large Pizza</td>
-                  </tr>
-                </tbody> */}
+                  <tbody>
+                    {prevOrderLoading ? (
+                      <tr>
+                        <td scope='col' colspan='2'>
+                          <div
+                            className={"spinner-border  mt-1"}
+                            role='status'
+                          />
+                        </td>
+                      </tr>
+                    ) : prevOrders?.length > 0 ? (
+                      prevOrders?.map((order) => {
+                        return (
+                          <tr
+                            key={order?.code}
+                            className='bg-white text-dark '
+                            style={{ cursor: "pointer" }}
+                            onClick={() => {
+                              dispatch(addToCart(order?.orderItems));
+                            }}
+                          >
+                            <td scope='col' className='px-0'>
+                              {order?.created_at?.split(" ")[0]}
+                            </td>
+                            <td scope='col' className='px-0'>
+                              {order?.code}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : null}
+                  </tbody>
                 </table>
               </div>
             </div>
@@ -749,23 +786,22 @@ function NewOrder({ printRef }) {
                             $
                           </span>
                         </div>
+                        {console.log(discount, "discountdiscount")}
                         <input
                           className='form-control w-25 text-end'
                           type='number'
                           placeholder='0.00'
-                          min='0'
                           step='1'
                           max={totalPrice.toFixed(2)}
-                          defaultValue={0}
                           value={discount}
                           onChange={(e) => {
-                            let inputValue = parseFloat(e.target.value);
-                            if (inputValue < 0) {
-                              inputValue = 0;
+                            let inputValue = Number(e.target.value);
+                            if (inputValue <= 0) {
+                              inputValue = "";
                             } else if (inputValue > totalPrice) {
                               inputValue = totalPrice;
                             }
-                            setDiscount(inputValue.toFixed(2));
+                            setDiscount(inputValue);
                           }}
                         ></input>
 
@@ -785,9 +821,9 @@ function NewOrder({ printRef }) {
                           <span className='input-group-text inputGroupTxt px-2'>
                             {cartdata.length !== 0
                               ? settingsData?.filter(
-                                (item) =>
-                                  item.settingName === "Tax Percentage"
-                              )[0].settingValue
+                                  (item) =>
+                                    item.settingName === "Tax Percentage"
+                                )[0].settingValue
                               : 0}{" "}
                             %
                           </span>
@@ -803,8 +839,8 @@ function NewOrder({ printRef }) {
                           value={
                             cartdata.length !== 0
                               ? ((discountedTotalPrice * taxPer) / 100).toFixed(
-                                2
-                              )
+                                  2
+                                )
                               : 0
                           }
                         ></input>
@@ -838,9 +874,9 @@ function NewOrder({ printRef }) {
                               cartdata.length === 0 || deliveryType == "pickup"
                                 ? 0
                                 : settingsData?.filter(
-                                  (item) =>
-                                    item.settingName === "Delivery Charges"
-                                )[0].settingValue
+                                    (item) =>
+                                      item.settingName === "Delivery Charges"
+                                  )[0].settingValue
                             }
                             readOnly
                           ></input>
@@ -936,7 +972,7 @@ function NewOrder({ printRef }) {
                             </button>
                           )}
                           content={() => printRef2?.current}
-                          onBeforePrint={() => { }}
+                          onBeforePrint={() => {}}
                         ></ReactToPrint>
                       </div>
                     </div>

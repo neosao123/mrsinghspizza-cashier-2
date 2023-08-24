@@ -40,10 +40,15 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   const [additionalToppingsCount, setAdditionalToppingsCount] = useState(0);
   const [noOfFreeDips, setNoOfFreeDips] = useState(0);
   const [noofFreeDrinks, setNoofFreeDrinks] = useState(0);
+  const [freeSides, setFreeSides] = useState([]);
   const [allToppings, setAllToppings] = useState([]);
   const [totalPriceOfToppings, setTotalPriceOfToppings] = useState(0);
   const [totalPriceOfDips, setTotalPriceOfDips] = useState(0);
   const [totalPriceOfDipsFinal, setTotalPriceOfDipsFinal] = useState(0);
+  let calcOneTpsArr = [];
+  let calcTwoTpsArr = [];
+  let noOfFreeToppings = Number(getSpecialData?.noofToppings);
+  let noOfAdditionalTps = Number(0);
   const dispatch = useDispatch();
   let cartdata = useSelector((state) => state.cart.cart);
   //  const
@@ -63,35 +68,43 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       return newArr;
     });
   };
-  const handlePriceWithFreeToppins = (
-    countAsTwoToppings,
-    offeredFreeToppings
-  ) => {
-    if (countAsTwoToppings.price - offeredFreeToppings <= 0) {
-      setOfferedFreeToppings(offeredFreeToppings - 2);
-      return 0;
+  const handleChangeAllIndianToppings = (e, count) => {
+    if (e.target.checked) {
+      const allFreeToppings = [...toppingsData?.toppings?.freeToppings].map(
+        (item) => {
+          let placement = "whole";
+
+          return {
+            toppingsPrice: item.price,
+            toppingsName: item.toppingsName,
+            toppingsCode: item.toppingsCode,
+            toppingsPlacement: placement,
+          };
+        }
+      );
+      let arr = [...pizzaState];
+      arr[count - 1] = {
+        ...arr[count - 1],
+        toppings: {
+          ...arr[count - 1].toppings,
+          freeToppings: allFreeToppings,
+        },
+      };
+
+      setPizzaState(arr);
+    } else {
+      let arr = [...pizzaState];
+      arr[count - 1] = {
+        ...arr[count - 1],
+        toppings: {
+          ...arr[count - 1].toppings,
+          freeToppings: [],
+        },
+      };
+      setPizzaState(arr);
     }
-    setOfferedFreeToppings(offeredFreeToppings - 2);
-    return (
-      countAsTwoToppings.price -
-      (offeredFreeToppings <= 0 ? 0 : offeredFreeToppings)
-    );
   };
-  const handlePriceWithFreeToppinsCountAsOne = (
-    countAsOneToppings,
-    offeredFreeToppings
-  ) => {
-    if (1 - offeredFreeToppings <= 0) {
-      setOfferedFreeToppings(offeredFreeToppings - 1);
-      return 0;
-    }
-    setOfferedFreeToppings(offeredFreeToppings - 1);
-    return (
-      countAsOneToppings.price -
-      (offeredFreeToppings <= 0 ? 0 : offeredFreeToppings)
-    );
-    // return 1 - offeredFreeToppings;
-  };
+
   const handleSpecialBasesChange = (event, i) => {
     const selectedValue = event.target.value;
     const selectedObject = getSpecialData?.specialbases?.find(
@@ -174,11 +187,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         {
           ...countAsTwoToppings,
           placement: "whole",
-
-          // price: handlePriceWithFreeToppins(
-          //   countAsTwoToppings,
-          //   offeredFreeToppings
-          // ),
         },
       ];
       arr[count - 1] = {
@@ -205,12 +213,11 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       // }
       setAllToppings([...allToppings, Number(countAsTwoToppings.countAs)]);
       setPizzaState(arr);
-      console.log(offeredFreeToppings);
-      if (offeredFreeToppings <= 0) {
-        console.log(offeredFreeToppings, "j");
-        console.log(additionalToppingsCount, "j");
-        setAdditionalToppingsCount((val) => val + 2);
-      }
+      // if (offeredFreeToppings <= 0) {
+      //   console.log(offeredFreeToppings, "j");
+      //   console.log(additionalToppingsCount, "j");
+      //   setAdditionalToppingsCount((val) => val + 2);
+      // }
     } else {
       let arr = [...pizzaState];
 
@@ -226,28 +233,28 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setAllToppings(updatedAll);
 
       if (index !== -1 && arr[count - 1]?.toppings?.countAsTwoToppings) {
-        if (offeredFreeToppings <= 0) {
-          if (additionalToppingsCount === 1) {
-            setAdditionalToppingsCount((val) => {
-              return val - 2 === -1 ? 0 : val - 2;
-            });
-            setOfferedFreeToppings(1);
-            // setTotalPriceOfToppings((prev) => {
-            //   return prev - 1;
-            // });
-            // setPrice((prev) => prev - Number(countAsTwoToppings.price));
-          } else {
-            if (offeredFreeToppings === 0) {
-              setOfferedFreeToppings((prev) => prev + 2);
-            }
-            setAdditionalToppingsCount((prev) => prev - 2);
-            // setTotalPriceOfToppings(
-            //   (prev) => prev - Number(countAsTwoToppings.price)
-            // );
-          }
-        } else if (offeredFreeToppings <= getSpecialData?.noofToppings) {
-          setOfferedFreeToppings((prev) => prev + 2);
-        }
+        // if (offeredFreeToppings <= 0) {
+        //   if (additionalToppingsCount === 1) {
+        //     setAdditionalToppingsCount((val) => {
+        //       return val - 2 === -1 ? 0 : val - 2;
+        //     });
+        //     setOfferedFreeToppings(1);
+        //     // setTotalPriceOfToppings((prev) => {
+        //     //   return prev - 1;
+        //     // });
+        //     // setPrice((prev) => prev - Number(countAsTwoToppings.price));
+        //   } else {
+        //     if (offeredFreeToppings === 0) {
+        //       setOfferedFreeToppings((prev) => prev + 2);
+        //     }
+        //     setAdditionalToppingsCount((prev) => prev - 2);
+        //     // setTotalPriceOfToppings(
+        //     //   (prev) => prev - Number(countAsTwoToppings.price)
+        //     // );
+        //   }
+        // } else if (offeredFreeToppings <= getSpecialData?.noofToppings) {
+        //   setOfferedFreeToppings((prev) => prev + 2);
+        // }
         let updatedArr = arr[count - 1]?.toppings?.countAsTwoToppings.filter(
           (item) => item.toppingsCode !== countAsTwoToppings.toppingsCode
         );
@@ -290,10 +297,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         {
           ...countAsOneToppings,
           placement: "whole",
-          // price: handlePriceWithFreeToppinsCountAsOne(
-          //   countAsOneToppings,
-          //   offeredFreeToppings
-          // ),
         },
       ];
 
@@ -307,16 +310,16 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setPizzaState(arr);
 
       console.log(offeredFreeToppings, "j");
-      if (offeredFreeToppings <= 0) {
-        setAdditionalToppingsCount((val) => {
-          return val + 1;
-        });
-        // setTotalPriceOfToppings(
-        //   (prev) => prev + Number(countAsOneToppings.price)
-        // );
-      } else {
-        setOfferedFreeToppings((prev) => prev - 1);
-      }
+      // if (offeredFreeToppings <= 0) {
+      //   setAdditionalToppingsCount((val) => {
+      //     return val + 1;
+      //   });
+      //   // setTotalPriceOfToppings(
+      //   //   (prev) => prev + Number(countAsOneToppings.price)
+      //   // );
+      // } else {
+      //   setOfferedFreeToppings((prev) => prev - 1);
+      // }
     } else {
       let arr = [...pizzaState];
       const index = arr[count - 1].toppings?.countAsOneToppings.findIndex(
@@ -339,20 +342,20 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         };
       }
       setPizzaState(arr);
-      if (offeredFreeToppings <= 0) {
-        if (additionalToppingsCount > 0) {
-          setAdditionalToppingsCount((val) => {
-            return val - 1;
-          });
-          // setTotalPriceOfToppings(
-          //   (prev) => prev - Number(countAsOneToppings.price)
-          // );
-        } else {
-          setOfferedFreeToppings((prev) => prev + 1);
-        }
-      } else if (offeredFreeToppings <= getSpecialData?.noofToppings) {
-        setOfferedFreeToppings((prev) => prev + 1);
-      }
+      // if (offeredFreeToppings <= 0) {
+      //   if (additionalToppingsCount > 0) {
+      //     setAdditionalToppingsCount((val) => {
+      //       return val - 1;
+      //     });
+      //     // setTotalPriceOfToppings(
+      //     //   (prev) => prev - Number(countAsOneToppings.price)
+      //     // );
+      //   } else {
+      //     setOfferedFreeToppings((prev) => prev + 1);
+      //   }
+      // } else if (offeredFreeToppings <= getSpecialData?.noofToppings) {
+      //   setOfferedFreeToppings((prev) => prev + 1);
+      // }
     }
   };
   const handleFreeToppingsPlacementChange = (event, count, toppingsCode) => {
@@ -468,6 +471,15 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       payloadEdit !== undefined &&
       payloadEdit?.productType === "Special_Pizza"
     ) {
+      console.log(payloadEdit, "payloadEdit");
+      console.log("payloadEditcode:", payloadEdit?.code);
+      console.log("payloadEditcode pizzaSize:", payloadEdit?.pizzaSize);
+      console.log("payloadEditcode pizzaState:", payloadEdit?.config?.pizza);
+      console.log("payloadEditcode drinksArr:", payloadEdit?.config?.drinks);
+      console.log("payloadEditcode dipsArr:", payloadEdit?.config?.dips);
+      console.log("payloadEditcode sidesArr:", payloadEdit?.config?.sides);
+      console.log("payloadEditcode price:", Number(payloadEdit?.amount));
+      console.log("payloadEditcode comments:", payloadEdit?.comments);
       handleGetSpecial({ code: payloadEdit?.code });
       setPizzaSize(payloadEdit?.pizzaSize);
       setPizzaState(payloadEdit?.config?.pizza);
@@ -476,14 +488,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setSidesArr(payloadEdit?.config?.sides);
 
       setPrice(Number(payloadEdit?.amount));
-      console.log(payloadEdit, "payloadEdit");
       setComments(payloadEdit?.comments);
     }
   }, [payloadEdit]);
 
-  useEffect(() => { }, [pizzaState]);
-
-  useEffect(() => { }, [pizzaState]);
   useEffect(() => {
     specialIngredients();
     dispatch(setDisplaySpecialForm(false));
@@ -508,6 +516,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   useEffect(() => {
     if (getSpecialData?.noofToppings !== undefined) {
       setOfferedFreeToppings(Number(getSpecialData?.noofToppings));
+      setAdditionalToppingsCount(0);
     }
     if (getSpecialData?.noofDips !== undefined) {
       setNoOfFreeDips(Number(getSpecialData?.noofDips));
@@ -517,6 +526,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     }
     if (payloadEdit === undefined) {
       createEmptyObjects(Number(getSpecialData?.noofPizzas));
+    }
+    if (getSpecialData?.freesides?.length > 0) {
+      console.log(getSpecialData?.freesides, "getSpecialData?.freeSides");
+      setFreeSides(getSpecialData?.freesides);
     }
   }, [getSpecialData]);
 
@@ -530,9 +543,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         getSpecialData={getSpecialData}
         count={i}
         toppingsData={toppingsData}
+        handleChangeAllIndianToppings={handleChangeAllIndianToppings}
         handleCrustChange={handleCrustChange}
         crustSelected={crustSelected}
         cheeseSelected={cheeseSelected}
+        setOfferedFreeToppings={setOfferedFreeToppings}
+        offeredFreeToppings={offeredFreeToppings}
+        additionalToppingsCount={additionalToppingsCount}
+        setAdditionalToppingsCount={setAdditionalToppingsCount}
         specialBasesSelected={specialBasesSelected}
         setCheeseSelected={setCheeseSelected}
         handleSpecialBasesChange={handleSpecialBasesChange}
@@ -547,9 +565,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       />
     );
   }
-  useEffect(() => {
-    console.log(price, "price at dips");
-  }, [price]);
 
   const handleDips = (e, dips) => {
     let { checked } = e.target;
@@ -560,34 +575,12 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         prevQty: 0,
       };
       setDipsArr([...dipsArr, obj]);
-      // calculateDipsPrice(obj, noOfFreeDips);
-      // if (noOfFreeDips <= 0) {
-      //   console.log(dips.qty, "price at dips");
-      //   let tempQty = dips.qty === undefined ? 1 : Number(dips.qty);
-      //   setTotalPriceOfDips(
-      //     (prev) => prev + Number(dips.price) * Number(tempQty)
-      //   );
-      // } else {
-      //   console.log(noOfFreeDips, "price at dips");
-      //   setNoOfFreeDips((prev) => prev - 1);
-      // }
-      // console.log(noOfFreeDips, "price at dips parent");
-
-      // calculateDipsPrice(dips, noOfFreeDips);
     } else {
       let filteredDips = dipsArr?.filter(
         (item) => item.dipsCode !== dips.dipsCode
       );
       let tempDips = dipsArr?.filter((item) => item.dipsCode === dips.dipsCode);
       setDipsArr(filteredDips);
-      // setNoOfFreeDips((prev) => prev + 1);
-      console.log(noOfFreeDips, "price at dips");
-      // if (noOfFreeDips - 1 <= 0) {
-      //   setTotalPriceOfDips((prev) => {
-      //     return prev - tempDips[0].price * tempDips[0].qty;
-      //   });
-      //   setNoOfFreeDips((prev) => prev + 1);
-      // }
     }
   };
   const handleDipsCount = (e, dips) => {
@@ -598,18 +591,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         ...dips,
         qty: e.target.value,
       };
-      console.log(dips, "price at dips");
-      // calculateDipsPrice(
-      //   {
-      //     ...tempDips,
-      //     qty:
-      //       dips.qty < e.target.value
-      //         ? e.target.value - dips.qty
-      //         : e.target.value,
-      //     prevQty: tempDips.qty,
-      //   },
-      //   noOfFreeDips
-      // );
       let temp = [...dipsArr];
       temp[ind] = updatedDips;
       setDipsArr(temp);
@@ -735,7 +716,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setComments("");
       setAdditionalToppingsCount(0);
       setOfferedFreeToppings(Number(getSpecialData?.noofToppings));
-      console.log(Number(getSpecialData?.price), "payloadEdit");
       setPrice(Number(getSpecialData?.price));
       createEmptyObjects(Number(getSpecialData?.noofPizzas));
     }
@@ -788,9 +768,12 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   };
   // Calculate Price
   const calculatePrice = () => {
-    let totalPrice = 0;
+    let totalPrice = Number(0);
+    let totalOneTpsPrice = Number(0);
+    let totalTwoTpsPrice = Number(0);
 
     // Calculate base pizza price
+
     totalPrice +=
       pizzaSize === "Large"
         ? Number(getSpecialData?.largePizzaPrice)
@@ -806,95 +789,88 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         ? Number(item?.specialbases?.price)
         : 0;
 
-      let totalToppingsCount = 0;
-      totalToppingsCount = allToppings?.reduce(
-        (accumulator, currentValue) => accumulator + currentValue,
-        0
-      );
-      // console.log(totalToppingsCount, "updatedAll sum");
-      let tempToppingsPrice = 0;
-      let remainingItemCount = 0;
-
-      // console.log("topping sum i", allToppings[1], allToppings[2]);
-      let sum = 0;
-      for (let i = 0; i < allToppings.length; i++) {
-        console.log("topping sum i", allToppings[i], allToppings[i + 1]);
-        sum = allToppings[i] + allToppings[i + 1];
-        console.log("topping sum", sum);
-        if (sum > offeredFreeToppings) {
-          tempToppingsPrice += sum - offeredFreeToppings;
-          console.log(
-            allToppings.length - (i + 1),
-            "topping sum restSum updatedAll"
-          );
-          // if (allToppings.length - (i + 1) > 0) {
-          //   let restSum = allToppings.length - (i + 1);
-          //   console.log(allToppings, "topping sum restSum updatedAll");
-          //   console.log("topping sum restSum", restSum);
-          //   tempToppingsPrice += restSum * 2;
-          //   console.log("topping sum tempToppingsPrice if", tempToppingsPrice);
-          // }
-
-          // break;
-        } else if (sum > 0) {
-          // Otherwise, increment the remainingItemCount
-          remainingItemCount++;
-        }
-        // if (sum == offeredFreeToppings) {
-        //   let restSum = allToppings.length - (i + 1);
-        //   tempToppingsPrice += restSum * 2;
-        // }
+      if (item?.toppings?.countAsTwoToppings?.length > 0) {
+        item?.toppings?.countAsTwoToppings?.map((items) => {
+          if (noOfFreeToppings > 1) {
+            let tpsObj = {
+              ...items,
+              amount: 0,
+            };
+            calcTwoTpsArr.push(tpsObj);
+            setOfferedFreeToppings((prev) => prev - 2);
+            noOfFreeToppings -= Number(2);
+          } else if (noOfFreeToppings === 1) {
+            let tpsObj = {
+              ...items,
+              amount: Number(items?.price) / 2,
+            };
+            calcTwoTpsArr.push(tpsObj);
+            setOfferedFreeToppings((prev) => prev - 1);
+            noOfFreeToppings -= Number(1);
+            noOfAdditionalTps++;
+            setAdditionalToppingsCount((prev) => prev + 1);
+          } else {
+            calcTwoTpsArr.push({ ...items, amount: Number(items?.price) });
+            noOfAdditionalTps += Number(2);
+            setAdditionalToppingsCount((prev) => prev + 2);
+          }
+        });
       }
-      console.log("topping sum remainingItemCount", remainingItemCount);
-      console.log("topping sum tempToppingsPrice", tempToppingsPrice);
-      // console.log(tempToppingsPrice, "updatedAll tempToppingsPrice");
-
-      // totalToppingsCount = ;
-      // item?.toppings?.countAsTwoToppings?.forEach((toppings) => {
-      //   totalToppingsCount += 2;
-      // });
-      // item?.toppings?.countAsOneToppings?.forEach((toppings) => {
-      //   totalToppingsCount += 1;
-      // });
-      // if (totalToppingsCount >= offeredFreeToppings) {
-      //   console.log("Total Toppings Count", totalToppingsCount);
-      //   let paidToppings = Number(totalToppingsCount) - offeredFreeToppings;
-      //   // let priceOfOneTopping = item?.toppings?.countAsTwoToppings[0]?.price
-      //   //   ? item?.toppings?.countAsTwoToppings[0]?.price
-      //   //   : null
-      //   //   ? Number(dipsArr[0]?.price)
-      //   //   : null;
-      //   let priceOfOneTopping = 1;
-      //   let paidPrice = paidToppings * priceOfOneTopping;
-      //   totalPrice += paidPrice;
-      // }
-
-      // // Add prices for freeToppings
-
-      // item?.toppings?.freeToppings?.forEach((toppings) => {
-      //   totalPrice += Number(toppings?.price);
-      // });
+      if (item?.toppings?.countAsOneToppings?.length > 0) {
+        item?.toppings?.countAsOneToppings?.map((items) => {
+          if (noOfFreeToppings > 0) {
+            let tpsObj = {
+              ...items,
+              amount: 0,
+            };
+            calcOneTpsArr.push(tpsObj);
+            noOfFreeToppings--;
+            setOfferedFreeToppings((prev) => prev - 1);
+          } else {
+            calcOneTpsArr.push({ ...items, amount: Number(items?.price) });
+            noOfAdditionalTps++;
+            setAdditionalToppingsCount((prev) => prev + 1);
+          }
+        });
+      }
     });
+    calcOneTpsArr?.map((tps) => {
+      totalOneTpsPrice += Number(tps?.amount);
+    });
+
+    calcTwoTpsArr?.map((tps) => {
+      totalTwoTpsPrice += Number(tps?.amount);
+    });
+    totalPrice += totalOneTpsPrice;
+    totalPrice += totalTwoTpsPrice;
 
     // Iterate through dipsArr
     let totalQtyDips = 0;
     dipsArr?.forEach((item) => {
-      totalQtyDips += Number(item.qty);
+      totalQtyDips += Number(item?.qty);
     });
     if (totalQtyDips >= noOfFreeDips) {
       let paidDips = Number(totalQtyDips) - noOfFreeDips;
       let priceOfOneDips = dipsArr[0]?.price ? Number(dipsArr[0]?.price) : null;
       let paidPrice = paidDips * priceOfOneDips;
+
       totalPrice += paidPrice;
     }
 
     sidesArr?.forEach((item) => {
-      totalPrice += Number(item?.lineEntries[0]?.price);
+      let ind = freeSides?.findIndex(
+        (side) => side.lineEntries[0].code == item?.lineEntries[0]?.code
+      );
+      if (ind === -1) {
+        totalPrice += Number(item?.lineEntries[0]?.price)
+          ? Number(item?.lineEntries[0]?.price)
+          : null;
+      }
     });
 
     drinksArr?.forEach((drinks, index) => {
       if (noofFreeDrinks < index + 1) {
-        totalPrice += Number(drinks?.price);
+        totalPrice += drinks?.price ? Number(drinks?.price) : 0;
       }
     });
 
@@ -905,31 +881,11 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     ).toFixed(2);
     setPrice(formattedPrice);
   };
-  useEffect(() => {
-    console.log(dipsArr, "qty dips");
-  }, [dipsArr]);
-
-  const calculateDipsPrice = (dips, noOfFreeDips) => {
-    // console.log(dips.prevQty, "price at dips");
-    // if (noOfFreeDips <= 0) {
-    //   // console.log(dips.qty, "price at dips");
-    //   let tempQty = dips.qty === undefined ? 1 : Number(dips.qty);
-    //   // console.log(tempQty, "price at dips");
-    //   setTotalPriceOfDips((prev) => {
-    //     let sum = prev - Number(dips.price) * Number(dips.prevQty);
-    //     // console.log(sum, "price at dips");
-    //     return Number(sum) + Number(dips.price) * Number(tempQty);
-    //   });
-    // } else {
-    //   setNoOfFreeDips((prev) => prev - 1);
-    // }
-  };
-  useEffect(() => {
-    console.log(price, "pricefinal");
-  }, [price]);
 
   useEffect(() => {
     // calculateDipsPrice();
+    setOfferedFreeToppings(noOfFreeToppings);
+    setAdditionalToppingsCount(noOfAdditionalTps);
     calculatePrice();
   }, [
     pizzaState,
@@ -939,6 +895,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     pizzaSize,
     drinksArr,
     popsArr,
+    calcOneTpsArr,
+    calcTwoTpsArr,
+    noOfFreeToppings,
   ]);
   useEffect(() => {
     if (getSpecialData) {
@@ -1030,6 +989,13 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                     onChange={(e) => handleSides(e, sidesData)}
                                   />
                                   {sidesData.sideName}
+                                  <span
+                                    className={
+                                      "badge-" + sidesData.type + " mx-1"
+                                    }
+                                  >
+                                    ( {sidesData.type} )
+                                  </span>
                                 </label>
                                 <div style={{ width: "12rem" }}>
                                   <select
@@ -1124,8 +1090,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   <>
                     {(getSpecialData?.pops.length > 0 ||
                       getSpecialData.bottle.length > 0) && (
-                        <h6 className='text-left mt-1 mb-2'>Drinks</h6>
-                      )}
+                      <h6 className='text-left mt-1 mb-2'>Drinks</h6>
+                    )}
 
                     <div id='drinks' className='mb-3'>
                       <ul className='list-group'>
@@ -1199,7 +1165,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                     onClick={handleAddToCart}
                   >
                     {payloadEdit !== undefined &&
-                      payloadEdit?.productType === "Special_Pizza"
+                    payloadEdit?.productType === "Special_Pizza"
                       ? "Edit"
                       : " Add to Cart"}
                   </button>

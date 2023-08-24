@@ -12,3 +12,8 @@ export const isZipCodeDelivarable = async (payload) => {
     zipcode: payload.toString(),
   });
 };
+export const prevOrderDetails = async (payload) => {
+  return await privateAPi.get(
+    `/customer/previousorder?mobileNumber=${payload}`
+  );
+};
