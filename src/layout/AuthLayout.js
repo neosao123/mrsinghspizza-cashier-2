@@ -1,24 +1,29 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import LoadingLayout from "./LoadingLayout";
 import { useSelector } from "react-redux";
 
 function AuthLayout({ children }) {
   const [ok, setOk] = useState(false);
 
-  const { user } = useSelector((state) => ({ ...state }));
-  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+
+  const userData = useSelector((state) => state.user.userData);
+
+
 
   useEffect(() => {
-    if (token !== undefined && token !== "") {
-      if (!user?.data?.token && user === null) {
-        setOk(false);
-      } else {
-        setOk(true);
-      }
-    }
-  }, [user?.data?.token, token]);
+    if (userData) {
 
-  //return ok ? <>{children}</> : <LoadingLayout />;
+      setOk(true);
+    } else {
+      setOk(false);
+      navigate("/");
+    }
+
+  }, [userData, navigate]);
+
+
   return <>{children}</>;
 }
 

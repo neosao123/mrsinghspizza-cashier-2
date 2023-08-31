@@ -4,7 +4,8 @@ import { loginApi } from "../../API/auth/login";
 import { useFormik } from "formik";
 import bgImage from "../../assets/bg-img.jpg";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { user, setUser, setToken } from "../../reducer/userReducer";
 import logo from "../../assets/logo.png";
 
 // Validation Functions
@@ -12,37 +13,25 @@ const getCharacterValidationError = (str) => {
   return `Your password must have at least 1 ${str} character`;
 };
 
+
 const ValidateSchema = Yup.object({
-  userName: Yup.string().required("Rquired"),
+  userName: Yup.string().required("Username is required").matches(/^[a-zA-Z0-9\s]+$/, "Invalid characters in user-name").min(4, "Username should be 4 characters minimum").max(20, "Maximum characters reached"),
   password: Yup.string()
-    .required("Required")
-    .min(8, "Password must have at least 8 characters")
-    .matches(/[0-9]/, getCharacterValidationError("digit")),
-  // .matches(/[a-z]/, getCharacterValidationError("lowercase"))
-  // .matches(/[A-Z]/, getCharacterValidationError("uppercase")),
+    .required("Password is required")
+    .min(6, "Password must have at least 6 characters")
 });
 
 function Login() {
   const [loginObj, setLoginObj] = new useState({
-    userName: "cashier",
-    password: "12345678",
+    userName: "",
+    password: "",
   });
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation;
 
-  // const { user } = useSelector((state) => ({ ...state }));
-  // const intended = location.state;
-  // useEffect(() => {
-  //   if (intended) {
-  //     return;
-  //   } else {
-  //     if (user?.data?.token) {
-  //       navigate("/ongoing-orders");
-  //     }
-  //   }
-  // }, [intended, user?.data?.token, navigate]);
+
+  const userData = useSelector((state) => state.user.userData);
 
   const onSubmit = async (values) => {
     try {
@@ -53,22 +42,19 @@ function Login() {
           let parseToken = res.data.token;
           localStorage.setItem("token", parseToken);
           localStorage.setItem("cashierCode", res.data.data.code);
-          dispatch({
-            type: "LOGGD_IN_USER",
-            payload: {
-              token: res.data.token,
-              code: res.data.data.code,
-              userName: res.data.data.userName,
-              firstName: res.data.data.firstName,
-              lastName: res.data.data.lastName,
-              mobileNumber: res.data.data.mobileNumber,
-              email: res.data.data.email,
-              isActive: res.data.data.isActive,
-              firebaseId: res.data.data.firebaseId,
-              profilePhoto: res.data.data.profilePhoto,
-            },
-          });
-
+          const payload = {
+            code: res.data.data.code,
+            userName: res.data.data.userName,
+            firstName: res.data.data.firstName,
+            lastName: res.data.data.lastName,
+            mobileNumber: res.data.data.mobileNumber,
+            email: res.data.data.email,
+            isActive: res.data.data.isActive,
+            firebaseId: res.data.data.firebaseId,
+            profilePhoto: res.data.data.profilePhoto,
+          }
+          dispatch(setUser(payload));
+          dispatch(setToken(res.data.token));
           setTimeout(() => {
             navigate("/ongoing-orders");
           }, 2000);
@@ -91,6 +77,13 @@ function Login() {
     onSubmit,
     enableReinitialize: true,
   });
+
+  useEffect(() => {
+    if (userData) { 
+      navigate("/ongoing-orders");
+    }
+  }, [userData, navigate]);
+
 
   return (
     <>
