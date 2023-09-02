@@ -218,6 +218,7 @@ function SpecialPizzaSelection({
                             </option>
                             <option value='lefthalf'>Left Half</option>
                             <option value='righthalf'>Right Half</option>
+                            <option value='1/4'>1/4</option>
                           </select>
                         </div>
                       </li>
@@ -292,6 +293,7 @@ function SpecialPizzaSelection({
                             </option>
                             <option value='lefthalf'>Left Half</option>
                             <option value='righthalf'>Right Half</option>
+                            <option value='1/4'>1/4</option>
                           </select>
                         </div>
                       </li>
@@ -367,6 +369,7 @@ function SpecialPizzaSelection({
                             </option>
                             <option value='lefthalf'>Left Half</option>
                             <option value='righthalf'>Right Half</option>
+                            <option value='1/4'>1/4</option>
                           </select>
                         </div>
                       </li>

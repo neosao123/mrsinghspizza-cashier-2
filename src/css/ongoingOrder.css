@@ -109,3 +109,8 @@ h6 {
   text-transform: capitalize;
   color: #8b0b45e4;
 }
+.custom-hover:hover {
+  background-color: #af886f;
+  /* color: #ffffff; */
+  /* border: none; */
+}

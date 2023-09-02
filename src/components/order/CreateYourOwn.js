@@ -630,22 +630,6 @@ function CreateYourOwn({
     );
     if (indexOfSelectedObject !== -1) {
       arr[indexOfSelectedObject] = selectedObject;
-      // arr[count - 1] = {
-      //   ...arr[count - 1],
-      //   toppings: {
-      //     ...arr[count - 1]?.toppings,
-      //     freeToppings: [
-      //       ...arr[count - 1]?.toppings?.freeToppings.slice(
-      //         0,
-      //         indexOfSelectedObject
-      //       ),
-      //       selectedObject,
-      //       ...arr[count - 1]?.toppings?.freeToppings.slice(
-      //         indexOfSelectedObject + 1
-      //       ),
-      //     ],
-      //   },
-      // };
     }
     setFreeToppingsArr(arr);
   };
@@ -876,6 +860,7 @@ function CreateYourOwn({
                                 </option>
                                 <option value='lefthalf'>Left Half</option>
                                 <option value='righthalf'>Right Half</option>
+                                <option value='1/4'>1/4</option>
                               </select>
                             </div>
                           </li>
@@ -949,6 +934,7 @@ function CreateYourOwn({
                                 </option>
                                 <option value='lefthalf'>Left Half</option>
                                 <option value='righthalf'>Right Half</option>
+                                <option value='1/4'>1/4</option>
                               </select>
                             </div>
                           </li>
@@ -1037,6 +1023,7 @@ function CreateYourOwn({
                                 </option>
                                 <option value='lefthalf'>Left Half</option>
                                 <option value='righthalf'>Right Half</option>
+                                <option value='1/4'>1/4</option>
                               </select>
                             </div>
                           </li>

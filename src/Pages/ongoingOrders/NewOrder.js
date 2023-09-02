@@ -738,8 +738,21 @@ function NewOrder() {
             </div>
 
             {/* Section 3 */}
-            <div className='col-lg-4 mt-1 '>
-              <h6 className='text-center'>Order</h6>
+            <div className='col-lg-4 mt-1  '>
+              <div className='d-flex justify-content-between pt-2'>
+                <h6 className='text-center'>Order</h6>
+                {cartdata?.length > 0 && (
+                  <div className='d-flex justify-content-end'>
+                    <button
+                      className='custom-hover bg-danger '
+                      onClick={() => dispatch(addToCart([]))}
+                    >
+                      Clear cart
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {/* Add to Cart */}
               <div className='d-flex flex-column cart'>
                 <div className='p-3 rounded mb-3 overflow-auto'>
