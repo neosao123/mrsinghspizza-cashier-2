@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { user, setUser, setToken } from "../../reducer/userReducer";
 import logo from "../../assets/logo.png";
+import { ToastContainer, toast } from "react-toastify";
 
 // Validation Functions
 const getCharacterValidationError = (str) => {
@@ -38,26 +39,32 @@ function Login() {
       setLoading(true);
       await loginApi(values)
         .then(async (res) => {
-          // Store res in LocalStorage
-          let parseToken = res.data.token;
-          localStorage.setItem("token", parseToken);
-          localStorage.setItem("cashierCode", res.data.data.code);
-          const payload = {
-            code: res.data.data.code,
-            userName: res.data.data.userName,
-            firstName: res.data.data.firstName,
-            lastName: res.data.data.lastName,
-            mobileNumber: res.data.data.mobileNumber,
-            email: res.data.data.email,
-            isActive: res.data.data.isActive,
-            firebaseId: res.data.data.firebaseId,
-            profilePhoto: res.data.data.profilePhoto,
+          // Store res in LocalStorage 
+          let data = res.data;
+          if (data.token && data.data) {
+            let parseToken = res.data.token;
+            localStorage.setItem("token", parseToken);
+            localStorage.setItem("cashierCode", res.data.data.code);
+            const payload = {
+              code: data.data.code,
+              userName: data.data.userName,
+              firstName: data.data.firstName,
+              lastName: data.data.lastName,
+              mobileNumber: data.data.mobileNumber,
+              email: data.data.email,
+              isActive: data.data.isActive,
+              firebaseId: data.data.firebaseId,
+              profilePhoto: data.data.profilePhoto,
+            }
+            dispatch(setUser(payload));
+            dispatch(setToken(res.data.token));
+            setTimeout(() => {
+              navigate("/ongoing-orders");
+            }, 800);
+          } else {
+            setLoading(false);
+            toast.error(data.message);
           }
-          dispatch(setUser(payload));
-          dispatch(setToken(res.data.token));
-          setTimeout(() => {
-            navigate("/ongoing-orders");
-          }, 2000);
         })
         .catch((err) => {
           setLoading(false);
@@ -66,6 +73,7 @@ function Login() {
     } catch (err) {
       setLoading(false);
       console.log("Exception From LoginApi", err);
+      setLoading(false);
     }
   };
 
@@ -79,7 +87,7 @@ function Login() {
   });
 
   useEffect(() => {
-    if (userData) { 
+    if (userData) {
       navigate("/ongoing-orders");
     }
   }, [userData, navigate]);
@@ -156,6 +164,7 @@ function Login() {
           </form>
         </div>
       </div>
+      <ToastContainer hideProgressBar={true} position="top-center"/>
     </>
   );
 }

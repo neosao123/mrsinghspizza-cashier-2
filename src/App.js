@@ -41,7 +41,7 @@ function App() {
           />
           <Route path='/orders' element={<Order printRef={printRef} />} />
           <Route path='/invoices' element={<Invoices />} />
-          <Route path='/reports' element={<Report />} />
+          {/* <Route path='/reports' element={<Report />} /> */}
           <Route path='/profile-update' element={<AuthLayout><Profile /></AuthLayout>} />
           <Route path='/password-change' element={<AuthLayout><PasswordChange /></AuthLayout>} />
           {/* Page For Restricted condition */}

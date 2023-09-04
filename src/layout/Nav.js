@@ -184,7 +184,7 @@ function Nav() {
                 <strong className="nav-text">Invoices</strong>
               </NavLink>
             </li>
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <NavLink
                 to="/reports"
                 className="nav-link"
@@ -192,7 +192,7 @@ function Nav() {
               >
                 <strong className="nav-text">Reports</strong>
               </NavLink>
-            </li>
+            </li> */}
           </ul>
         </div>
 

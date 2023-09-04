@@ -9,10 +9,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import defaultPhoto from "../../assets/user.png";
 
 const profileSchema = Yup.object({
-    firstName: Yup.string().required("Name is required").matches(/^[a-zA-Z\s]*$/, "Invalid characters in first name").min(3, "Name should be 3 characters minimum").max(30, "Maximum characters reached"),
-    lastName: Yup.string().required("Phone is required").matches(/^[a-zA-Z\s]+$/, "Invalid characters in last name").max(30, "Maximum characters reached"),
-    mobileNumber: Yup.number().required("Password is required").min(10, "Password must be 6 characters at minimum"),
-    email: Yup.string().email("Email is required").min(4, "Username should be 6 characters minimum"),
+    firstName: Yup.string().required("First name is required").matches(/^[a-zA-Z\s]*$/, "Invalid characters in first name").min(3, "Name should be 3 characters minimum").max(30, "Maximum characters reached"),
+    lastName: Yup.string().required("Last name is required").matches(/^[a-zA-Z\s]+$/, "Invalid characters in last name").min(3, "Name should be 3 characters minimum").max(30, "Maximum characters reached"),
+    mobileNumber: Yup.number().required("Password is required").min(10, "Invalid phone number"),
+    email: Yup.string().email("Email is required"),
     userName: Yup.string().required("Username is required").matches(/^[a-zA-Z0-9\s]+$/, "Invalid characters in user-name").min(4, "Username should be 4 characters minimum").max(20, "Maximum characters reached"),
 });
 
