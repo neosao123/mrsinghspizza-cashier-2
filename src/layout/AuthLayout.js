@@ -10,19 +10,14 @@ function AuthLayout({ children }) {
 
   const userData = useSelector((state) => state.user.userData);
 
-
-
   useEffect(() => {
     if (userData) {
-
       setOk(true);
     } else {
       setOk(false);
       navigate("/");
     }
-
   }, [userData, navigate]);
-
 
   return <>{children}</>;
 }

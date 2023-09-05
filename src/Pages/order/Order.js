@@ -91,7 +91,7 @@ function Order() {
       })
       .catch((err) => console.log(err));
   };
-  useEffect(() => {}, [orderDetail]);
+  useEffect(() => { }, [orderDetail]);
 
   useEffect(() => {
     if (orderId !== undefined) {
@@ -189,7 +189,7 @@ function Order() {
                               <div className='d-flex flex-wrap'>
                                 {" "}
                                 {data?.orderStatus !== "cancelled" &&
-                                data?.orderStatus === "placed" ? (
+                                  data?.orderStatus === "placed" ? (
                                   <div className='d-flex  my-1 justify-content-end '>
                                     <span
                                       className='mx-2 py-2 badge bg-secondary'
@@ -208,8 +208,8 @@ function Order() {
                                   </div>
                                 ) : null}
                                 {data?.orderStatus !== "cancelled" &&
-                                data?.orderStatus !== "delivered" &&
-                                data?.orderStatus === "placed" ? (
+                                  data?.orderStatus !== "delivered" &&
+                                  data?.orderStatus === "placed" ? (
                                   <div className='d-flex my-1 justify-content-end'>
                                     <span
                                       className='mx-2 py-2 badge bg-danger'
@@ -353,13 +353,13 @@ function Order() {
                         <button
                           style={{ backgroundColor: "#ff8c00" }}
                           className='btn text-white mx-3'
-                          onClick={() => {}}
+                          onClick={() => { }}
                         >
                           Print
                         </button>
                       )}
                       content={() => printRef?.current}
-                      onBeforePrint={() => {}}
+                      onBeforePrint={() => { }}
                     ></ReactToPrint>
                   </div>
                 </div>
@@ -646,35 +646,38 @@ function Order() {
     </>
   );
 }
-export const PizzaDetails = ({ pizzaData }) => {
+export const PizzaDetails = ({ pizzaData, productType }) => {
   return (
     <div>
-      {pizzaData.value.map((ele, index) => (
-        <div key={index}>
-          {/* <p className='p-0 m-0 fw-bold'>Pizza {index + 1}</p> */}
-          <p className='p-0 m-0 fw-bold'>Next Pizza </p>
-          {ele?.cheese?.cheeseName !== "Mozzarella" && (
+      {
+        pizzaData.value.map((ele, index) => (
+          <div key={index}>
+            {/* <p className='p-0 m-0 fw-bold'>Pizza {index + 1}</p> */}
+            {
+              productType === "custom_pizza" ? "" : <p className='p-0 m-0 fw-bold'>Next Pizza</p>
+            }
+            {ele?.cheese?.cheeseName !== "Mozzarella" && (
+              <p className='p-0 m-0'>
+                <strong>Cheese :</strong> {ele?.cheese?.cheeseName}
+              </p>
+            )}
+            {ele?.crust?.crustName !== "Regular" && (
+              <p className='p-0 m-0'>
+                <strong>Crust :</strong> {ele?.crust?.crustName}
+              </p>
+            )}
+            {ele?.specialbases?.specialbaseName !== undefined && (
+              <p className='p-0 m-0'>
+                <strong>Specialbases :</strong>{" "}
+                {ele?.specialbases?.specialbaseName}
+              </p>
+            )}
             <p className='p-0 m-0'>
-              <strong>Cheese :</strong> {ele?.cheese?.cheeseName}
+              <strong>Toppings :</strong>
             </p>
-          )}
-          {ele?.crust?.crustName !== "Regular" && (
-            <p className='p-0 m-0'>
-              <strong>Crust :</strong> {ele?.crust?.crustName}
-            </p>
-          )}
-          {ele?.specialbases?.specialbaseName !== undefined && (
-            <p className='p-0 m-0'>
-              <strong>Specialbases :</strong>{" "}
-              {ele?.specialbases?.specialbaseName}
-            </p>
-          )}
-          <p className='p-0 m-0'>
-            <strong>Toppings :</strong>
-          </p>
-          <ToppingsList toppingsData={ele.toppings} />
-        </div>
-      ))}
+            <ToppingsList toppingsData={ele.toppings} />
+          </div>
+        ))}
     </div>
   );
 };
@@ -691,29 +694,33 @@ export const ToppingsList = ({ toppingsData }) => {
 
   function renderToppingsList(toppingsList, countAs) {
     return (
-      <span>
+      <div>
         {toppingsList.map((topping, index) => (
-          <p className='m-0 p-0' key={index}>
-            {topping.toppingsName} (
-            {topping.toppingsPlacement === "whole"
-              ? "W"
-              : topping.toppingsPlacement === "lefthalf"
-              ? "L"
-              : topping.toppingsPlacement === "1/4"
-              ? "1/4"
-              : "R"}
-            ) {countAs === "2" && "(2)"}
-            {index === toppingsList.length - 1 ? "" : ","}{" "}
-            {topping.price === undefined || topping.price === "0.00"
-              ? ""
-              : `$ ${topping.price}`}
-            {topping.toppingsPrice === undefined ||
-            topping.toppingsPrice === "0.00"
-              ? ""
-              : `$ ${topping.toppingsPrice}`}
-          </p>
+          <div className='row'>
+            <div className='col-7 text-capitalize' key={index}>
+              {topping.toppingsName} (
+              {topping.toppingsPlacement === "whole"
+                ? "W"
+                : topping.toppingsPlacement === "lefthalf"
+                  ? "L"
+                  : topping.toppingsPlacement === "1/4"
+                    ? "1/4"
+                    : "R"}
+              ) {countAs === "2" && "(2)"}
+              {index === toppingsList.length - 1 ? "" : ","}{" "}
+              {topping.price === undefined || topping.price === "0.00"
+                ? ""
+                : `$ ${topping.price}`}
+            </div>
+            <div className="col-3 text-end">
+              {topping.toppingsPrice === undefined ||
+                topping.toppingsPrice === "0.00"
+                ? ""
+                : `$ ${topping.toppingsPrice}`}
+            </div>
+          </div>
         ))}
-      </span>
+      </div>
     );
   }
 };
