@@ -629,21 +629,35 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   };
   const handleDrinks = (e, drink) => {
     let { checked } = e.target;
+    console.log(drink, "set drink");
+    let drinksObj = {
+      drinksCode: drink.code,
+      drinksName: drink.softDrinkName,
+      drinksPrice: drink.price ? drink.price : 0,
+    };
     if (checked) {
-      setDrinksArr([...drinksArr, drink]);
+      setDrinksArr([...drinksArr, drinksObj]);
     } else {
       let filteredDrinks = drinksArr?.filter(
-        (item) => item.code !== drink.code
+        (item) => item.drinksCode !== drink.code
       );
       setDrinksArr(filteredDrinks);
     }
   };
   const handlePops = (e, pops) => {
     let { checked } = e.target;
+    console.log(pops, "pop added");
+    let drinksObj = {
+      drinksCode: pops.code,
+      drinksName: pops.softDrinkName,
+      drinksPrice: pops.price ? pops.price : "0",
+    };
     if (checked) {
-      setDrinksArr([...drinksArr, pops]);
+      setDrinksArr([...drinksArr, drinksObj]);
     } else {
-      let filteredPops = drinksArr?.filter((item) => item.code !== pops.code);
+      let filteredPops = drinksArr?.filter(
+        (item) => item.drinksCode !== pops.code
+      );
       setDrinksArr(filteredPops);
     }
   };
@@ -870,7 +884,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
     drinksArr?.forEach((drinks, index) => {
       if (noofFreeDrinks < index + 1) {
-        totalPrice += drinks?.price ? Number(drinks?.price) : 0;
+        totalPrice += drinks?.drinksPrice ? Number(drinks?.drinksPrice) : 0;
       }
     });
 
@@ -1097,7 +1111,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                       <ul className='list-group'>
                         {getSpecialData?.pops.map((pop) => {
                           const comm = drinksArr?.findIndex(
-                            (item) => item.code === pop.code
+                            (item) => item.drinksCode === pop.code
                           );
 
                           return (
@@ -1120,7 +1134,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                         })}
                         {getSpecialData?.bottle.map((pop) => {
                           const comm = drinksArr?.findIndex(
-                            (item) => item.code === pop.code
+                            (item) => item.drinksCode === pop.code
                           );
                           return (
                             <li
