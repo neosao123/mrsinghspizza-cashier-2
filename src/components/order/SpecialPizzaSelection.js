@@ -91,7 +91,7 @@ function SpecialPizzaSelection({
               })}
             </select>
           </div>
-          <div className='row my-2'>
+          <div className='row'>
             <div className=' d-flex align-items-center mt-2'>
               <input
                 className='my-2 form-check-input'
@@ -114,7 +114,7 @@ function SpecialPizzaSelection({
             </div>
           </div>
           {/*  */}
-          <div className='mt-3 mb-3'>
+          <div className='mb-3'>
             {/* Tabs Headings */}
             <ul className='nav nav-tabs mt-2' role='tablist'>
               <li className='nav-item'>

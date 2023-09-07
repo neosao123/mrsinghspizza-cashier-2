@@ -59,7 +59,7 @@ const Profile = () => {
         if (selectedFile) {
             formData.append('profilePhoto', selectedFile);
         }
-
+        
         try {
             setLoading(true);
             const result = await updateProfile(formData);

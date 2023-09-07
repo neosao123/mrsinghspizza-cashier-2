@@ -6,7 +6,7 @@ import Logo from "../../assets/logo.png";
 
 const Print = ({ orderDetail, printRef }) => {
   return (
-    <div className=''>
+    <div className='d-none'>
       <div className='col-12 m-1' style={{ width: "273px" }} ref={printRef}>
         <div className='row'>
           <div className='d-flex justify-content-center'>
@@ -79,9 +79,9 @@ const Print = ({ orderDetail, printRef }) => {
           </div>
         </div>
         <div className='row'>
-          <div className='col-2'>Qty</div>
-          <div className='col-7'>Item</div>
-          <div className='col-3 text-end'>Amount</div>
+          <div className='col-2 text-secondary'>Qty</div>
+          <div className='col-7 text-secondary'>Item</div>
+          <div className='col-3 text-secondary text-end'>Amount</div>
         </div>
 
         {orderDetail?.orderItems?.map((order, index) => {
@@ -108,7 +108,6 @@ const Print = ({ orderDetail, printRef }) => {
                     <>
                       {item?.value[0]?.dipsName !== undefined && (
                         <div className="row">
-
                           <div className='col-2'> </div>
                           <div className="col-10">
                             <strong className='m-0' style={{ color: "#717171" }}>
@@ -149,7 +148,6 @@ const Print = ({ orderDetail, printRef }) => {
                     <div className='row'>
                       <div className='col-2'> </div>
                       <div className="col-10">
-
                         <strong className='m-0' style={{ color: "#717171" }}>
                           Sides :{" "}
                         </strong>
@@ -256,16 +254,17 @@ const Print = ({ orderDetail, printRef }) => {
             </div>
           );
         })}
-        <div className='d-flex col-12 row  justify-content-between'>
-          <div className='col-4 px-1 m-0'>
+        <div className='row'>
+          <div className='col-4 m-0'>
             <img
               src={Barcode}
               width={"100px"}
               height={"100px"}
               className='mt-1'
+              alt=""
             />
           </div>
-          <div className='col-8 text-end p-0'>
+          <div className='col-8 text-end pe-1'>
             <p className='m-0 p-0'>Sub Total : $ {orderDetail?.subTotal}</p>
             <p className='m-0 p-0'>Tax : $ {orderDetail?.taxAmount}</p>
             {Number(orderDetail?.extraDeliveryCharges) > 0 ? (
@@ -275,7 +274,7 @@ const Print = ({ orderDetail, printRef }) => {
               </p>
             ) : null}
             {orderDetail?.deliveryType === "delivery" && (
-              <p className='m-0 p-0 fw-bold'>
+              <p className='m-0 p-0'>
                 Delivery Charges:$ {orderDetail?.deliveryCharges}
               </p>
             )}

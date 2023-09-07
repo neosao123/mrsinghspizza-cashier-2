@@ -40,6 +40,7 @@ import NotDeliverableModel from "./newOrder/model";
 import { orderDetails } from "../../API/order";
 import Print from "../order/Print";
 import ReactToPrint from "react-to-print";
+import { BiTrash } from "react-icons/bi";
 
 function NewOrder() {
   const [allIngredients, setAllIngredients] = useState();
@@ -744,10 +745,10 @@ function NewOrder() {
                 {cartdata?.length > 0 && (
                   <div className='d-flex justify-content-end'>
                     <button
-                      className='custom-hover bg-danger '
+                      className='btn btn-danger btn-xs'
                       onClick={() => dispatch(addToCart([]))}
                     >
-                      Clear cart
+                      <BiTrash/> Clear cart
                     </button>
                   </div>
                 )}

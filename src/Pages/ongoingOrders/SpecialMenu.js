@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import backBtn from "../../assets/back-button.png";
+import { BiChevronLeftCircle } from "react-icons/bi";
 import { v4 as uuidv4 } from "uuid";
 import "../../css/specialMenu.css";
 import SpecialPizzaSelection from "../../components/order/SpecialPizzaSelection";
@@ -926,30 +926,24 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           {displaySpecialForm ? (
             <>
               {/* Back Button */}
-              <div
-                className='m-0 p-0 mx-2'
+              <button
+                type="button"
+                className='btn btn-secondary btn-xs mb-1'
                 onClick={() => {
                   setShow(false);
                   setPizzaState();
                   dispatch(setDisplaySpecialForm(false));
                 }}
-                style={{ cursor: "pointer" }}
               >
-                <img
-                  className='mb-2 p-0'
-                  src={`${backBtn}`}
-                  width='35px'
-                  height='35px'
-                  alt=''
-                />
-              </div>
+                <BiChevronLeftCircle /> Back
+              </button>
 
               <div className='customizablePizza px-3'>
                 <div className='d-flex justify-content-between'>
                   <h6>{getSpecialData?.name}</h6>
                   <h6 className='mx-2'>$ {price}</h6>
                 </div>
-                <div className='mb-4'>
+                <div className='mb-1'>
                   <p className='mb-1'>
                     Toppings :{" "}
                     <span className='mx-2'>
@@ -1104,8 +1098,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   <>
                     {(getSpecialData?.pops.length > 0 ||
                       getSpecialData.bottle.length > 0) && (
-                      <h6 className='text-left mt-1 mb-2'>Drinks</h6>
-                    )}
+                        <h6 className='text-left mt-1 mb-2'>Drinks</h6>
+                      )}
 
                     <div id='drinks' className='mb-3'>
                       <ul className='list-group'>
@@ -1179,7 +1173,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                     onClick={handleAddToCart}
                   >
                     {payloadEdit !== undefined &&
-                    payloadEdit?.productType === "Special_Pizza"
+                      payloadEdit?.productType === "Special_Pizza"
                       ? "Edit"
                       : " Add to Cart"}
                   </button>
