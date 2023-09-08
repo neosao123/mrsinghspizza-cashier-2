@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { sidesApi } from "../../API/ongoingOrder";
-import specialImg1 from "../../assets/bg-img.jpg";
 import $ from "jquery";
 import { toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
@@ -35,8 +34,6 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     }
   };
   const handleSidesLineChange = (e, data) => {
-    console.log(e.target.value, "sidelinechange");
-    console.log(data, "sidelinechange");
     let index = sidesArr?.findIndex((item) => item.sideCode === data.sideCode);
     let selectedSideLine = sidesArr[index]?.combination?.filter(
       (item) => item.lineCode === e.target.value
@@ -53,13 +50,9 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
       let selectedSideLine = data?.combination?.filter(
         (item) => item.lineCode === e.target.value
       );
-      console.log(selectedSideLine, "sidelinechange");
       setSidesArr([{ ...data, combination: selectedSideLine }]);
     }
   };
-  useEffect(() => {
-    console.log(sidesArr, "sidelinechange");
-  }, [sidesArr]);
 
   // Onclick handle Add To Cart & API - Add To Cart
   const handleAddToCart = async (e, sideCode, Obj) => {
@@ -139,8 +132,6 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     const selectedSide = sidesArr?.filter(
       (sides) => sides.sideCode === sideCode
     );
-    console.log(selectedSide, "selectedSide");
-    console.log(selectedSide[0].combination, "selectedSide");
 
     if (payloadEdit !== undefined && payloadEdit.productType === "side") {
       const payloadForEdit = {
@@ -214,7 +205,6 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     }
   };
   useEffect(() => {
-    console.log(payloadEdit, "sidelinechange");
     if (payloadEdit !== undefined && payloadEdit.productType === "side") {
       setSidesArr([
         ...sidesArr,
@@ -258,8 +248,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
             (item) => item.sideCode === data.sideCode
           );
           let obj = sidesArr?.find((item) => item.sideCode === data.sideCode);
-          console.log(data);
-          console.log(obj);
+
           return (
             <li className='list-group-item' key={data.sideCode}>
               <div className='d-flex justify-content-between align-items-end py-2 px-1'>
@@ -274,8 +263,12 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                 </div>
                 <div className='d-flex justify-content-center flex-column py-1 w-100'>
                   <div className='d-flex justify-content-between align-items-center'>
-                    <h6 className='mb-2'>{data.sideName} <span className={"badge-" + data.type}>({data.type})</span></h6>
-                    
+                    <h6 className='mb-2'>
+                      {data.sideName}{" "}
+                      <span className={"badge-" + data.type}>
+                        ({data.type})
+                      </span>
+                    </h6>
                   </div>
                   <div className='d-flex justify-content-between align-items-center'>
                     <select
@@ -324,8 +317,8 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                       onClick={(e) => handleAddToCart(e, data.sideCode, data)}
                     >
                       {payloadEdit !== undefined &&
-                        payloadEdit.productType === "side" &&
-                        obj !== undefined
+                      payloadEdit.productType === "side" &&
+                      obj !== undefined
                         ? "Edit"
                         : "Add To Cart"}
                     </button>

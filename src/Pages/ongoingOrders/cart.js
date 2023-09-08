@@ -47,7 +47,6 @@ const Cart = ({ setPayloadEdit, onProductClick }) => {
                   <span className=''>{data.quantity}</span>
                 </div>
               </div>
-              {console.log(data.productType)}
               {data.productType === "Special_Pizza" ||
               data.productType === "custom_pizza" ? (
                 <div className='row d-flex'>

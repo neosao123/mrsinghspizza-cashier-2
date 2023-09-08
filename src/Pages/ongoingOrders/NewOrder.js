@@ -748,7 +748,7 @@ function NewOrder() {
                       className='btn btn-danger btn-xs'
                       onClick={() => dispatch(addToCart([]))}
                     >
-                      <BiTrash/> Clear cart
+                      <BiTrash /> Clear cart
                     </button>
                   </div>
                 )}
@@ -800,7 +800,6 @@ function NewOrder() {
                             $
                           </span>
                         </div>
-                        {console.log(discount, "discountdiscount")}
                         <input
                           className='form-control w-25 text-end'
                           type='number'

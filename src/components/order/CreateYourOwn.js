@@ -951,15 +951,11 @@ function CreateYourOwn({
                   {allIngredients?.toppings?.freeToppings?.map(
                     (freeToppings, index) => {
                       const toppingCode = freeToppings.toppingsCode;
-                      console.log(
-                        freeToppings.toppingsCode,
-                        "freeToppings.toppingsCode"
-                      );
+
                       const comm = freeToppingsArr?.findIndex(
                         (item) =>
                           item.toppingsCode === freeToppings.toppingsCode
                       );
-                      console.log(comm, "freeToppings.toppingsCode");
 
                       return (
                         <>
@@ -1040,7 +1036,6 @@ function CreateYourOwn({
                 >
                   {sidesData?.map((sidesData) => {
                     const sideCode = sidesData.sideCode;
-                    console.log(sidesData);
                     const comm = sidesArr.findIndex(
                       (item) => item.sideCode === sidesData.sideCode
                     );

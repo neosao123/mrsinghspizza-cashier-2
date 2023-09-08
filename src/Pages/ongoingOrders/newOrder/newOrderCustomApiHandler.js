@@ -4,7 +4,6 @@ export const pizzaIngredients = async (
 ) => {
   await allIngredientsApi()
     .then((res) => {
-      console.log("AllIngredient ", res?.data?.data);
       setAllIngredients(res.data.data);
     })
     .catch((err) => {

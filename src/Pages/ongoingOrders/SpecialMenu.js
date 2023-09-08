@@ -13,6 +13,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart, setDisplaySpecialForm } from "../../reducer/cartReducer";
 import { toast } from "react-toastify";
 import { getSpecialDetails } from "./specialMenu/specialMenuCustomApiHandler";
+import { handlePops } from "./specialMenuFunctions";
+import { specialMenuParamsFn } from "./specialMenuParameters";
 
 function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   const [pizzaState, setPizzaState] = useState();
@@ -116,12 +118,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   };
   const handleCrustChange = (event, count) => {
     const selectedValue = event.target.value;
-    console.log(event.target.value, "selected Object ");
-    console.log(getSpecialData?.crust, "selected Object ");
     const selectedObject = getSpecialData?.crust?.find(
       (option) => option.code === selectedValue
     );
-    console.log("selected Object ", selectedObject);
 
     let arr = [...pizzaState];
     arr[count - 1] = {
@@ -137,8 +136,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     toppingsCode
   ) => {
     const selectedValue = event.target.value;
-    console.log(event.target.value, "selected Object ");
-    console.log(getSpecialData?.crust, "selected Object ");
     let arr = [...pizzaState];
     let selectedObject = arr[count - 1]?.toppings?.countAsTwoToppings?.find(
       (option) => option.toppingsCode === toppingsCode
@@ -173,9 +170,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     }
     setPizzaState(arr);
   };
-  useEffect(() => {
-    console.log(totalPriceOfToppings, "totalPriceOfToppings");
-  }, [totalPriceOfToppings]);
 
   const handleTwoToppings = (e, count, countAsTwoToppings) => {
     const { checked } = e.target;
@@ -258,7 +252,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         let updatedArr = arr[count - 1]?.toppings?.countAsTwoToppings.filter(
           (item) => item.toppingsCode !== countAsTwoToppings.toppingsCode
         );
-        console.log(updatedArr, "updatedArr");
         arr[count - 1] = {
           ...arr[count - 1],
           toppings: {
@@ -309,7 +302,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
       setPizzaState(arr);
 
-      console.log(offeredFreeToppings, "j");
       // if (offeredFreeToppings <= 0) {
       //   setAdditionalToppingsCount((val) => {
       //     return val + 1;
@@ -471,15 +463,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       payloadEdit !== undefined &&
       payloadEdit?.productType === "Special_Pizza"
     ) {
-      console.log(payloadEdit, "payloadEdit");
-      console.log("payloadEditcode:", payloadEdit?.code);
-      console.log("payloadEditcode pizzaSize:", payloadEdit?.pizzaSize);
-      console.log("payloadEditcode pizzaState:", payloadEdit?.config?.pizza);
-      console.log("payloadEditcode drinksArr:", payloadEdit?.config?.drinks);
-      console.log("payloadEditcode dipsArr:", payloadEdit?.config?.dips);
-      console.log("payloadEditcode sidesArr:", payloadEdit?.config?.sides);
-      console.log("payloadEditcode price:", Number(payloadEdit?.amount));
-      console.log("payloadEditcode comments:", payloadEdit?.comments);
       handleGetSpecial({ code: payloadEdit?.code });
       setPizzaSize(payloadEdit?.pizzaSize);
       setPizzaState(payloadEdit?.config?.pizza);
@@ -528,7 +511,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       createEmptyObjects(Number(getSpecialData?.noofPizzas));
     }
     if (getSpecialData?.freesides?.length > 0) {
-      console.log(getSpecialData?.freesides, "getSpecialData?.freeSides");
       setFreeSides(getSpecialData?.freesides);
     }
   }, [getSpecialData]);
@@ -571,10 +553,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     if (checked) {
       let obj = {
         ...dips,
-        qty: 1,
+        qty: Number(getSpecialData?.noofDips),
+        // getSpecialData?.noofDips !== undefined ||
+        // getSpecialData?.noofDips !== "0"
+        //   ? Number(getSpecialData?.noofDips)
+        //   : 1,
         prevQty: 0,
       };
-      setDipsArr([...dipsArr, obj]);
+      setDipsArr([obj]);
     } else {
       let filteredDips = dipsArr?.filter(
         (item) => item.dipsCode !== dips.dipsCode
@@ -589,13 +575,17 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     if (ind !== -1) {
       let updatedDips = {
         ...dips,
-        qty: e.target.value,
+        qty:
+          e.target.value > Number(getSpecialData?.noofDips)
+            ? e.target.value
+            : Number(getSpecialData?.noofDips),
       };
       let temp = [...dipsArr];
       temp[ind] = updatedDips;
       setDipsArr(temp);
     }
   };
+
   const handleSides = (e, sides) => {
     let { checked } = e.target;
 
@@ -605,7 +595,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         lineEntries: [sides.lineEntries[0]],
         qty: 1,
       };
-      setSidesArr([...sidesArr, obj]);
+      setSidesArr([obj]);
     } else {
       let filteredSides = sidesArr?.filter((item) => item.code !== sides.code);
       setSidesArr(filteredSides);
@@ -629,14 +619,13 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   };
   const handleDrinks = (e, drink) => {
     let { checked } = e.target;
-    console.log(drink, "set drink");
     let drinksObj = {
       drinksCode: drink.code,
       drinksName: drink.softDrinkName,
       drinksPrice: drink.price ? drink.price : 0,
     };
     if (checked) {
-      setDrinksArr([...drinksArr, drinksObj]);
+      setDrinksArr([drinksObj]);
     } else {
       let filteredDrinks = drinksArr?.filter(
         (item) => item.drinksCode !== drink.code
@@ -644,23 +633,24 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setDrinksArr(filteredDrinks);
     }
   };
-  const handlePops = (e, pops) => {
-    let { checked } = e.target;
-    console.log(pops, "pop added");
-    let drinksObj = {
-      drinksCode: pops.code,
-      drinksName: pops.softDrinkName,
-      drinksPrice: pops.price ? pops.price : "0",
-    };
-    if (checked) {
-      setDrinksArr([...drinksArr, drinksObj]);
-    } else {
-      let filteredPops = drinksArr?.filter(
-        (item) => item.drinksCode !== pops.code
-      );
-      setDrinksArr(filteredPops);
-    }
-  };
+
+  // const handlePops = (e, pops) => {
+  //   let { checked } = e.target;
+  //   console.log(pops, "pop added");
+  //   let drinksObj = {
+  //     drinksCode: pops.code,
+  //     drinksName: pops.softDrinkName,
+  //     drinksPrice: pops.price ? pops.price : "0",
+  //   };
+  //   if (checked) {
+  //     setDrinksArr([...drinksArr, drinksObj]);
+  //   } else {
+  //     let filteredPops = drinksArr?.filter(
+  //       (item) => item.drinksCode !== pops.code
+  //     );
+  //     setDrinksArr(filteredPops);
+  //   }
+  // };
 
   const handleAddToCart = () => {
     if (
@@ -689,7 +679,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
       );
-      console.log();
       let tempPayload = [...cartdata];
       tempPayload[updatedCart] = payloadForEdit;
       dispatch(addToCart([...tempPayload]));
@@ -789,7 +778,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     // Calculate base pizza price
 
     totalPrice +=
-      pizzaSize === "Large"
+      Number(getSpecialData?.largePizzaPrice) > 0
         ? Number(getSpecialData?.largePizzaPrice)
         : Number(getSpecialData?.extraLargePizzaPrice);
 
@@ -918,6 +907,13 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       calculatePrice();
     }
   }, [getSpecialData]);
+  let specialMenuParamsObj = specialMenuParamsFn(
+    handlePops,
+    {},
+    {},
+    setDrinksArr,
+    drinksArr
+  );
 
   return (
     <>
@@ -927,7 +923,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             <>
               {/* Back Button */}
               <button
-                type="button"
+                type='button'
                 className='btn btn-secondary btn-xs mb-1'
                 onClick={() => {
                   setShow(false);
@@ -964,22 +960,25 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                     className='form-select mx-2 my-2 w-25 d-inline'
                     value={pizzaSize}
                   >
-                    <option value='Large'>Large</option>
-                    <option value='Extra Large'>Extra Large</option>
+                    {Number(getSpecialData?.largePizzaPrice) > 0 && (
+                      <option value='Large'>Large</option>
+                    )}
+                    {Number(getSpecialData?.extraLargePizzaPrice) > 0 && (
+                      <option value='Extra Large'>Extra Large</option>
+                    )}
                   </select>
                 </div>
 
                 {elements}
 
                 {/* Sides */}
-                {getSpecialData?.sides.length === 0 ? (
-                  ""
-                ) : (
+
+                {getSpecialData?.freesides.length === 0 ? null : (
                   <>
                     <h6 className='text-left mt-1 mb-2'>Sides</h6>
                     <div id='sides' className='mb-3'>
                       <ul className='list-group'>
-                        {getSpecialData?.sides?.map((sidesData) => {
+                        {getSpecialData?.freesides?.map((sidesData) => {
                           const comm = sidesArr.findIndex(
                             (item) => item.code === sidesData.code
                           );
@@ -991,7 +990,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                               >
                                 <label className='d-flex align-items-center'>
                                   <input
-                                    type='checkbox'
+                                    type='radio'
+                                    name='sides'
                                     className='mx-3 d-inline-block'
                                     checked={comm !== -1 ? true : false}
                                     onChange={(e) => handleSides(e, sidesData)}
@@ -1065,7 +1065,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                 <div className='d-flex align-items-center'>
                                   <label className='d-flex align-items-center'>
                                     <input
-                                      type='checkbox'
+                                      type='radio'
+                                      name='dips'
                                       className='mx-3 d-inline-block'
                                       checked={comm !== -1 ? true : false}
                                       onChange={(e) => handleDips(e, data)}
@@ -1073,12 +1074,19 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                     {data.dipsName} - ${data.price}
                                   </label>
                                 </div>
+
                                 <input
                                   type='number'
                                   defaultValue={1}
                                   min={1}
                                   value={
-                                    dipsArr[comm]?.qty ? dipsArr[comm]?.qty : 1
+                                    dipsArr[comm]?.qty
+                                      ? dipsArr[comm]?.qty
+                                      : getSpecialData?.noofDips !==
+                                          undefined ||
+                                        getSpecialData?.noofDips !== "0"
+                                      ? Number(getSpecialData?.noofDips)
+                                      : 1
                                   }
                                   className='form-control mx-2'
                                   style={{ width: "75px" }}
@@ -1098,8 +1106,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   <>
                     {(getSpecialData?.pops.length > 0 ||
                       getSpecialData.bottle.length > 0) && (
-                        <h6 className='text-left mt-1 mb-2'>Drinks</h6>
-                      )}
+                      <h6 className='text-left mt-1 mb-2'>Drinks</h6>
+                    )}
 
                     <div id='drinks' className='mb-3'>
                       <ul className='list-group'>
@@ -1115,10 +1123,18 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                             >
                               <label className='d-flex align-items-center'>
                                 <input
-                                  type='checkbox'
+                                  type='radio'
+                                  name='drinks'
                                   className='mx-3 d-inline-block'
                                   checked={comm !== -1 ? true : false}
-                                  onChange={(e) => handlePops(e, pop)}
+                                  onChange={(e) =>
+                                    specialMenuParamsObj.handlePops.callback({
+                                      ...specialMenuParamsObj.handlePops
+                                        .parameters,
+                                      e: e,
+                                      pop: pop,
+                                    })
+                                  }
                                 />
                                 {pop.softDrinkName}
                               </label>
@@ -1137,7 +1153,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                             >
                               <label className='d-flex align-items-center'>
                                 <input
-                                  type='checkbox'
+                                  type='radio'
+                                  name='drinks'
                                   className='mx-3 d-inline-block'
                                   checked={comm !== -1 ? true : false}
                                   onChange={(e) => handleDrinks(e, pop)}
@@ -1173,7 +1190,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                     onClick={handleAddToCart}
                   >
                     {payloadEdit !== undefined &&
-                      payloadEdit?.productType === "Special_Pizza"
+                    payloadEdit?.productType === "Special_Pizza"
                       ? "Edit"
                       : " Add to Cart"}
                   </button>
@@ -1198,7 +1215,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                       </div>
                       <div className='d-flex flex-column align-items-end'>
                         <h6 className='mb-3'>
-                          $ {speicalPizza.largePizzaPrice}
+                          ${" "}
+                          {Number(speicalPizza.largePizzaPrice) > 0
+                            ? Number(speicalPizza.largePizzaPrice)
+                            : Number(speicalPizza?.extraLargePizzaPrice)}
                         </h6>
                         <button
                           type='button'
