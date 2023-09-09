@@ -415,63 +415,16 @@ function Order() {
                       <th>Amount</th>
                     </tr>
                     {orderDetail?.orderItems?.map((order, index) => {
-                      console.log(order, "ordethdksjh");
                       const objectToArray = Object.entries(order?.config).map(
                         ([key, value]) => ({ key, value })
                       );
                       return (
                         <tr key={index + order?.productName}>
                           <td scope='row'>{index + 1}</td>
-                          {console.log(order, "new order")}
                           <td className='text-capitalize'>
                             {order?.productType === "custom_pizza"
                               ? ""
                               : order.productName}
-                            {/* {objectToArray?.map((item, index) => {
-                              if (item.key === "sidesSize") {
-                                return <p className='m-0'>{item.value}</p>;
-                              }
-                              if (item?.key === "pizza") {
-                                return (
-                                  <>
-                                    <p className='m-0'>
-                                      {item.key} ({order?.pizzaSize})
-                                    </p>
-                                    <PizzaDetails pizzaData={item} />
-                                  </>
-                                );
-                              }
-                              if (item.key === "dips") {
-                                return item?.value.length > 0 ? (
-                                  <span>
-                                    <strong> {item.key}</strong> :
-                                    {item?.value.map((dips, index) => (
-                                      <span className='text-capitalize'>
-                                        {dips.dipsName}{" "}
-                                        {item.value.length - 1 === index
-                                          ? ""
-                                          : ","}
-                                      </span>
-                                    ))}
-                                  </span>
-                                ) : null;
-                              }
-                              // if (item.key === "drinks") {
-                              //   return item?.value.length > 0 ? (
-                              //     <span>
-                              //       <strong> {item.key}</strong> :
-                              //       {item?.value.map((drinks, index) => (
-                              //         <span className='text-capitalize'>
-                              //           {drinks.drinksName}{" "}
-                              //           {item.value.length - 1 === index
-                              //             ? ""
-                              //             : ","}
-                              //         </span>
-                              //       ))}
-                              //     </span>
-                              //   ) : null;
-                              // }
-                            })} */}
                             {objectToArray?.map((item, index) => {
                               if (item.key === "dips") {
                                 return (
@@ -480,31 +433,27 @@ function Order() {
                                       <>
                                         <strong
                                           className='m-0'
-                                          style={{ color: "#717171" }}
+                                          style={{ color: "#191919" }}
                                         >
                                           Dips :{" "}
                                         </strong>
                                         <div className='col-12 text-capitalize'>
                                           {item?.value?.map((dips, index) => {
-                                            console.log(
-                                              dips,
-                                              "pizza side dips"
-                                            );
                                             return (
                                               <>
                                                 <div>
                                                   <div className='row'>
                                                     <div
-                                                      className='col-7 text-capitalize'
+                                                      className='col-9 text-capitalize'
                                                       key={index}
                                                     >
                                                       {dips.dipsName}
                                                     </div>
-                                                    <div className='col-5 text-end'>
+                                                    <div className='col-3 text-end me-0 pe-0'>
                                                       $
                                                       {dips.dipsPrice !==
                                                       undefined
-                                                        ? dips.dipsPrice
+                                                        ? dips?.dipsPrice
                                                         : dips?.price}
                                                     </div>
                                                   </div>
@@ -521,51 +470,56 @@ function Order() {
                               if (item.key === "sides") {
                                 return (
                                   <>
-                                    <strong
-                                      className='m-0'
-                                      style={{ color: "#717171" }}
-                                    >
-                                      Sides :{" "}
-                                    </strong>
-                                    <div className='col-12 text-capitalize'>
-                                      {item?.value?.map((side, index) => {
-                                        return (
-                                          <>
-                                            <div>
-                                              <div className='row'>
-                                                <div
-                                                  className='col-7 text-capitalize'
-                                                  key={index}
-                                                >
-                                                  {side?.sidesName !== undefined
-                                                    ? side?.sidesName
-                                                    : null}
-                                                  {side?.sidesSize !== undefined
-                                                    ? side?.sidesSize
-                                                    : null}
-                                                  {side?.sideName} (
-                                                  {side?.lineEntries !==
-                                                    undefined &&
-                                                    side?.lineEntries[0]?.size}
-                                                  )
-                                                </div>
-                                                <div className='col-5 text-end'>
-                                                  $
-                                                  {side?.sidesPrice !==
-                                                  undefined
-                                                    ? side?.sidesPrice
-                                                    : side?.lineEntries !==
+                                    {item?.value[0]?.sidesName !==
+                                      undefined && (
+                                      <>
+                                        <strong
+                                          className='m-0'
+                                          style={{ color: "#191919" }}
+                                        >
+                                          Sides :{" "}
+                                        </strong>
+                                        <div className='col-12 text-capitalize'>
+                                          {item?.value?.map((side, index) => {
+                                            return (
+                                              <>
+                                                <div>
+                                                  <div className='row'>
+                                                    <div
+                                                      className='col-7 text-capitalize'
+                                                      key={index}
+                                                    >
+                                                      {side?.sidesName !==
                                                       undefined
-                                                    ? side?.lineEntries[0]
-                                                        ?.price
-                                                    : null}
+                                                        ? side?.sidesName
+                                                        : null}
+                                                      {side?.sideName} (
+                                                      {side?.lineEntries !==
+                                                      undefined
+                                                        ? side?.lineEntries[0]
+                                                            ?.size
+                                                        : side?.sidesSize}
+                                                      )
+                                                    </div>
+                                                    <div className='col-5 text-end'>
+                                                      $
+                                                      {side?.sidesPrice !==
+                                                      undefined
+                                                        ? side?.sidesPrice
+                                                        : side?.lineEntries !==
+                                                          undefined
+                                                        ? side?.lineEntries[0]
+                                                            ?.price
+                                                        : null}
+                                                    </div>
+                                                  </div>
                                                 </div>
-                                              </div>
-                                            </div>
-                                          </>
-                                        );
-                                      })}
-                                    </div>
+                                              </>
+                                            );
+                                          })}
+                                        </div>
+                                      </>
+                                    )}
                                   </>
                                 );
                               }
@@ -589,37 +543,42 @@ function Order() {
                                 return (
                                   <>
                                     {order?.productType === "custom_pizza" ||
-                                    order?.productType === "Special_Pizza" ? (
-                                      <>
-                                        <strong
-                                          className='m-0'
-                                          style={{ color: "#717171" }}
-                                        >
-                                          Drinks :{" "}
-                                        </strong>
-                                        <div className='col-12 text-capitalize'>
-                                          {item.value?.map((drink, index) => {
-                                            return (
-                                              <>
-                                                <div>
-                                                  <div className='row'>
-                                                    <div
-                                                      className='col-7 text-capitalize'
-                                                      key={index}
-                                                    >
-                                                      {drink.drinksName}
-                                                    </div>
-                                                    <div className='col-5 text-end'>
-                                                      ${drink.drinksPrice}
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                              </>
-                                            );
-                                          })}
-                                        </div>
-                                      </>
-                                    ) : null}
+                                    order?.productType === "Special_Pizza"
+                                      ? item?.value[0]?.drinksName !==
+                                          undefined && (
+                                          <>
+                                            <strong
+                                              className='m-0'
+                                              style={{ color: "#191919" }}
+                                            >
+                                              Drinks :{" "}
+                                            </strong>
+                                            <div className='col-12 text-capitalize'>
+                                              {item.value?.map(
+                                                (drink, index) => {
+                                                  return (
+                                                    <>
+                                                      <div>
+                                                        <div className='row'>
+                                                          <div
+                                                            className='col-9 text-capitalize'
+                                                            key={index}
+                                                          >
+                                                            {drink.drinksName}
+                                                          </div>
+                                                          <div className='col-3 text-end'>
+                                                            ${drink.drinksPrice}
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    </>
+                                                  );
+                                                }
+                                              )}
+                                            </div>
+                                          </>
+                                        )
+                                      : null}
                                   </>
                                 );
                               }
@@ -744,60 +703,6 @@ function Order() {
           </div>
         </div>
       </div>
-      {/* <div
-        class='modal fade'
-        id='exampleModalStatus'
-        tabindex='-1'
-        aria-labelledby='exampleModalLabel'
-        aria-hidden='true'
-      >
-        <div class='modal-dialog modal-dialog-centered'>
-          <div class='modal-content'>
-            <div class='modal-header'>
-              <h5 class='modal-title'>Change Order Status</h5>
-              <button
-                type='button'
-                class='btn-close'
-                data-bs-dismiss='modal'
-                aria-label='Close'
-              ></button>
-            </div>
-            <div class='modal-body'>
-              <select
-                class='form-select form-select-sm'
-                aria-label='.form-select-sm example'
-                value={orderStatus}
-                onChange={(e) => setOrderStatus(e.target.value)}
-              >
-                <option selected value={""}>
-                  Choose Order Status
-                </option>
-                <option value='pickedup'>Pickedup</option>
-                <option value='completed'>Completed</option>
-                <option value='cancelled'>Cancelled</option>
-              </select>
-            </div>
-            <div class='modal-footer'>
-              <button
-                type='button'
-                class='btn btn-secondary'
-                data-bs-dismiss='modal'
-              >
-                Close
-              </button>
-              <button
-                type='button'
-                style={{ backgroundColor: "#ff8c00" }}
-                class='btn text-white'
-                data-bs-dismiss='modal'
-                onClick={handleStatusChange}
-              >
-                Save changes
-              </button>
-            </div>
-          </div>
-        </div>
-      </div> */}
       <ToastContainer position='top-center' />
     </>
   );
@@ -808,22 +713,20 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
       {pizzaData.value.map((ele, index) => (
         <div key={index}>
           {/* <p className='p-0 m-0 fw-bold'>Pizza {index + 1}</p> */}
-          {productType === "custom_pizza" ? (
-            ""
-          ) : (
-            <p className='p-0 m-0 fw-bold' style={{ color: "#717171" }}>
+          {productType === "Special_Pizza" && index > 0 ? (
+            <p className='p-0 m-0 fw-bold' style={{ color: "#191919" }}>
               Next Pizza
             </p>
-          )}
+          ) : null}
 
           {ele?.cheese?.cheeseName !== "Mozzarella" && (
             <div className='row'>
               <div className='col-7 text-capitalize' key={index}>
-                <strong style={{ color: "#717171" }}>Cheese : </strong>
+                <strong style={{ color: "#191919" }}>Cheese : </strong>
 
                 {ele?.cheese?.cheeseName}
               </div>
-              <div className='col-5 text-end'>
+              <div className='col-5 text-end p-0 m-0'>
                 {ele?.cheese?.price === undefined ||
                 ele?.cheese?.price === "0.00"
                   ? ""
@@ -834,10 +737,10 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
           {ele?.crust?.crustName !== "Regular" && (
             <div className='row'>
               <div className='col-7 text-capitalize' key={index}>
-                <strong style={{ color: "#717171" }}>Crust : </strong>
+                <strong style={{ color: "#191919" }}>Crust : </strong>
                 {ele?.crust?.crustName}
               </div>
-              <div className='col-5 text-end'>
+              <div className='col-5 text-end m-0 p-0'>
                 {ele?.crust?.crustPrice === undefined ||
                 ele?.crust?.crustPrice === "0.00"
                   ? ""
@@ -848,27 +751,28 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
               </div>
             </div>
           )}
-          {/* {ele?.specialBases?.specialbaseName !== undefined && ( */}
-          <div className='row'>
-            <div className='col-7 text-capitalize' key={index}>
-              <strong style={{ color: "#717171" }}>Specialbases : </strong>
-              {ele?.specialBases?.specialbaseName}
-              {ele?.specialbases?.specialbaseName}
+
+          {ele?.specialBases?.specialbaseName !== undefined && (
+            <div className='row'>
+              <div className='col-7 text-capitalize' key={index}>
+                <strong style={{ color: "#191919" }}>Specialbases : </strong>
+                {ele?.specialBases?.specialbaseName}
+                {/* {ele?.specialbases?.specialbaseName} */}
+              </div>
+              <div className='col-5 text-end p-0 m-0'>
+                {ele?.specialBases?.price === undefined ||
+                ele?.specialBases?.price === "0.00"
+                  ? ""
+                  : `$ ${ele?.specialBases?.price}`}
+                {ele?.specialbases?.price === undefined ||
+                ele?.specialbases?.price === "0.00"
+                  ? ""
+                  : `$ ${ele?.specialbases?.price}`}
+              </div>
             </div>
-            <div className='col-5 text-end'>
-              {ele?.specialBases?.price === undefined ||
-              ele?.specialBases?.price === "0.00"
-                ? ""
-                : `$ ${ele?.specialBases?.price}`}
-              {ele?.specialbases?.price === undefined ||
-              ele?.specialbases?.price === "0.00"
-                ? ""
-                : `$ ${ele?.specialbases?.price}`}
-            </div>
-          </div>
-          {/* )} */}
+          )}
           <p className='p-0 m-0'>
-            <strong style={{ color: "#717171" }}>Toppings :</strong>
+            <strong style={{ color: "#191919" }}>Toppings :</strong>
           </p>
           <ToppingsList toppingsData={ele.toppings} />
         </div>
@@ -879,9 +783,9 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
 export const ToppingsList = ({ toppingsData }) => {
   return (
     <div>
-      {renderToppingsList(toppingsData.countAsTwoToppings, "1")}
+      {renderToppingsList(toppingsData.countAsTwoToppings, "2")}
 
-      {renderToppingsList(toppingsData.countAsOneToppings, "2")}
+      {renderToppingsList(toppingsData.countAsOneToppings, "1")}
 
       {renderToppingsList(toppingsData.freeToppings, "")}
     </div>
@@ -892,25 +796,18 @@ export const ToppingsList = ({ toppingsData }) => {
       <div>
         {toppingsList?.map((topping, index) => (
           <div className='row'>
-            <div className='col-7 text-capitalize' key={index}>
+            <div className='col-9 text-capitalize' key={index}>
+              {countAs === "2" && "(2) "}
               {topping.toppingsName} (
-              {topping.toppingsPlacement === "whole"
-                ? "W"
-                : topping.toppingsPlacement === "lefthalf"
-                ? "L"
-                : topping.toppingsPlacement === "1/4"
-                ? "1/4"
-                : "R"}
-              ) {countAs === "2" && "(2)"}
+              {topping.toppingsPlacement === "whole" && "W"}
+              {topping.toppingsPlacement === "lefthalf" && "L"}
+              {topping.toppingsPlacement === "righthalf" && "R"}
+              {topping.toppingsPlacement === "1/4" && "1/4"})
             </div>
-            <div className='col-5 text-end'>
-              {topping.toppingsPrice === undefined ||
-              topping.toppingsPrice === "0.00"
+            <div className='col-3 text-end m-0 p-0'>
+              {topping.amount === undefined || topping.amount === 0
                 ? ""
-                : `$ ${topping.toppingsPrice}`}
-              {topping.price === undefined || topping.price === "0.00"
-                ? ""
-                : `$ ${topping.price}`}
+                : `$ ${topping.amount}`}
             </div>
           </div>
         ))}

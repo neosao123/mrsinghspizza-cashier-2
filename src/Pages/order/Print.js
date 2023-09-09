@@ -6,7 +6,7 @@ import Logo from "../../assets/logo.png";
 
 const Print = ({ orderDetail, printRef }) => {
   return (
-    <div className='d-none'>
+    <div className=''>
       <div className='col-12 m-1' style={{ width: "273px" }} ref={printRef}>
         <div className='row'>
           <div className='d-flex justify-content-center'>
@@ -95,7 +95,7 @@ const Print = ({ orderDetail, printRef }) => {
                 <span className='m-0'>{order.quantity}</span>
               </div>
               <div className='col-10'>
-                <div className='row g-0'>
+                <div className='row g-0 m-0 p-0'>
                   <div className='col-9'>
                     {product_type === "custom_pizza" ? "" : order.productName}
                   </div>
@@ -107,10 +107,13 @@ const Print = ({ orderDetail, printRef }) => {
                   return (
                     <>
                       {item?.value[0]?.dipsName !== undefined && (
-                        <div className="row">
+                        <div className='row pe-0'>
                           <div className='col-2'> </div>
-                          <div className="col-10">
-                            <strong className='m-0' style={{ color: "#717171" }}>
+                          <div className='col-10'>
+                            <strong
+                              className='m-0'
+                              style={{ color: "#191919" }}
+                            >
                               Dips :{" "}
                             </strong>
                             <div className='col-12 text-capitalize'>
@@ -120,12 +123,12 @@ const Print = ({ orderDetail, printRef }) => {
                                     <div>
                                       <div className='row'>
                                         <div
-                                          className='col-7 text-capitalize'
+                                          className='col-9 text-capitalize'
                                           key={index}
                                         >
                                           {dips.dipsName}
                                         </div>
-                                        <div className='col-5 text-end'>
+                                        <div className='col-3 text-end pe-0 '>
                                           $
                                           {dips.dipsPrice !== undefined
                                             ? dips.dipsPrice
@@ -137,105 +140,49 @@ const Print = ({ orderDetail, printRef }) => {
                                 );
                               })}
                             </div>
-                          </div >
-                        </div >
+                          </div>
+                        </div>
                       )}
                     </>
                   );
                 }
                 if (item.key === "sides") {
                   return (
-                    <div className='row'>
-                      <div className='col-2'> </div>
-                      <div className="col-10">
-                        <strong className='m-0' style={{ color: "#717171" }}>
-                          Sides :{" "}
-                        </strong>
-                        <div className='col-12 text-capitalize'>
-                          {item?.value?.map((side, index) => {
-                            return (
-                              <>
-                                <div>
-                                  <div className='row'>
-                                    <div
-                                      className='col-7 text-capitalize'
-                                      key={index}
-                                    >
-                                      {side?.sidesName !== undefined
-                                        ? side?.sidesName
-                                        : null}
-                                      {side?.sidesSize !== undefined
-                                        ? side?.sidesSize
-                                        : null}
-                                      {side?.sideName} (
-                                      {side?.lineEntries !== undefined &&
-                                        side?.lineEntries[0]?.size}
-                                      )
-                                    </div>
-                                    <div className='col-5 text-end'>
-                                      $
-                                      {side?.sidesPrice !== undefined
-                                        ? side?.sidesPrice
-                                        : side?.lineEntries !== undefined
-                                          ? side?.lineEntries[0]?.price
-                                          : null}
-                                    </div>
-                                  </div>
-                                </div>
-                              </>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                    </div>
-                  );
-                }
-                if (item?.key === "pizza") {
-                  return (
-                    <div className='row'>
-                      <div className='col-2'></div>
-                      <div className='col-10'>
-                        <p className='m-0 text-capitalize'>
-                          {item.key} ({order?.pizzaSize})
-                        </p>
-                        <PizzaDetails
-                          pizzaData={item}
-                          productType={product_type}
-                        />
-                        <p className='m-0 text-capitalize fst-italic'>
-                          Comment : {order?.comments}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                }
-                if (item.key === "drinks") {
-                  return (
-                    <div className="row" style={{ padding: "0px !important" }}>
-
-                      <div className='col-2'> </div>
-                      <div className="col-10">
-                        {product_type === "custom_pizza" ||
-                          product_type === "Special_Pizza" ? (
-                          <>
-                            <strong className='m-0' style={{ color: "#717171" }}>
-                              Drinks :{" "}
+                    <>
+                      {item?.value[0]?.sidesName !== undefined && (
+                        <div className='row'>
+                          <div className='col-2'> </div>
+                          <div className='col-10'>
+                            <strong
+                              className='m-0'
+                              style={{ color: "#191919" }}
+                            >
+                              Sides :{" "}
                             </strong>
                             <div className='col-12 text-capitalize'>
-                              {item.value?.map((drink, index) => {
+                              {item?.value?.map((side, index) => {
                                 return (
                                   <>
-                                    <div className="p-0" style={{ padding: "0px !important" }}>
-                                      <div className='row p-0'>
+                                    <div>
+                                      <div className='row pe-0'>
                                         <div
-                                          className='col-7 text-capitalize'
+                                          className='col-9 text-capitalize pe-0'
                                           key={index}
                                         >
-                                          {drink.drinksName}
+                                          {side?.sidesName !== undefined
+                                            ? side?.sidesName
+                                            : null}
+                                          {side?.sidesSize !== undefined
+                                            ? ` (${side?.sidesSize}) `
+                                            : `(${side?.lineEntries[0]?.size})`}
                                         </div>
-                                        <div className='col-5 text-end'>
-                                          ${drink.drinksPrice}
+                                        <div className='col-3 text-end pe-0'>
+                                          $
+                                          {side?.sidesPrice !== undefined
+                                            ? side?.sidesPrice
+                                            : side?.lineEntries !== undefined
+                                            ? side?.lineEntries[0]?.price
+                                            : null}
                                         </div>
                                       </div>
                                     </div>
@@ -243,10 +190,82 @@ const Print = ({ orderDetail, printRef }) => {
                                 );
                               })}
                             </div>
-                          </>
-                        ) : null}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  );
+                }
+                if (item?.key === "pizza") {
+                  return (
+                    <div className='row pe-0'>
+                      <div className='col-2'></div>
+                      <div className='col-10'>
+                        <p className='m-0 text-capitalize p-0'>
+                          {item.key} ({order?.pizzaSize})
+                        </p>
+                        <PizzaDetails
+                          pizzaData={item}
+                          productType={product_type}
+                        />
+                        {order?.comments !== "" && (
+                          <p className='m-0 text-capitalize fst-italic'>
+                            Comment : {order?.comments}
+                          </p>
+                        )}
                       </div>
                     </div>
+                  );
+                }
+                if (item.key === "drinks") {
+                  return (
+                    <>
+                      {item?.value[0]?.drinksName !== undefined && (
+                        <div
+                          className='row pe-0'
+                          style={{ padding: "0px !important" }}
+                        >
+                          <div className='col-2'> </div>
+                          <div className='col-10'>
+                            {product_type === "custom_pizza" ||
+                            product_type === "Special_Pizza" ? (
+                              <>
+                                <strong
+                                  className='m-0'
+                                  style={{ color: "#191919" }}
+                                >
+                                  Drinks :{" "}
+                                </strong>
+                                <div className='col-12 text-capitalize'>
+                                  {item.value?.map((drink, index) => {
+                                    return (
+                                      <>
+                                        <div
+                                          className='p-0'
+                                          style={{ padding: "0px !important" }}
+                                        >
+                                          <div className='row p-0'>
+                                            <div
+                                              className='col-9 text-capitalize'
+                                              key={index}
+                                            >
+                                              {drink.drinksName}
+                                            </div>
+                                            <div className='col-3 text-end pe-0'>
+                                              ${drink.drinksPrice}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </>
+                                    );
+                                  })}
+                                </div>
+                              </>
+                            ) : null}
+                          </div>
+                        </div>
+                      )}
+                    </>
                   );
                 }
               })}
@@ -261,7 +280,7 @@ const Print = ({ orderDetail, printRef }) => {
               width={"100px"}
               height={"100px"}
               className='mt-1'
-              alt=""
+              alt=''
             />
           </div>
           <div className='col-8 text-end pe-1'>
@@ -284,7 +303,7 @@ const Print = ({ orderDetail, printRef }) => {
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 

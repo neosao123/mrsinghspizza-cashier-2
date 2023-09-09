@@ -590,6 +590,7 @@ function CreateYourOwn({
     const selectedObject = allIngredients?.specialbases?.find(
       (option) => option.specialbaseCode === selectedValue
     );
+
     setSpecialBasesSelected(selectedObject);
   };
   // all indian toppings

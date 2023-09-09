@@ -739,24 +739,37 @@ function NewOrder() {
             </div>
 
             {/* Section 3 */}
-            <div className='col-lg-4 mt-1  '>
-              <div className='d-flex justify-content-between pt-2'>
-                <h6 className='text-center'>Order</h6>
-                {cartdata?.length > 0 && (
-                  <div className='d-flex justify-content-end'>
-                    <button
-                      className='btn btn-danger btn-xs'
-                      onClick={() => dispatch(addToCart([]))}
-                    >
-                      <BiTrash /> Clear cart
-                    </button>
-                  </div>
-                )}
+            <div
+              className='col-lg-4 mt-1 '
+              style={{ backgroundColor: "#ff8c008as !important" }}
+            >
+              <div className='d-flex pt-2'>
+                <div className='col-6 '>
+                  <h6 className='text-end fs-5 fw-bold'>Cart</h6>
+                </div>
+                <div className='col-6'>
+                  {cartdata?.length > 0 && (
+                    <div className='d-flex justify-content-end'>
+                      <button
+                        className='btn btn-danger btn-xs ms-5 '
+                        onClick={() => dispatch(addToCart([]))}
+                      >
+                        <BiTrash /> Clear cart
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Add to Cart */}
               <div className='d-flex flex-column cart'>
-                <div className='p-3 rounded mb-3 overflow-auto'>
+                <div
+                  className='p-3 rounded mb-3 overflow-auto'
+                  style={{
+                    minHeight: "calc(100% - 45%)",
+                    backgroundColor: "#ff8c0026",
+                  }}
+                >
                   <Cart
                     onProductClick={handleProductClick}
                     payloadEdit={payloadEdit}
