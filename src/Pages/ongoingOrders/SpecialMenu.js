@@ -49,6 +49,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   const [totalPriceOfDipsFinal, setTotalPriceOfDipsFinal] = useState(0);
   let calcOneTpsArr = [];
   let calcTwoTpsArr = [];
+  let calcDipsArr = [];
+  // let ides = [];
   let noOfFreeToppings = Number(getSpecialData?.noofToppings);
   let noOfAdditionalTps = Number(0);
   const dispatch = useDispatch();
@@ -378,7 +380,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       payloadEdit !== undefined &&
       payloadEdit?.productType === "Special_Pizza"
     ) {
-      handleGetSpecial({ code: payloadEdit?.code });
+      console.log(payloadEdit, "edit item on click");
+      handleGetSpecial({ code: payloadEdit?.productCode });
       setPizzaSize(payloadEdit?.pizzaSize);
       setPizzaState(payloadEdit?.config?.pizza);
       setDrinksArr(payloadEdit?.config?.drinks);
@@ -558,7 +561,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       let payloadForEdit = {
         id: payloadEdit?.id,
         code: getSpecialData.code,
-        productCode: "#NA",
+        productCode: getSpecialData.code,
         productType: "Special_Pizza",
         productName: getSpecialData?.name,
         config: {
@@ -617,7 +620,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       let payload = {
         id: uuidv4(),
         code: getSpecialData.code,
-        productCode: "#NA",
+        productCode: getSpecialData.code,
         productType: "Special_Pizza",
         productName: getSpecialData?.name,
         config: {
@@ -647,12 +650,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     }
   };
   // Customize Details
-  const handleGetSpecial = (speicalPizza) => {
-    getSpecialDetails(
-      { code: speicalPizza.code },
-      getSpecialDetailsApi,
-      setGetSpecialData
-    );
+  const handleGetSpecial = (code) => {
+    getSpecialDetails({ code: code }, getSpecialDetailsApi, setGetSpecialData);
     toppings();
     dips();
 
@@ -692,6 +691,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         console.log("ERROR From Dips API: ", err);
       });
   };
+
   // Calculate Price
   const calculatePrice = () => {
     let totalPrice = Number(0);
@@ -701,9 +701,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     // Calculate base pizza price
 
     totalPrice +=
-      Number(getSpecialData?.largePizzaPrice) > 0
+      pizzaSize === "Large"
         ? Number(getSpecialData?.largePizzaPrice)
-        : Number(getSpecialData?.extraLargePizzaPrice);
+        : pizzaSize === "Extra Large"
+        ? Number(getSpecialData?.extraLargePizzaPrice)
+        : 0;
+    // Number(getSpecialData?.largePizzaPrice) > 0
+    //   ? Number(getSpecialData?.largePizzaPrice)
+    //   : Number(getSpecialData?.extraLargePizzaPrice);
 
     // Iterate through pizzaState
     pizzaState?.forEach((item) => {
@@ -773,15 +778,58 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     // Iterate through dipsArr
     let totalQtyDips = 0;
     dipsArr?.forEach((item) => {
+      // console.log(item)
+      // console.log(item, "dips iten");
+      // console.log(noOfFreeDips, "dips inside");
+      // if (noOfFreeDips <= 0) {
+      //   console.log(noOfFreeDips, "dips inside");
+      //   console.log(item, "dips inside");
+      //   calcDipsArr.push({ ...item, amount: Number(item.price) });
+      //   return;
+      // } else {
+      //   if (noOfFreeDips - item.qty < 0) {
+      //     calcDipsArr.push({
+      //       ...item,
+      //       amount: (noOfFreeDips - item.qty) * Number(item.price),
+      //     });
+      //     setNoOfFreeDips(0);
+      //     return;
+      //   } else {
+      //     setNoOfFreeDips((prev) => prev - item.qty);
+      //     calcDipsArr.push({ ...item, amount: 0 });
+      //   }
+      // }
       totalQtyDips += Number(item?.qty);
     });
     if (totalQtyDips >= noOfFreeDips) {
       let paidDips = Number(totalQtyDips) - noOfFreeDips;
       let priceOfOneDips = dipsArr[0]?.price ? Number(dipsArr[0]?.price) : null;
       let paidPrice = paidDips * priceOfOneDips;
-
       totalPrice += paidPrice;
     }
+
+    // dipsArr?.map((dip) => {
+    //   if (noOfFreeDips > 0) {
+    //     if (noOfFreeDips - Number(dip.qty) < 0) {
+    //       let dipObj = {
+    //         ...dip,
+    //         amount:
+    //           Math.abs(noOfFreeDips - Number(dip.qty)) * Number(dip.price),
+    //       };
+    //       calcDipsArr.push(dipObj);
+    //       setNoOfFreeDips(0);
+    //     }
+    //     let dipObj = {
+    //       ...dip,
+    //       amount: 0,
+    //     };
+    //     calcDipsArr.push(dipObj);
+    //     setNoOfFreeDips((prev) => prev - 1);
+    //   }
+    // });
+    // calcDipsArr?.forEach((dips) => {
+    //   totalPrice += dips.amount;
+    // });
 
     sidesArr?.forEach((item) => {
       let ind = freeSides?.findIndex(
@@ -807,6 +855,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     ).toFixed(2);
     setPrice(formattedPrice);
   };
+  useEffect(() => {
+    console.log(calcDipsArr, "calcDipsArr");
+  }, []);
 
   useEffect(() => {
     // calculateDipsPrice();
@@ -1001,6 +1052,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                 <input
                                   type='number'
                                   defaultValue={1}
+                                  readOnly
                                   min={1}
                                   value={
                                     dipsArr[comm]?.qty
@@ -1013,7 +1065,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                   }
                                   className='form-control mx-2'
                                   style={{ width: "75px" }}
-                                  onChange={(e) => handleDipsCount(e, data)}
+                                  // onChange={(e) => handleDipsCount(e, data)}
                                 />
                               </div>
                             </li>
@@ -1163,7 +1215,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                           // }
                           className='btn btn-sm customize py-1 px-2'
                           onClick={() => {
-                            handleGetSpecial(speicalPizza);
+                            handleGetSpecial(speicalPizza?.code);
                             createEmptyObjects(
                               Number(getSpecialData?.noofPizzas)
                             );

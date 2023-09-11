@@ -435,7 +435,7 @@ function Order() {
                                           className='m-0'
                                           style={{ color: "#191919" }}
                                         >
-                                          Dips :{" "}
+                                          Dips :
                                         </strong>
                                         <div className='col-12 text-capitalize'>
                                           {item?.value?.map((dips, index) => {
@@ -449,13 +449,16 @@ function Order() {
                                                     >
                                                       {dips.dipsName}
                                                     </div>
-                                                    <div className='col-3 text-end me-0 pe-0'>
-                                                      $
-                                                      {dips.dipsPrice !==
-                                                      undefined
-                                                        ? dips?.dipsPrice
-                                                        : dips?.price}
-                                                    </div>
+                                                    {order?.productType !==
+                                                      "Special_Pizza" && (
+                                                      <div className='col-3 text-end me-0 pe-0'>
+                                                        $
+                                                        {dips.dipsPrice !==
+                                                        undefined
+                                                          ? dips?.dipsPrice
+                                                          : dips?.price}
+                                                      </div>
+                                                    )}
                                                   </div>
                                                 </div>
                                               </>
@@ -566,9 +569,15 @@ function Order() {
                                                           >
                                                             {drink.drinksName}
                                                           </div>
-                                                          <div className='col-3 text-end'>
-                                                            ${drink.drinksPrice}
-                                                          </div>
+                                                          {order?.productType !==
+                                                            "Special_Pizza" && (
+                                                            <div className='col-3 text-end'>
+                                                              $
+                                                              {
+                                                                drink.drinksPrice
+                                                              }
+                                                            </div>
+                                                          )}
                                                         </div>
                                                       </div>
                                                     </>

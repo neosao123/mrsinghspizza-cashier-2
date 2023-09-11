@@ -307,6 +307,7 @@ function NewOrder() {
     await prevOrderDetails(phoneno)
       .then((res) => {
         setPrevOrders(res.data.data);
+        console.log(res.data.data, "res.data.data");
         setPrevOrderLoading(false);
       })
       .catch((err) => {

@@ -108,18 +108,22 @@ const Print = ({ orderDetail, printRef }) => {
                     <>
                       {item?.value[0]?.dipsName !== undefined && (
                         <div className='row pe-0'>
-                          <div className='col-2'> </div>
-                          <div className='col-10'>
-                            <strong
-                              className='m-0'
-                              style={{ color: "#191919" }}
-                            >
-                              Dips :{" "}
-                            </strong>
-                            <div className='col-12 text-capitalize'>
-                              {item?.value?.map((dips, index) => {
-                                return (
-                                  <>
+                          {item?.value?.map((dips, index) => {
+                            return (
+                              <>
+                                <div className='col-2 d-flex align-items-end'>
+                                  <span className='p-0 m-0'>{dips.qty} </span>
+                                </div>
+                                <div className='col-10'>
+                                  {index === 0 && (
+                                    <strong
+                                      className='m-0'
+                                      style={{ color: "#191919" }}
+                                    >
+                                      Dips :{" "}
+                                    </strong>
+                                  )}
+                                  <div className='col-12 text-capitalize'>
                                     <div>
                                       <div className='row'>
                                         <div
@@ -128,19 +132,21 @@ const Print = ({ orderDetail, printRef }) => {
                                         >
                                           {dips.dipsName}
                                         </div>
-                                        <div className='col-3 text-end pe-0 '>
-                                          $
-                                          {dips.dipsPrice !== undefined
-                                            ? dips.dipsPrice
-                                            : dips?.price}
-                                        </div>
+                                        {product_type !== "Special_Pizza" && (
+                                          <div className='col-3 text-end pe-0 '>
+                                            $
+                                            {dips.dipsPrice !== undefined
+                                              ? dips.dipsPrice
+                                              : dips?.price}
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
-                                  </>
-                                );
-                              })}
-                            </div>
-                          </div>
+                                  </div>
+                                </div>
+                              </>
+                            );
+                          })}
                         </div>
                       )}
                     </>
@@ -251,9 +257,12 @@ const Print = ({ orderDetail, printRef }) => {
                                             >
                                               {drink.drinksName}
                                             </div>
-                                            <div className='col-3 text-end pe-0'>
-                                              ${drink.drinksPrice}
-                                            </div>
+                                            {product_type !==
+                                              "Special_Pizza" && (
+                                              <div className='col-3 text-end pe-0'>
+                                                ${drink.drinksPrice}
+                                              </div>
+                                            )}
                                           </div>
                                         </div>
                                       </>
