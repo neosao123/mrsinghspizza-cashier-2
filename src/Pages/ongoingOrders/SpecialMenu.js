@@ -575,6 +575,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         amount: price,
         comments: comments,
         pizzaSize: pizzaSize === "Large" ? "Large" : "Extra Large",
+        pizzaPrice: pizzaSize === "Large" ? getSpecialData?.largePizzaPrice : getSpecialData?.extraLargePizzaPrice
       };
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
@@ -634,6 +635,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         amount: price,
         comments: comments,
         pizzaSize: pizzaSize === "Large" ? "Large" : "Extra Large",
+        pizzaPrice: pizzaSize === "Large" ? getSpecialData?.largePizzaPrice : getSpecialData?.extraLargePizzaPrice
       };
 
       dispatch(addToCart([...cartdata, payload]));
@@ -733,7 +735,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           } else if (noOfFreeToppings === 1) {
             let tpsObj = {
               ...items,
-              amount: Number(items?.price) / 2,
+              amount: (Number(items?.price).toFixed(2)) / 2,
             };
             calcTwoTpsArr.push(tpsObj);
             setOfferedFreeToppings((prev) => prev - 1);
@@ -741,7 +743,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             noOfAdditionalTps++;
             setAdditionalToppingsCount((prev) => prev + 1);
           } else {
-            calcTwoTpsArr.push({ ...items, amount: Number(items?.price) });
+            calcTwoTpsArr.push({ ...items, amount: Number(items?.price).toFixed(2) });
             noOfAdditionalTps += Number(2);
             setAdditionalToppingsCount((prev) => prev + 2);
           }
@@ -758,7 +760,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             noOfFreeToppings--;
             setOfferedFreeToppings((prev) => prev - 1);
           } else {
-            calcOneTpsArr.push({ ...items, amount: Number(items?.price) });
+            calcOneTpsArr.push({ ...items, amount: Number(items?.price).toFixed(2) });
             noOfAdditionalTps++;
             setAdditionalToppingsCount((prev) => prev + 1);
           }

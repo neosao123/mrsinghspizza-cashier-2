@@ -6,13 +6,13 @@ import Logo from "../../assets/logo.png";
 
 const Print = ({ orderDetail, printRef }) => {
   return (
-    <div className=''>
+    <div className='d-none'>
       <div className='col-12 m-1' style={{ width: "273px" }} ref={printRef}>
         <div className='row'>
           <div className='d-flex justify-content-center'>
             <img
               src={Logo}
-              alt="Mr Singh's pizza logo"
+              alt="Mr. Singh's Pizza logo"
               width={"30px"}
               height={"30px"}
               className='m-1'
@@ -23,7 +23,7 @@ const Print = ({ orderDetail, printRef }) => {
             </div>
           </div>
           <p className='text-center mb-0'>
-            2120 N Park Dr Unit #25, Brampton, ON L6S 0C9{" "}
+            {orderDetail?.storeAddress ? orderDetail?.storeAddress : ""}
           </p>
           <p className='text-center mb-1'>905-500-4000</p>
         </div>
@@ -79,13 +79,12 @@ const Print = ({ orderDetail, printRef }) => {
           </div>
         </div>
         <div className='row'>
-          <div className='col-2 text-secondary'>Qty</div>
-          <div className='col-7 text-secondary'>Item</div>
-          <div className='col-3 text-secondary text-end'>Amount</div>
+          <div className='col-2 text-dark' style={{fontWeight:"600"}}>Qty</div>
+          <div className='col-7 text-dark' style={{fontWeight:"600"}}>Item</div>
+          <div className='col-3 text-dark text-end'  style={{fontWeight:"600"}}>Amount</div>
         </div>
-
         {orderDetail?.orderItems?.map((order, index) => {
-          const product_type = order.productType;
+          const product_type = order.productType.toLowerCase();
           const objectToArray = Object.entries(order?.config).map(
             ([key, value]) => ({ key, value })
           );
@@ -94,14 +93,29 @@ const Print = ({ orderDetail, printRef }) => {
               <div className='col-2'>
                 <span className='m-0'>{order.quantity}</span>
               </div>
-              <div className='col-10'>
-                <div className='row g-0 m-0 p-0'>
-                  <div className='col-9'>
-                    {product_type === "custom_pizza" ? "" : order.productName}
-                  </div>
-                  <div className='col-3 text-end '>$ {order.amount}</div>
-                </div>
-              </div>
+              {
+                product_type === "custom_pizza" ?
+                  (
+                    <div className='col-10'>
+                      <div className='row g-0 m-0 p-0'>
+                        <div className='col-9'>
+                          Pizza {order?.pizzaSize}
+                        </div>
+                        <div className='col-3 text-end'>$ {order.amount}</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className='col-10'>
+                      <div className='row g-0 m-0 p-0'>
+                        <div className='col-9'>
+                          {product_type === "custom_pizza" ? "" : order.productName}
+                        </div>
+                        <div className='col-3 text-end '>$ {product_type !== "special_pizza" ? order.amount : order.pizzaPrice}</div>
+                      </div>
+                    </div>
+                  )
+              }
+
               {objectToArray?.map((item, index) => {
                 if (item.key === "dips") {
                   return (
@@ -132,7 +146,7 @@ const Print = ({ orderDetail, printRef }) => {
                                         >
                                           {dips.dipsName}
                                         </div>
-                                        {product_type !== "Special_Pizza" && (
+                                        {product_type !== "special_pizza" && (
                                           <div className='col-3 text-end pe-0 '>
                                             $
                                             {dips.dipsPrice !== undefined
@@ -156,8 +170,8 @@ const Print = ({ orderDetail, printRef }) => {
                   return (
                     <>
                       {item?.value[0]?.sidesName !== undefined && (
-                        <div className='row'>
-                          <div className='col-2'> </div>
+                        <div className='row pe-0'>
+                          <div className='col-2'></div>
                           <div className='col-10'>
                             <strong
                               className='m-0'
@@ -165,37 +179,30 @@ const Print = ({ orderDetail, printRef }) => {
                             >
                               Sides :{" "}
                             </strong>
-                            <div className='col-12 text-capitalize'>
-                              {item?.value?.map((side, index) => {
-                                return (
-                                  <>
-                                    <div>
-                                      <div className='row pe-0'>
-                                        <div
-                                          className='col-9 text-capitalize pe-0'
-                                          key={index}
-                                        >
-                                          {side?.sidesName !== undefined
-                                            ? side?.sidesName
-                                            : null}
-                                          {side?.sidesSize !== undefined
-                                            ? ` (${side?.sidesSize}) `
-                                            : `(${side?.lineEntries[0]?.size})`}
-                                        </div>
-                                        <div className='col-3 text-end pe-0'>
-                                          $
-                                          {side?.sidesPrice !== undefined
-                                            ? side?.sidesPrice
-                                            : side?.lineEntries !== undefined
-                                            ? side?.lineEntries[0]?.price
-                                            : null}
-                                        </div>
-                                      </div>
+                            {item?.value?.map((side, index) => {
+                              return (
+                                <div className="col-12 pe-0">
+                                  <div className='row pe-0'>
+                                    <div className='col-9 text-capitalize' key={index}>
+                                      {side?.sidesName !== undefined
+                                        ? side?.sidesName
+                                        : null}
+                                      {side?.sidesSize !== undefined
+                                        ? ` (${side?.sidesSize}) `
+                                        : `(${side?.lineEntries[0]?.size})`}
                                     </div>
-                                  </>
-                                );
-                              })}
-                            </div>
+                                    <div className='col-3 text-end pe-0'>
+                                      $
+                                      {side?.sidesPrice !== undefined
+                                        ? side?.sidesPrice
+                                        : side?.lineEntries !== undefined
+                                          ? side?.lineEntries[0]?.price
+                                          : null}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
@@ -207,9 +214,12 @@ const Print = ({ orderDetail, printRef }) => {
                     <div className='row pe-0'>
                       <div className='col-2'></div>
                       <div className='col-10'>
-                        <p className='m-0 text-capitalize p-0'>
-                          {item.key} ({order?.pizzaSize})
-                        </p>
+                        {
+                          product_type !== "custom_pizza" &&
+                          (<p className='m-0 text-capitalize p-0'>
+                            {item.key} ({order?.pizzaSize})
+                          </p>)
+                        }
                         <PizzaDetails
                           pizzaData={item}
                           productType={product_type}
@@ -234,7 +244,7 @@ const Print = ({ orderDetail, printRef }) => {
                           <div className='col-2'> </div>
                           <div className='col-10'>
                             {product_type === "custom_pizza" ||
-                            product_type === "Special_Pizza" ? (
+                              product_type === "special_pizza" ? (
                               <>
                                 <strong
                                   className='m-0'
@@ -258,11 +268,11 @@ const Print = ({ orderDetail, printRef }) => {
                                               {drink.drinksName}
                                             </div>
                                             {product_type !==
-                                              "Special_Pizza" && (
-                                              <div className='col-3 text-end pe-0'>
-                                                ${drink.drinksPrice}
-                                              </div>
-                                            )}
+                                              "special_pizza" && (
+                                                <div className='col-3 text-end pe-0'>
+                                                  ${drink.drinksPrice}
+                                                </div>
+                                              )}
                                           </div>
                                         </div>
                                       </>
