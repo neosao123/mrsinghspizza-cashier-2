@@ -79,9 +79,18 @@ const Print = ({ orderDetail, printRef }) => {
           </div>
         </div>
         <div className='row'>
-          <div className='col-2 text-dark' style={{fontWeight:"600"}}>Qty</div>
-          <div className='col-7 text-dark' style={{fontWeight:"600"}}>Item</div>
-          <div className='col-3 text-dark text-end'  style={{fontWeight:"600"}}>Amount</div>
+          <div className='col-2 text-dark' style={{ fontWeight: "600" }}>
+            Qty
+          </div>
+          <div className='col-7 text-dark' style={{ fontWeight: "600" }}>
+            Item
+          </div>
+          <div
+            className='col-3 text-dark text-end'
+            style={{ fontWeight: "600" }}
+          >
+            Amount
+          </div>
         </div>
         {orderDetail?.orderItems?.map((order, index) => {
           const product_type = order.productType.toLowerCase();
@@ -93,28 +102,28 @@ const Print = ({ orderDetail, printRef }) => {
               <div className='col-2'>
                 <span className='m-0'>{order.quantity}</span>
               </div>
-              {
-                product_type === "custom_pizza" ?
-                  (
-                    <div className='col-10'>
-                      <div className='row g-0 m-0 p-0'>
-                        <div className='col-9'>
-                          Pizza {order?.pizzaSize}
-                        </div>
-                        <div className='col-3 text-end'>$ {order.amount}</div>
-                      </div>
+              {product_type === "custom_pizza" ? (
+                <div className='col-10'>
+                  <div className='row g-0 m-0 p-0'>
+                    <div className='col-9'>Pizza {order?.pizzaSize}</div>
+                    <div className='col-3 text-end'>$ {order.amount}</div>
+                  </div>
+                </div>
+              ) : (
+                <div className='col-10'>
+                  <div className='row g-0 m-0 p-0'>
+                    <div className='col-9'>
+                      {product_type === "custom_pizza" ? "" : order.productName}
                     </div>
-                  ) : (
-                    <div className='col-10'>
-                      <div className='row g-0 m-0 p-0'>
-                        <div className='col-9'>
-                          {product_type === "custom_pizza" ? "" : order.productName}
-                        </div>
-                        <div className='col-3 text-end '>$ {product_type !== "special_pizza" ? order.amount : order.pizzaPrice}</div>
-                      </div>
+                    <div className='col-3 text-end '>
+                      ${" "}
+                      {product_type !== "special_pizza"
+                        ? order.amount
+                        : order.pizzaPrice}
                     </div>
-                  )
-              }
+                  </div>
+                </div>
+              )}
 
               {objectToArray?.map((item, index) => {
                 if (item.key === "dips") {
@@ -181,9 +190,12 @@ const Print = ({ orderDetail, printRef }) => {
                             </strong>
                             {item?.value?.map((side, index) => {
                               return (
-                                <div className="col-12 pe-0">
+                                <div className='col-12 pe-0'>
                                   <div className='row pe-0'>
-                                    <div className='col-9 text-capitalize' key={index}>
+                                    <div
+                                      className='col-9 text-capitalize'
+                                      key={index}
+                                    >
                                       {side?.sidesName !== undefined
                                         ? side?.sidesName
                                         : null}
@@ -196,8 +208,8 @@ const Print = ({ orderDetail, printRef }) => {
                                       {side?.sidesPrice !== undefined
                                         ? side?.sidesPrice
                                         : side?.lineEntries !== undefined
-                                          ? side?.lineEntries[0]?.price
-                                          : null}
+                                        ? side?.lineEntries[0]?.price
+                                        : null}
                                     </div>
                                   </div>
                                 </div>
@@ -214,12 +226,11 @@ const Print = ({ orderDetail, printRef }) => {
                     <div className='row pe-0'>
                       <div className='col-2'></div>
                       <div className='col-10'>
-                        {
-                          product_type !== "custom_pizza" &&
-                          (<p className='m-0 text-capitalize p-0'>
+                        {product_type !== "custom_pizza" && (
+                          <p className='m-0 text-capitalize p-0'>
                             {item.key} ({order?.pizzaSize})
-                          </p>)
-                        }
+                          </p>
+                        )}
                         <PizzaDetails
                           pizzaData={item}
                           productType={product_type}
@@ -244,7 +255,7 @@ const Print = ({ orderDetail, printRef }) => {
                           <div className='col-2'> </div>
                           <div className='col-10'>
                             {product_type === "custom_pizza" ||
-                              product_type === "special_pizza" ? (
+                            product_type === "special_pizza" ? (
                               <>
                                 <strong
                                   className='m-0'
@@ -269,10 +280,10 @@ const Print = ({ orderDetail, printRef }) => {
                                             </div>
                                             {product_type !==
                                               "special_pizza" && (
-                                                <div className='col-3 text-end pe-0'>
-                                                  ${drink.drinksPrice}
-                                                </div>
-                                              )}
+                                              <div className='col-3 text-end pe-0'>
+                                                ${drink.drinksPrice}
+                                              </div>
+                                            )}
                                           </div>
                                         </div>
                                       </>
