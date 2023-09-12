@@ -91,7 +91,7 @@ function Order() {
       })
       .catch((err) => console.log(err));
   };
-  useEffect(() => {}, [orderDetail]);
+  useEffect(() => { }, [orderDetail]);
 
   useEffect(() => {
     if (orderId !== undefined) {
@@ -189,7 +189,7 @@ function Order() {
                               <div className='d-flex flex-wrap'>
                                 {" "}
                                 {data?.orderStatus !== "cancelled" &&
-                                data?.orderStatus === "placed" ? (
+                                  data?.orderStatus === "placed" ? (
                                   <div className='d-flex  my-1 justify-content-end '>
                                     <span
                                       className='mx-2 py-2 badge bg-secondary'
@@ -208,8 +208,8 @@ function Order() {
                                   </div>
                                 ) : null}
                                 {data?.orderStatus !== "cancelled" &&
-                                data?.orderStatus !== "delivered" &&
-                                data?.orderStatus === "placed" ? (
+                                  data?.orderStatus !== "delivered" &&
+                                  data?.orderStatus === "placed" ? (
                                   <div className='d-flex my-1 justify-content-end'>
                                     <span
                                       className='mx-2 py-2 badge bg-danger'
@@ -353,13 +353,13 @@ function Order() {
                         <button
                           style={{ backgroundColor: "#ff8c00" }}
                           className='btn text-white mx-3'
-                          onClick={() => {}}
+                          onClick={() => { }}
                         >
                           Print
                         </button>
                       )}
                       content={() => printRef?.current}
-                      onBeforePrint={() => {}}
+                      onBeforePrint={() => { }}
                     ></ReactToPrint>
                   </div>
                 </div>
@@ -451,14 +451,14 @@ function Order() {
                                                     </div>
                                                     {order?.productType !==
                                                       "Special_Pizza" && (
-                                                      <div className='col-3 text-end me-0 pe-0'>
-                                                        $
-                                                        {dips.dipsPrice !==
-                                                        undefined
-                                                          ? dips?.dipsPrice
-                                                          : dips?.price}
-                                                      </div>
-                                                    )}
+                                                        <div className='col-3 text-end me-0 pe-0'>
+                                                          $
+                                                          {dips.dipsPrice !==
+                                                            undefined
+                                                            ? dips?.dipsPrice
+                                                            : dips?.price}
+                                                        </div>
+                                                      )}
                                                   </div>
                                                 </div>
                                               </>
@@ -475,31 +475,31 @@ function Order() {
                                   <>
                                     {item?.value[0]?.sidesName !==
                                       undefined && (
-                                      <>
-                                        <strong
-                                          className='m-0'
-                                          style={{ color: "#191919" }}
-                                        >
-                                          Sides :{" "}
-                                        </strong>
-                                        <div className='col-12 text-capitalize'>
-                                          {item?.value?.map((side, index) => {
-                                            return (
-                                              <>
-                                                <div>
-                                                  <div className='row'>
-                                                    <div
-                                                      className='col-7 text-capitalize'
-                                                      key={index}
-                                                    >
-                                                      {side?.sidesName !==
-                                                      undefined
-                                                        ? side?.sidesName
-                                                        : null}
-                                                      {side?.sideName} (
-                                                      {side?.lineEntries !==
-                                                      undefined
-                                                        ? side?.lineEntries[0]
+                                        <>
+                                          <strong
+                                            className='m-0'
+                                            style={{ color: "#191919" }}
+                                          >
+                                            Sides :{" "}
+                                          </strong>
+                                          <div className='col-12 text-capitalize'>
+                                            {item?.value?.map((side, index) => {
+                                              return (
+                                                <>
+                                                  <div>
+                                                    <div className='row'>
+                                                      <div
+                                                        className='col-7 text-capitalize'
+                                                        key={index}
+                                                      >
+                                                        {side?.sidesName !==
+                                                          undefined
+                                                          ? side?.sidesName
+                                                          : null}
+                                                        {side?.sideName} (
+                                                        {side?.lineEntries !==
+                                                          undefined
+                                                          ? side?.lineEntries[0]
                                                             ?.size
                                                         : side?.sidesSize}
                                                       )
@@ -518,14 +518,28 @@ function Order() {
                                                           : null}
                                                       </div>
                                                     )}
+                                                          : side?.sidesSize}
+                                                        )
+                                                      </div>
+                                                      <div className='col-5 text-end'>
+                                                        $
+                                                        {side?.sidesPrice !==
+                                                          undefined
+                                                          ? side?.sidesPrice
+                                                          : side?.lineEntries !==
+                                                            undefined
+                                                            ? side?.lineEntries[0]
+                                                              ?.price
+                                                            : null}
+                                                      </div>
+                                                    </div>
                                                   </div>
-                                                </div>
-                                              </>
-                                            );
-                                          })}
-                                        </div>
-                                      </>
-                                    )}
+                                                </>
+                                              );
+                                            })}
+                                          </div>
+                                        </>
+                                      )}
                                   </>
                                 );
                               }
@@ -549,31 +563,31 @@ function Order() {
                                 return (
                                   <>
                                     {order?.productType === "custom_pizza" ||
-                                    order?.productType === "Special_Pizza"
+                                      order?.productType === "Special_Pizza"
                                       ? item?.value[0]?.drinksName !==
-                                          undefined && (
-                                          <>
-                                            <strong
-                                              className='m-0'
-                                              style={{ color: "#191919" }}
-                                            >
-                                              Drinks :{" "}
-                                            </strong>
-                                            <div className='col-12 text-capitalize'>
-                                              {item.value?.map(
-                                                (drink, index) => {
-                                                  return (
-                                                    <>
-                                                      <div>
-                                                        <div className='row'>
-                                                          <div
-                                                            className='col-9 text-capitalize'
-                                                            key={index}
-                                                          >
-                                                            {drink.drinksName}
-                                                          </div>
-                                                          {order?.productType !==
-                                                            "Special_Pizza" && (
+                                      undefined && (
+                                        <>
+                                          <strong
+                                            className='m-0'
+                                            style={{ color: "#191919" }}
+                                          >
+                                            Drinks :{" "}
+                                          </strong>
+                                          <div className='col-12 text-capitalize'>
+                                            {item.value?.map(
+                                              (drink, index) => {
+                                                return (
+                                                  <>
+                                                    <div>
+                                                      <div className='row'>
+                                                        <div
+                                                          className='col-9 text-capitalize'
+                                                          key={index}
+                                                        >
+                                                          {drink.drinksName}
+                                                        </div>
+                                                        {order?.productType !==
+                                                          "Special_Pizza" && (
                                                             <div className='col-3 text-end'>
                                                               $
                                                               {
@@ -581,15 +595,15 @@ function Order() {
                                                               }
                                                             </div>
                                                           )}
-                                                        </div>
                                                       </div>
-                                                    </>
-                                                  );
-                                                }
-                                              )}
-                                            </div>
-                                          </>
-                                        )
+                                                    </div>
+                                                  </>
+                                                );
+                                              }
+                                            )}
+                                          </div>
+                                        </>
+                                      )
                                       : null}
                                   </>
                                 );
@@ -724,9 +738,9 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
     <div>
       {pizzaData.value.map((ele, index) => (
         <div key={index}>
-          {/* <p className='p-0 m-0 fw-bold'>Pizza {index + 1}</p> */}
-          {productType === "Special_Pizza" && index > 0 ? (
-            <p className='p-0 m-0 fw-bold' style={{ color: "#191919" }}>
+
+          {productType === "special_pizza" && index > 0 ? (
+            <p className='p-0 m-0 fw-bold mt-1' style={{ color: "#191919" }}>
               Next Pizza
             </p>
           ) : null}
@@ -740,7 +754,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
               </div>
               <div className='col-5 text-end p-0 m-0'>
                 {ele?.cheese?.price === undefined ||
-                ele?.cheese?.price === "0.00"
+                  ele?.cheese?.price === "0.00"
                   ? ""
                   : `$ ${ele?.cheese?.price}`}
               </div>
@@ -754,7 +768,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
               </div>
               <div className='col-5 text-end m-0 p-0'>
                 {ele?.crust?.crustPrice === undefined ||
-                ele?.crust?.crustPrice === "0.00"
+                  ele?.crust?.crustPrice === "0.00"
                   ? ""
                   : `$ ${ele?.crust?.crustPrice}`}
                 {ele?.crust?.price === undefined || ele?.crust?.price === "0.00"
@@ -765,27 +779,32 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
           )}
 
           {ele?.specialBases?.specialbaseName !== undefined && (
-            <div className='row'>
-              <div className='col-7 text-capitalize' key={index}>
-                <strong style={{ color: "#191919" }}>Specialbases : </strong>
-                {ele?.specialBases?.specialbaseName}
-                {/* {ele?.specialbases?.specialbaseName} */}
-              </div>
-              <div className='col-5 text-end p-0 m-0'>
-                {ele?.specialBases?.price === undefined ||
-                ele?.specialBases?.price === "0.00"
-                  ? ""
-                  : `$ ${ele?.specialBases?.price}`}
-                {ele?.specialbases?.price === undefined ||
-                ele?.specialbases?.price === "0.00"
-                  ? ""
-                  : `$ ${ele?.specialbases?.price}`}
+            <div className='row pe-0'>
+              <div className='col-12 text-capitalize' key={index}>
+                <div className="row pe-0">
+                  <div className="col-9 pe-0">
+                    <strong style={{ color: "#191919" }}>Spb : </strong> <span>{ele?.specialBases?.specialbaseName}</span>
+                  </div>
+                  <div className="col-3 pe-0 text-end">
+                    {ele?.specialBases?.price === undefined ||
+                      ele?.specialBases?.price === "0.00"
+                      ? ""
+                      : `$ ${ele?.specialBases?.price}`}
+                    {ele?.specialbases?.price === undefined ||
+                      ele?.specialbases?.price === "0.00"
+                      ? ""
+                      : `$ ${ele?.specialbases?.price}`}
+                  </div>
+                </div>
               </div>
             </div>
           )}
-          <p className='p-0 m-0'>
-            <strong style={{ color: "#191919" }}>Toppings :</strong>
-          </p>
+          {
+            ele.toppings.length > 0 &&
+            <p className='p-0 m-0'>
+              <strong style={{ color: "#191919" }}>Toppings :</strong>
+            </p>
+          }
           <ToppingsList toppingsData={ele.toppings} />
         </div>
       ))}
@@ -804,27 +823,37 @@ export const ToppingsList = ({ toppingsData }) => {
   );
 
   function renderToppingsList(toppingsList, countAs) {
-    return (
-      <div>
-        {toppingsList?.map((topping, index) => (
-          <div className='row'>
-            <div className='col-9 text-capitalize' key={index}>
-              {countAs === "2" && "(2) "}
-              {topping.toppingsName} (
-              {topping.toppingsPlacement === "whole" && "W"}
-              {topping.toppingsPlacement === "lefthalf" && "L"}
-              {topping.toppingsPlacement === "righthalf" && "R"}
-              {topping.toppingsPlacement === "1/4" && "1/4"})
-            </div>
-            <div className='col-3 text-end m-0 p-0'>
-              {topping.amount === undefined || topping.amount === 0
-                ? ""
-                : `$ ${topping.amount}`}
-            </div>
+    if (toppingsList.length === 6 && countAs === "") {
+      return (
+        <div className='row'>
+          <div className='col-9 text-capitalize'>
+            <strong style={{ color: "#191919" }}>Indian Style</strong>
           </div>
-        ))}
-      </div>
-    );
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          {toppingsList?.map((topping, index) => (
+            <div className='row'>
+              <div className='col-9 text-capitalize' key={index}>
+                {countAs === "2" && "(2) "}
+                {topping.toppingsName} (
+                {topping.toppingsPlacement === "whole" && "W"}
+                {topping.toppingsPlacement === "lefthalf" && "L"}
+                {topping.toppingsPlacement === "righthalf" && "R"}
+                {topping.toppingsPlacement === "1/4" && "1/4"})
+              </div>
+              <div className='col-3 text-end m-0 p-0'>
+                {topping.amount === undefined || topping.amount === 0
+                  ? ""
+                  : `$ ${topping.amount}`}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
   }
 };
 
