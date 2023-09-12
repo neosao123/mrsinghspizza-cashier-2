@@ -182,14 +182,16 @@ const Print = ({ orderDetail, printRef }) => {
                                             ? ` (${side?.sidesSize}) `
                                             : `(${side?.lineEntries[0]?.size})`}
                                         </div>
-                                        <div className='col-3 text-end pe-0'>
-                                          $
-                                          {side?.sidesPrice !== undefined
-                                            ? side?.sidesPrice
-                                            : side?.lineEntries !== undefined
-                                            ? side?.lineEntries[0]?.price
-                                            : null}
-                                        </div>
+                                        {product_type !== "Special_Pizza" && (
+                                          <div className='col-3 text-end pe-0'>
+                                            $
+                                            {side?.sidesPrice !== undefined
+                                              ? side?.sidesPrice
+                                              : side?.lineEntries !== undefined
+                                              ? side?.lineEntries[0]?.price
+                                              : null}
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                   </>

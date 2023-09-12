@@ -504,17 +504,20 @@ function Order() {
                                                         : side?.sidesSize}
                                                       )
                                                     </div>
-                                                    <div className='col-5 text-end'>
-                                                      $
-                                                      {side?.sidesPrice !==
-                                                      undefined
-                                                        ? side?.sidesPrice
-                                                        : side?.lineEntries !==
-                                                          undefined
-                                                        ? side?.lineEntries[0]
-                                                            ?.price
-                                                        : null}
-                                                    </div>
+                                                    {order?.productType !==
+                                                      "Special_Pizza" && (
+                                                      <div className='col-5 text-end'>
+                                                        $
+                                                        {side?.sidesPrice !==
+                                                        undefined
+                                                          ? side?.sidesPrice
+                                                          : side?.lineEntries !==
+                                                            undefined
+                                                          ? side?.lineEntries[0]
+                                                              ?.price
+                                                          : null}
+                                                      </div>
+                                                    )}
                                                   </div>
                                                 </div>
                                               </>

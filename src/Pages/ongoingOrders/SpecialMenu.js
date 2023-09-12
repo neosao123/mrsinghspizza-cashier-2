@@ -215,58 +215,122 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           ...arr[count - 1],
           toppings: {
             ...arr[count - 1].toppings,
-            countAsTwoToppings: updatedArr,
+            countAsTwoToppings: [...updatedArr],
           },
         };
       }
-      setPizzaState(arr);
+      setPizzaState([...arr]);
     }
   };
   const handleOneToppings = (e, count, countAsOneToppings) => {
     const { checked } = e.target;
     if (checked) {
-      let arr = [...pizzaState];
-      const tempCountAsOne = [
-        ...(arr[count - 1].toppings?.countAsOneToppings || []),
-        {
-          ...countAsOneToppings,
-          toppingsPlacement: "whole",
-          pizzaIndex: count - 1,
-        },
-      ];
+      setPizzaState((prevState) => {
+        const newState = [...prevState];
+        const pizzaIndex = count - 1;
 
-      arr[count - 1].toppings = {
-        ...arr[count - 1].toppings,
-        countAsOneToppings: tempCountAsOne,
-      };
-
-      setAllToppings([...allToppings, Number(countAsOneToppings.countAs)]);
-
-      setPizzaState(arr);
-    } else {
-      let arr = [...pizzaState];
-      const index = arr[count - 1].toppings?.countAsOneToppings.findIndex(
-        (item) => item.toppingsCode == countAsOneToppings.toppingsCode
-      );
-      let updatedAll = allToppings.filter(
-        (item) => item.toppingsCode !== countAsOneToppings.toppingsCode
-      );
-      setAllToppings(updatedAll);
-      if (index !== -1) {
-        let updatedArr = arr[count - 1]?.toppings?.countAsOneToppings.filter(
-          (item) => item.toppingsCode !== countAsOneToppings.toppingsCode
-        );
-        arr[count - 1] = {
-          ...arr[count - 1],
+        newState[pizzaIndex] = {
+          ...newState[pizzaIndex],
           toppings: {
-            ...arr[count - 1].toppings,
-            countAsOneToppings: updatedArr,
+            ...newState[pizzaIndex].toppings,
+            countAsOneToppings: [
+              ...(newState[pizzaIndex].toppings.countAsOneToppings || []),
+              {
+                ...countAsOneToppings,
+                toppingsPlacement: "whole",
+                pizzaIndex: pizzaIndex,
+              },
+            ],
           },
         };
-      }
-      setPizzaState(arr);
+
+        setAllToppings([...allToppings, Number(countAsOneToppings.countAs)]);
+
+        return newState;
+      });
+    } else {
+      setPizzaState((prevState) => {
+        const newState = [...prevState];
+        const pizzaIndex = count - 1;
+
+        const index = newState[
+          pizzaIndex
+        ]?.toppings?.countAsOneToppings.findIndex(
+          (item) => item.toppingsCode === countAsOneToppings.toppingsCode
+        );
+
+        if (index !== -1) {
+          const updatedArr = newState[
+            pizzaIndex
+          ]?.toppings?.countAsOneToppings.filter(
+            (item) => item.toppingsCode !== countAsOneToppings.toppingsCode
+          );
+
+          newState[pizzaIndex] = {
+            ...newState[pizzaIndex],
+            toppings: {
+              ...newState[pizzaIndex].toppings,
+              countAsOneToppings: [...updatedArr],
+            },
+          };
+
+          setAllToppings((prevAllToppings) =>
+            prevAllToppings.filter(
+              (item) => item !== Number(countAsOneToppings.countAs)
+            )
+          );
+        }
+
+        return newState;
+      });
     }
   };
+
+  // const handleOneToppings = (e, count, countAsOneToppings) => {
+  //   const { checked } = e.target;
+  //   if (checked) {
+  //     let arr = [...pizzaState];
+  //     const tempCountAsOne = [
+  //       ...(arr[count - 1].toppings?.countAsOneToppings || []),
+  //       {
+  //         ...countAsOneToppings,
+  //         toppingsPlacement: "whole",
+  //         pizzaIndex: count - 1,
+  //       },
+  //     ];
+
+  //     arr[count - 1].toppings = {
+  //       ...arr[count - 1].toppings,
+  //       countAsOneToppings: [...tempCountAsOne],
+  //     };
+
+  //     setAllToppings([...allToppings, Number(countAsOneToppings.countAs)]);
+
+  //     setPizzaState([...arr]);
+  //   } else {
+  //     let arr = [...pizzaState];
+  //     const index = arr[count - 1].toppings?.countAsOneToppings.findIndex(
+  //       (item) => item.toppingsCode == countAsOneToppings.toppingsCode
+  //     );
+  //     let updatedAll = allToppings.filter(
+  //       (item) => item.toppingsCode !== countAsOneToppings.toppingsCode
+  //     );
+  //     setAllToppings(updatedAll);
+  //     if (index !== -1) {
+  //       let updatedArr = arr[count - 1]?.toppings?.countAsOneToppings.filter(
+  //         (item) => item.toppingsCode !== countAsOneToppings.toppingsCode
+  //       );
+  //       arr[count - 1] = {
+  //         ...arr[count - 1],
+  //         toppings: {
+  //           ...arr[count - 1].toppings,
+  //           countAsOneToppings: [...updatedArr],
+  //         },
+  //       };
+  //     }
+  //     setPizzaState([...arr]);
+  //   }
+  // };
   const handleFreeToppingsPlacementChange = (event, count, toppingsCode) => {
     const selectedValue = event.target.value;
     let arr = [...pizzaState];
@@ -343,38 +407,80 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   };
   const handleFreeToppings = (e, count, freeToppings) => {
     const { checked } = e.target;
-    if (checked) {
-      let arr = [...pizzaState];
-      const tempFreeToppings = [
-        ...(arr[count - 1].toppings?.freeToppings || []),
-        { ...freeToppings, toppingsPlacement: "whole" },
-      ];
+    setPizzaState((prevState) => {
+      const newState = [...prevState];
+      const pizzaIndex = count - 1;
 
-      arr[count - 1].toppings = {
-        ...arr[count - 1].toppings,
-        freeToppings: tempFreeToppings,
-      };
-      setPizzaState(arr);
-    } else {
-      let arr = [...pizzaState];
-      const index = arr[count - 1].toppings?.freeToppings?.findIndex(
-        (item) => item.toppingsCode == freeToppings.toppingsCode
-      );
-      if (index !== -1) {
-        let updatedArr = arr[count - 1]?.toppings?.freeToppings?.filter(
-          (item) => item.toppingsCode !== freeToppings.toppingsCode
-        );
-        arr[count - 1] = {
-          ...arr[count - 1],
+      if (checked) {
+        newState[pizzaIndex] = {
+          ...newState[pizzaIndex],
           toppings: {
-            ...arr[count - 1].toppings,
-            freeToppings: updatedArr,
+            ...newState[pizzaIndex].toppings,
+            freeToppings: [
+              ...(newState[pizzaIndex].toppings.freeToppings || []),
+              { ...freeToppings, toppingsPlacement: "whole" },
+            ],
           },
         };
+      } else {
+        const index = newState[pizzaIndex]?.toppings?.freeToppings?.findIndex(
+          (item) => item.toppingsCode === freeToppings.toppingsCode
+        );
+
+        if (index !== -1) {
+          const updatedArr = newState[
+            pizzaIndex
+          ]?.toppings?.freeToppings?.filter(
+            (item) => item.toppingsCode !== freeToppings.toppingsCode
+          );
+
+          newState[pizzaIndex] = {
+            ...newState[pizzaIndex],
+            toppings: {
+              ...newState[pizzaIndex].toppings,
+              freeToppings: [...updatedArr],
+            },
+          };
+        }
       }
-      setPizzaState(arr);
-    }
+      return newState;
+    });
   };
+
+  // const handleFreeToppings = (e, count, freeToppings) => {
+  //   const { checked } = e.target;
+  //   if (checked) {
+  //     let arr = [...pizzaState];
+  //     const tempFreeToppings = [
+  //       ...(arr[count - 1].toppings?.freeToppings || []),
+  //       { ...freeToppings, toppingsPlacement: "whole" },
+  //     ];
+
+  //     arr[count - 1].toppings = {
+  //       ...arr[count - 1].toppings,
+  //       freeToppings: tempFreeToppings,
+  //     };
+  //     setPizzaState(arr);
+  //   } else {
+  //     let arr = [...pizzaState];
+  //     const index = arr[count - 1].toppings?.freeToppings?.findIndex(
+  //       (item) => item.toppingsCode == freeToppings.toppingsCode
+  //     );
+  //     if (index !== -1) {
+  //       let updatedArr = arr[count - 1]?.toppings?.freeToppings?.filter(
+  //         (item) => item.toppingsCode !== freeToppings.toppingsCode
+  //       );
+  //       arr[count - 1] = {
+  //         ...arr[count - 1],
+  //         toppings: {
+  //           ...arr[count - 1].toppings,
+  //           freeToppings: updatedArr,
+  //         },
+  //       };
+  //     }
+  //     setPizzaState(arr);
+  //   }
+  // };
   useEffect(() => {
     if (
       payloadEdit !== undefined &&
