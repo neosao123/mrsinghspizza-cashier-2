@@ -17,3 +17,11 @@
   border-radius: 50%;
   object-fit: cover;
 }
+
+.text-large-pizza-price {
+  color: #3d007e; 
+}
+
+.text-xlarge-pizza-price {
+  color: #00657e; 
+}

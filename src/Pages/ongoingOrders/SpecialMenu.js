@@ -823,8 +823,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       pizzaSize === "Large"
         ? Number(getSpecialData?.largePizzaPrice)
         : pizzaSize === "Extra Large"
-        ? Number(getSpecialData?.extraLargePizzaPrice)
-        : 0,
+          ? Number(getSpecialData?.extraLargePizzaPrice)
+          : 0,
       "pizzaprice"
     );
 
@@ -832,8 +832,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       pizzaSize === "Large"
         ? Number(getSpecialData?.largePizzaPrice)
         : pizzaSize === "Extra Large"
-        ? Number(getSpecialData?.extraLargePizzaPrice)
-        : 0;
+          ? Number(getSpecialData?.extraLargePizzaPrice)
+          : 0;
 
     // Iterate through pizzaState
     pizzaState?.forEach((item) => {
@@ -1189,14 +1189,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                     dipsArr[comm]?.qty
                                       ? dipsArr[comm]?.qty
                                       : getSpecialData?.noofDips !==
-                                          undefined ||
+                                        undefined ||
                                         getSpecialData?.noofDips !== "0"
-                                      ? Number(getSpecialData?.noofDips)
-                                      : 1
+                                        ? Number(getSpecialData?.noofDips)
+                                        : 1
                                   }
                                   className='form-control mx-2'
                                   style={{ width: "75px" }}
-                                  // onChange={(e) => handleDipsCount(e, data)}
+                                // onChange={(e) => handleDipsCount(e, data)}
                                 />
                               </div>
                             </li>
@@ -1212,8 +1212,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   <>
                     {(getSpecialData?.pops.length > 0 ||
                       getSpecialData.bottle.length > 0) && (
-                      <h6 className='text-left mt-1 mb-2'>Drinks</h6>
-                    )}
+                        <h6 className='text-left mt-1 mb-2'>Drinks</h6>
+                      )}
 
                     <div id='drinks' className='mb-3'>
                       <ul className='list-group'>
@@ -1296,7 +1296,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                     onClick={handleAddToCart}
                   >
                     {payloadEdit !== undefined &&
-                    payloadEdit?.productType === "Special_Pizza"
+                      payloadEdit?.productType === "Special_Pizza"
                       ? "Edit"
                       : " Add to Cart"}
                   </button>
@@ -1311,11 +1311,11 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
               {specialData?.map((speicalPizza) => {
                 return (
                   <li className='list-group-item' key={speicalPizza.code}>
-                    <div className='d-flex justify-content-between align-items-end py-2 px-1'>
-                      <div className='d-flex align-items-center'>
+                    <div className='d-flex align-items-start justify-content-between px-1'>
+                      <div className='d-flex align-align-items-start'>
                         <div className='d-flex flex-column'>
                           <h6 className='mb-1'>
-                            {speicalPizza.name}{" "}
+                            {speicalPizza.name}
                             {speicalPizza?.subtitle !== null && (
                               <span
                                 style={{
@@ -1324,25 +1324,20 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                               >
                                 ({speicalPizza?.subtitle})
                               </span>
-                            )}{" "}
+                            )}
                           </h6>
                           <span>{speicalPizza.noofToppings} Toppings</span>
                           <span>{speicalPizza.noofPizzas} Pizzas</span>
                         </div>
                       </div>
                       <div className='d-flex flex-column align-items-end'>
-                        <h6 className='mb-3'>
+                        <h6>
                           <p className='m-0 mb-1 p-0 text-end'>
-                            Large (${Number(speicalPizza.largePizzaPrice)})
+                            Large <span className="text-large-pizza-price">${Number(speicalPizza.largePizzaPrice)}</span>
                           </p>
                           <p className='m-0 p-0'>
-                            Extra Large ($
-                            {Number(speicalPizza.extraLargePizzaPrice)})
+                            Extra Large <span className="text-xlarge-pizza-price">${Number(speicalPizza.extraLargePizzaPrice)}</span>
                           </p>
-                          {/* ${" "}
-                          {Number(speicalPizza.largePizzaPrice) > 0
-                            ? Number(speicalPizza.largePizzaPrice)
-                            : Number(speicalPizza?.extraLargePizzaPrice)} */}
                         </h6>
                         <button
                           type='button'
