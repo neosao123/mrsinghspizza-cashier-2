@@ -190,7 +190,7 @@ const Print = ({ orderDetail, printRef }) => {
                               Sides :{" "}
                             </strong>
                             {item?.value?.map((side, index) => {
-                              console.log(side);
+                              //console.log(side);
                               return (
                                 <div className='col-12 pe-0'>
                                   <div className='row pe-0'>
