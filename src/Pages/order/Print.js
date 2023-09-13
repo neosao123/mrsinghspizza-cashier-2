@@ -6,7 +6,7 @@ import Logo from "../../assets/logo.png";
 
 const Print = ({ orderDetail, printRef }) => {
   return (
-    <div className='d-none'>
+    <div className=''>
       <div className='col-12 m-1' style={{ width: "273px" }} ref={printRef}>
         <div className='row'>
           <div className='d-flex justify-content-center'>
@@ -190,6 +190,7 @@ const Print = ({ orderDetail, printRef }) => {
                               Sides :{" "}
                             </strong>
                             {item?.value?.map((side, index) => {
+                              console.log(side);
                               return (
                                 <div className='col-12 pe-0'>
                                   <div className='row pe-0'>
@@ -197,8 +198,8 @@ const Print = ({ orderDetail, printRef }) => {
                                       className='col-9 text-capitalize'
                                       key={index}
                                     >
-                                      {side?.sidesName !== undefined
-                                        ? side?.sidesName
+                                      {side?.sideName !== undefined
+                                        ? side?.sideName
                                         : null}
                                       {side?.sidesSize !== undefined
                                         ? ` (${side?.sidesSize}) `
