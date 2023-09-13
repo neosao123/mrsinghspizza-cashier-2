@@ -471,10 +471,16 @@ function Order() {
                                 );
                               }
                               if (item.key === "sides") {
+                                console.log(
+                                  item?.value,
+                                  item?.value[0]?.sidesName !== undefined ||
+                                    item?.value[0]?.sideName !== undefined,
+                                  "item?.value"
+                                );
                                 return (
                                   <>
-                                    {item?.value[0]?.sidesName !==
-                                      undefined && (
+                                    {item?.value[0]?.sidesName !== undefined ||
+                                    item?.value[0]?.sideName !== undefined ? (
                                       <>
                                         <strong
                                           className='m-0'
@@ -525,7 +531,7 @@ function Order() {
                                           })}
                                         </div>
                                       </>
-                                    )}
+                                    ) : null}
                                   </>
                                 );
                               }

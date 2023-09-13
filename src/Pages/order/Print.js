@@ -6,7 +6,7 @@ import Logo from "../../assets/logo.png";
 
 const Print = ({ orderDetail, printRef }) => {
   return (
-    <div className='d-none'>
+    <div className=''>
       <div className='col-12 m-1' style={{ width: "273px" }} ref={printRef}>
         <div className='row'>
           <div className='d-flex justify-content-center'>
@@ -178,7 +178,8 @@ const Print = ({ orderDetail, printRef }) => {
                 if (item.key === "sides") {
                   return (
                     <>
-                      {item?.value[0]?.sidesName !== undefined && (
+                      {item?.value[0]?.sidesName !== undefined ||
+                      item?.value[0]?.sideName !== undefined ? (
                         <div className='row pe-0'>
                           <div className='col-2'></div>
                           <div className='col-10'>
@@ -203,21 +204,23 @@ const Print = ({ orderDetail, printRef }) => {
                                         ? ` (${side?.sidesSize}) `
                                         : `(${side?.lineEntries[0]?.size})`}
                                     </div>
-                                    <div className='col-3 text-end pe-0'>
-                                      $
-                                      {side?.sidesPrice !== undefined
-                                        ? side?.sidesPrice
-                                        : side?.lineEntries !== undefined
-                                        ? side?.lineEntries[0]?.price
-                                        : null}
-                                    </div>
+                                    {product_type !== "special_pizza" && (
+                                      <div className='col-3 text-end pe-0'>
+                                        $
+                                        {side?.sidesPrice !== undefined
+                                          ? side?.sidesPrice
+                                          : side?.lineEntries !== undefined
+                                          ? side?.lineEntries[0]?.price
+                                          : null}
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               );
                             })}
                           </div>
                         </div>
-                      )}
+                      ) : null}
                     </>
                   );
                 }
@@ -325,6 +328,11 @@ const Print = ({ orderDetail, printRef }) => {
             {orderDetail?.deliveryType === "delivery" && (
               <p className='m-0 p-0'>
                 Delivery Charges:$ {orderDetail?.deliveryCharges}
+              </p>
+            )}
+            {orderDetail?.discountmount !== "0.00" && (
+              <p className='m-0 p-0'>
+                Discount : $ {Number(orderDetail?.discountmount)}
               </p>
             )}
             <p className='m-0 p-0 fw-bold'>

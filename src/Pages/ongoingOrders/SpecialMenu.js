@@ -22,14 +22,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   const displaySpecialForm = useSelector(
     (state) => state.cart.displaySpecialForm
   );
-  const [pizzaSize, setPizzaSize] = useState("Large");
+  const [getSpecialData, setGetSpecialData] = useState();
+  const [pizzaSize, setPizzaSize] = useState();
   // For Data
   const [selectedLineEntries, setSelectedLineEntries] = useState();
   const [specialData, setSpecialData] = useState();
   const [crustSelected, setCrustSelected] = useState();
   const [cheeseSelected, setCheeseSelected] = useState();
   const [specialBasesSelected, setSpecialBasesSelected] = useState();
-  const [getSpecialData, setGetSpecialData] = useState();
   const [toppingsData, setToppingsData] = useState();
   const [dipsData, setDipsData] = useState();
   const [dipsArr, setDipsArr] = useState([]);
@@ -681,7 +681,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         amount: price,
         comments: comments,
         pizzaSize: pizzaSize === "Large" ? "Large" : "Extra Large",
-        pizzaPrice: pizzaSize === "Large" ? getSpecialData?.largePizzaPrice : getSpecialData?.extraLargePizzaPrice
+        pizzaPrice:
+          pizzaSize === "Large"
+            ? getSpecialData?.largePizzaPrice
+            : getSpecialData?.extraLargePizzaPrice,
       };
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
@@ -741,7 +744,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         amount: price,
         comments: comments,
         pizzaSize: pizzaSize === "Large" ? "Large" : "Extra Large",
-        pizzaPrice: pizzaSize === "Large" ? getSpecialData?.largePizzaPrice : getSpecialData?.extraLargePizzaPrice
+        pizzaPrice:
+          pizzaSize === "Large"
+            ? getSpecialData?.largePizzaPrice
+            : getSpecialData?.extraLargePizzaPrice,
       };
 
       dispatch(addToCart([...cartdata, payload]));
@@ -759,7 +765,12 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   };
   // Customize Details
   const handleGetSpecial = (code) => {
-    getSpecialDetails({ code: code }, getSpecialDetailsApi, setGetSpecialData);
+    getSpecialDetails(
+      { code: code },
+      getSpecialDetailsApi,
+      setGetSpecialData,
+      setPizzaSize
+    );
     toppings();
     dips();
 
@@ -807,6 +818,15 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     let totalTwoTpsPrice = Number(0);
 
     // Calculate base pizza price
+    console.log(
+      pizzaSize,
+      pizzaSize === "Large"
+        ? Number(getSpecialData?.largePizzaPrice)
+        : pizzaSize === "Extra Large"
+        ? Number(getSpecialData?.extraLargePizzaPrice)
+        : 0,
+      "pizzaprice"
+    );
 
     totalPrice +=
       pizzaSize === "Large"
@@ -814,9 +834,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         : pizzaSize === "Extra Large"
         ? Number(getSpecialData?.extraLargePizzaPrice)
         : 0;
-    // Number(getSpecialData?.largePizzaPrice) > 0
-    //   ? Number(getSpecialData?.largePizzaPrice)
-    //   : Number(getSpecialData?.extraLargePizzaPrice);
 
     // Iterate through pizzaState
     pizzaState?.forEach((item) => {
@@ -841,7 +858,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           } else if (noOfFreeToppings === 1) {
             let tpsObj = {
               ...items,
-              amount: (Number(items?.price).toFixed(2)) / 2,
+              amount: Number(items?.price).toFixed(2) / 2,
             };
             calcTwoTpsArr.push(tpsObj);
             setOfferedFreeToppings((prev) => prev - 1);
@@ -849,7 +866,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             noOfAdditionalTps++;
             setAdditionalToppingsCount((prev) => prev + 1);
           } else {
-            calcTwoTpsArr.push({ ...items, amount: Number(items?.price).toFixed(2) });
+            calcTwoTpsArr.push({
+              ...items,
+              amount: Number(items?.price).toFixed(2),
+            });
             noOfAdditionalTps += Number(2);
             setAdditionalToppingsCount((prev) => prev + 2);
           }
@@ -866,7 +886,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             noOfFreeToppings--;
             setOfferedFreeToppings((prev) => prev - 1);
           } else {
-            calcOneTpsArr.push({ ...items, amount: Number(items?.price).toFixed(2) });
+            calcOneTpsArr.push({
+              ...items,
+              amount: Number(items?.price).toFixed(2),
+            });
             noOfAdditionalTps++;
             setAdditionalToppingsCount((prev) => prev + 1);
           }
@@ -1309,10 +1332,17 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                       </div>
                       <div className='d-flex flex-column align-items-end'>
                         <h6 className='mb-3'>
-                          ${" "}
+                          <p className='m-0 mb-1 p-0 text-end'>
+                            Large (${Number(speicalPizza.largePizzaPrice)})
+                          </p>
+                          <p className='m-0 p-0'>
+                            Extra Large ($
+                            {Number(speicalPizza.extraLargePizzaPrice)})
+                          </p>
+                          {/* ${" "}
                           {Number(speicalPizza.largePizzaPrice) > 0
                             ? Number(speicalPizza.largePizzaPrice)
-                            : Number(speicalPizza?.extraLargePizzaPrice)}
+                            : Number(speicalPizza?.extraLargePizzaPrice)} */}
                         </h6>
                         <button
                           type='button'
