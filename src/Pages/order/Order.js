@@ -425,6 +425,7 @@ function Order() {
                             {order?.productType === "custom_pizza"
                               ? ""
                               : order.productName}
+                            {console.log(order)}
                             {objectToArray?.map((item, index) => {
                               if (item.key === "dips") {
                                 return (
