@@ -22,7 +22,7 @@ const Cart = ({ setPayloadEdit, onProductClick }) => {
       <div>
         {cartdata?.map((data, index) => {
           return (
-            <div key={data.cartCode + index}>
+            <div key={"cart-div-"+index}>
               <div className='d-flex justify-content-between'>
                 <h6>{data.productName}</h6>
                 <span className='mx-0'>${data.amount}</span>

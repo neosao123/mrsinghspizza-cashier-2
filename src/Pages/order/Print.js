@@ -6,7 +6,7 @@ import Logo from "../../assets/logo.png";
 
 const Print = ({ orderDetail, printRef }) => {
   return (
-    <div className="d-non">
+    <div className="d-none">
       <div className="col-12 m-1" style={{ width: "273px" }} ref={printRef}>
         <div className="row">
           <div className="d-flex justify-content-center">
@@ -179,7 +179,7 @@ const Print = ({ orderDetail, printRef }) => {
                   return (
                     <>
                       {item.value.length > 0 &&
-                      item.value[0]?.sideName !== undefined ? (
+                        item.value[0]?.sideName !== undefined ? (
                         <div className="row pe-0">
                           <div className="col-2"></div>
                           <div className="col-10">
@@ -197,9 +197,25 @@ const Print = ({ orderDetail, printRef }) => {
                                       className="col-9 text-capitalize"
                                       key={index}
                                     >
-                                      {side?.sideName !== undefined
-                                        ? side?.sideName
-                                        : null}
+                                      <span className="me-1">
+                                        {side?.sideName !== undefined
+                                          ? side?.sideName
+                                          : null}
+                                      </span>
+                                      <span>
+                                        {side?.sidesSize !== undefined
+                                          ? ` (${side?.sidesSize}) `
+                                          : `(${side?.lineEntries[0]?.size})`}
+                                      </span>
+                                    </div>
+                                    <div className="col-3 text-end pe-0">
+                                      {product_type !== "special_pizza" && (
+                                        side?.sidesPrice !== undefined
+                                          ? `$ ` + side?.sidesPrice
+                                          : side?.lineEntries !== undefined
+                                            ? `$ ` + side?.lineEntries[0]?.price
+                                            : null
+                                      )}
                                     </div>
                                   </div>
                                 </div>
@@ -245,7 +261,7 @@ const Print = ({ orderDetail, printRef }) => {
                           <div className="col-2"> </div>
                           <div className="col-10">
                             {product_type === "custom_pizza" ||
-                            product_type === "special_pizza" ? (
+                              product_type === "special_pizza" ? (
                               <>
                                 <strong
                                   className="m-0"
@@ -270,10 +286,10 @@ const Print = ({ orderDetail, printRef }) => {
                                             </div>
                                             {product_type !==
                                               "special_pizza" && (
-                                              <div className="col-3 text-end pe-0">
-                                                ${drink.drinksPrice}
-                                              </div>
-                                            )}
+                                                <div className="col-3 text-end pe-0">
+                                                  ${drink.drinksPrice}
+                                                </div>
+                                              )}
                                           </div>
                                         </div>
                                       </>
@@ -306,17 +322,17 @@ const Print = ({ orderDetail, printRef }) => {
           <div className="col-8 text-end pe-1">
             <p className="m-0 p-0">Sub Total : $ {orderDetail?.subTotal}</p>
             <p className="m-0 p-0">Tax : $ {orderDetail?.taxAmount}</p>
+            {orderDetail?.deliveryType === "delivery" && (
+              <p className="m-0 p-0">
+                Delivery Charges:$ {orderDetail?.deliveryCharges}
+              </p>
+            )}
             {Number(orderDetail?.extraDeliveryCharges) > 0 ? (
               <p className="m-0 p-0">
                 Extra Delivery Charges : ${" "}
                 {Number(orderDetail?.extraDeliveryCharges)}
               </p>
             ) : null}
-            {orderDetail?.deliveryType === "delivery" && (
-              <p className="m-0 p-0">
-                Delivery Charges:$ {orderDetail?.deliveryCharges}
-              </p>
-            )}
             {orderDetail?.discountmount !== "0.00" && (
               <p className="m-0 p-0">
                 Discount : $ {Number(orderDetail?.discountmount)}

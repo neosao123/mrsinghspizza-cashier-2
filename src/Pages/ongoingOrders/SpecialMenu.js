@@ -823,8 +823,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       pizzaSize === "Large"
         ? Number(getSpecialData?.largePizzaPrice)
         : pizzaSize === "Extra Large"
-        ? Number(getSpecialData?.extraLargePizzaPrice)
-        : 0,
+          ? Number(getSpecialData?.extraLargePizzaPrice)
+          : 0,
       "pizzaprice"
     );
 
@@ -832,8 +832,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       pizzaSize === "Large"
         ? Number(getSpecialData?.largePizzaPrice)
         : pizzaSize === "Extra Large"
-        ? Number(getSpecialData?.extraLargePizzaPrice)
-        : 0;
+          ? Number(getSpecialData?.extraLargePizzaPrice)
+          : 0;
 
     // Iterate through pizzaState
     pizzaState?.forEach((item) => {
@@ -845,67 +845,143 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         ? Number(item?.specialBases?.price)
         : 0;
 
-      if (item?.toppings?.countAsTwoToppings?.length > 0) {
-        item?.toppings?.countAsTwoToppings?.map((items) => {
-          if (noOfFreeToppings > 1) {
-            let tpsObj = {
-              ...items,
-              amount: 0,
-            };
-            calcTwoTpsArr.push(tpsObj);
-            setOfferedFreeToppings((prev) => prev - 2);
-            noOfFreeToppings -= Number(2);
-          } else if (noOfFreeToppings === 1) {
-            // let tpsObj = {
-            //   ...items,
-            //   amount: Number(items?.price).toFixed(2) / 2,
-            // };
-            calcTwoTpsArr.push({
-              ...items,
-              amount: Number(items?.price).toFixed(2),
-            });
-            setOfferedFreeToppings((prev) => prev - 1);
-            noOfFreeToppings -= Number(1);
-            noOfAdditionalTps++;
-            setAdditionalToppingsCount((prev) => prev + 1);
-          } else {
-            calcTwoTpsArr.push({
-              ...items,
-              amount: Number(items?.price).toFixed(2),
-            });
-            noOfAdditionalTps += Number(2);
-            setAdditionalToppingsCount((prev) => prev + 2);
-          }
-        });
+      let pizzaCartons = [];
+
+      for (let i = 0; i < getSpecialData?.noofPizzas; i++) {
+        pizzaCartons.push(i);
       }
-      if (item?.toppings?.countAsOneToppings?.length > 0) {
-        item?.toppings?.countAsOneToppings?.map((items) => {
-          if (noOfFreeToppings > 0) {
-            let tpsObj = {
-              ...items,
-              amount: 0,
-            };
-            calcOneTpsArr.push(tpsObj);
-            noOfFreeToppings--;
-            setOfferedFreeToppings((prev) => prev - 1);
-          } else {
-            calcOneTpsArr.push({
-              ...items,
-              amount: Number(items?.price).toFixed(2),
-            });
-            noOfAdditionalTps++;
-            setAdditionalToppingsCount((prev) => prev + 1);
-          }
-        });
-      }
+
+      console.log(pizzaCartons);
+
+      pizzaCartons.map((pizzaCarton) => {
+        if (item?.toppings?.countAsOneToppings?.length > 0) {
+          item?.toppings?.countAsOneToppings?.map((items) => {
+            if (items.pizzaIndex === pizzaCarton) {
+              if (noOfFreeToppings > 0) {
+                let tpsObj = {
+                  ...items,
+                  amount: 0,
+                };
+                calcOneTpsArr.push(tpsObj);
+                noOfFreeToppings--;
+                setOfferedFreeToppings((prev) => prev - 1);
+              } else {
+                calcOneTpsArr.push({
+                  ...items,
+                  amount: Number(items?.price).toFixed(2),
+                });
+                noOfAdditionalTps++;
+                setAdditionalToppingsCount((prev) => prev + 1);
+              }
+            }
+          });
+        }
+
+        if (item?.toppings?.countAsTwoToppings?.length > 0) {
+          item?.toppings?.countAsTwoToppings?.map((items) => {
+            if (items.pizzaIndex === pizzaCarton) {
+              if (noOfFreeToppings > 1) {
+                let tpsObj = {
+                  ...items,
+                  amount: 0,
+                };
+                calcTwoTpsArr.push(tpsObj);
+                setOfferedFreeToppings((prev) => prev - 2);
+                noOfFreeToppings -= Number(2);
+              } else if (noOfFreeToppings === 1) {
+                // let tpsObj = {
+                //   ...items,
+                //   amount: Number(items?.price).toFixed(2) / 2,
+                // };
+                calcTwoTpsArr.push({
+                  ...items,
+                  amount: Number(items?.price).toFixed(2),
+                });
+                setOfferedFreeToppings((prev) => prev - 1);
+                noOfFreeToppings -= Number(1);
+                noOfAdditionalTps++;
+                setAdditionalToppingsCount((prev) => prev + 1);
+              } else {
+                calcTwoTpsArr.push({
+                  ...items,
+                  amount: Number(items?.price).toFixed(2),
+                });
+                noOfAdditionalTps += Number(2);
+                setAdditionalToppingsCount((prev) => prev + 2);
+              }
+            }
+          });
+        }
+
+
+      });
+
+      // if (item?.toppings?.countAsTwoToppings?.length > 0) {
+      //   item?.toppings?.countAsTwoToppings?.map((items) => {
+      //     if (noOfFreeToppings > 1) {
+      //       let tpsObj = {
+      //         ...items,
+      //         amount: 0,
+      //       };
+      //       calcTwoTpsArr.push(tpsObj);
+      //       setOfferedFreeToppings((prev) => prev - 2);
+      //       noOfFreeToppings -= Number(2);
+      //     } else if (noOfFreeToppings === 1) {
+      //       // let tpsObj = {
+      //       //   ...items,
+      //       //   amount: Number(items?.price).toFixed(2) / 2,
+      //       // };
+      //       calcTwoTpsArr.push({
+      //         ...items,
+      //         amount: Number(items?.price).toFixed(2),
+      //       });
+      //       setOfferedFreeToppings((prev) => prev - 1);
+      //       noOfFreeToppings -= Number(1);
+      //       noOfAdditionalTps++;
+      //       setAdditionalToppingsCount((prev) => prev + 1);
+      //     } else {
+      //       calcTwoTpsArr.push({
+      //         ...items,
+      //         amount: Number(items?.price).toFixed(2),
+      //       });
+      //       noOfAdditionalTps += Number(2);
+      //       setAdditionalToppingsCount((prev) => prev + 2);
+      //     }
+      //   });
+      // }
+      // if (item?.toppings?.countAsOneToppings?.length > 0) {
+      //   item?.toppings?.countAsOneToppings?.map((items) => {
+      //     if (noOfFreeToppings > 0) {
+      //       let tpsObj = {
+      //         ...items,
+      //         amount: 0,
+      //       };
+      //       calcOneTpsArr.push(tpsObj);
+      //       noOfFreeToppings--;
+      //       setOfferedFreeToppings((prev) => prev - 1);
+      //     } else {
+      //       calcOneTpsArr.push({
+      //         ...items,
+      //         amount: Number(items?.price).toFixed(2),
+      //       });
+      //       noOfAdditionalTps++;
+      //       setAdditionalToppingsCount((prev) => prev + 1);
+      //     }
+      //   });
+      // }
+
     });
+
     calcOneTpsArr?.map((tps) => {
+      console.log("one tps", tps);
       totalOneTpsPrice += Number(tps?.amount);
     });
 
     calcTwoTpsArr?.map((tps) => {
+      console.log("two tps", tps);
       totalTwoTpsPrice += Number(tps?.amount);
     });
+
     totalPrice += totalOneTpsPrice;
     totalPrice += totalTwoTpsPrice;
 
@@ -1044,7 +1120,20 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
               <div className="customizablePizza px-3">
                 <div className="d-flex justify-content-between">
-                  <h6>{getSpecialData?.name}</h6>
+                  <h6>
+                    {getSpecialData?.name}
+
+                    {getSpecialData?.subtitle !== null && (
+                      <span
+                        style={{
+                          color: "#b1130be4",
+                        }}
+                        className="ms-1"
+                      >
+                        ({getSpecialData?.subtitle})
+                      </span>
+                    )}
+                  </h6>
                   <h6 className="mx-2">$ {price}</h6>
                 </div>
                 <div className="mb-1">
@@ -1192,14 +1281,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                     dipsArr[comm]?.qty
                                       ? dipsArr[comm]?.qty
                                       : getSpecialData?.noofDips !==
-                                          undefined ||
+                                        undefined ||
                                         getSpecialData?.noofDips !== "0"
-                                      ? Number(getSpecialData?.noofDips)
-                                      : 1
+                                        ? Number(getSpecialData?.noofDips)
+                                        : 1
                                   }
                                   className="form-control mx-2"
                                   style={{ width: "75px" }}
-                                  // onChange={(e) => handleDipsCount(e, data)}
+                                // onChange={(e) => handleDipsCount(e, data)}
                                 />
                               </div>
                             </li>
@@ -1215,8 +1304,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   <>
                     {(getSpecialData?.pops.length > 0 ||
                       getSpecialData.bottle.length > 0) && (
-                      <h6 className="text-left mt-1 mb-2">Drinks</h6>
-                    )}
+                        <h6 className="text-left mt-1 mb-2">Drinks</h6>
+                      )}
 
                     <div id="drinks" className="mb-3">
                       <ul className="list-group">
@@ -1299,7 +1388,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                     onClick={handleAddToCart}
                   >
                     {payloadEdit !== undefined &&
-                    payloadEdit?.productType === "Special_Pizza"
+                      payloadEdit?.productType === "Special_Pizza"
                       ? "Edit"
                       : " Add to Cart"}
                   </button>
@@ -1324,6 +1413,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                 style={{
                                   color: "#b1130be4",
                                 }}
+                                className="ms-1"
                               >
                                 ({speicalPizza?.subtitle})
                               </span>
