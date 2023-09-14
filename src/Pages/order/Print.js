@@ -6,7 +6,7 @@ import Logo from "../../assets/logo.png";
 
 const Print = ({ orderDetail, printRef }) => {
   return (
-    <div className="d-none">
+    <div className="d-non">
       <div className="col-12 m-1" style={{ width: "273px" }} ref={printRef}>
         <div className="row">
           <div className="d-flex justify-content-center">
@@ -178,8 +178,8 @@ const Print = ({ orderDetail, printRef }) => {
                 if (item.key === "sides") {
                   return (
                     <>
-                      {item?.value[0]?.sidesName !== undefined ||
-                      item?.value[0]?.sideName !== undefined ? (
+                      {item.value.length > 0 &&
+                      item.value[0]?.sideName !== undefined ? (
                         <div className="row pe-0">
                           <div className="col-2"></div>
                           <div className="col-10">
@@ -189,8 +189,7 @@ const Print = ({ orderDetail, printRef }) => {
                             >
                               Sides :{" "}
                             </strong>
-                            {item?.value?.map((side, index) => {
-                              // console.log(side);
+                            {item.value.map((side, index) => {
                               return (
                                 <div className="col-12 pe-0">
                                   <div className="row pe-0">
@@ -201,20 +200,7 @@ const Print = ({ orderDetail, printRef }) => {
                                       {side?.sideName !== undefined
                                         ? side?.sideName
                                         : null}
-                                      {side?.sidesSize !== undefined
-                                        ? ` (${side?.sidesSize}) `
-                                        : `(${side?.lineEntries[0]?.size})`}
                                     </div>
-                                    {product_type !== "special_pizza" && (
-                                      <div className="col-3 text-end pe-0">
-                                        $
-                                        {side?.sidesPrice !== undefined
-                                          ? side?.sidesPrice
-                                          : side?.lineEntries !== undefined
-                                          ? side?.lineEntries[0]?.price
-                                          : null}
-                                      </div>
-                                    )}
                                   </div>
                                 </div>
                               );
