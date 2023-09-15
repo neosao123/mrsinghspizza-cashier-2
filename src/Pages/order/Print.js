@@ -179,7 +179,7 @@ const Print = ({ orderDetail, printRef }) => {
                   return (
                     <>
                       {item.value.length > 0 &&
-                        item.value[0]?.sideName !== undefined ? (
+                        (item.value[0]?.sideName !== undefined || item.value[0]?.sidesName !== undefined) ? (
                         <div className="row pe-0">
                           <div className="col-2"></div>
                           <div className="col-10">
@@ -198,9 +198,17 @@ const Print = ({ orderDetail, printRef }) => {
                                       key={index}
                                     >
                                       <span className="me-1">
-                                        {side?.sideName !== undefined
-                                          ? side?.sideName
-                                          : null}
+                                        {
+                                          product_type === "custom_pizza" ? (
+                                            side?.sidesName !== undefined
+                                              ? side?.sidesName
+                                              : null
+                                          ) : (
+                                            side?.sideName !== undefined
+                                              ? side?.sideName
+                                              : null
+                                          )
+                                        }
                                       </span>
                                       <span>
                                         {side?.sidesSize !== undefined

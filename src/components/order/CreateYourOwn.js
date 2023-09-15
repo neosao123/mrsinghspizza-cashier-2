@@ -9,7 +9,7 @@ import {
   SelectDropDownCrust,
   SelectDropDownSpecialBases,
 } from "./createYourOwn/selectDropDown";
-import {} from "./createYourOwn/selectDropDown";
+import { } from "./createYourOwn/selectDropDown";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, setCart } from "../../reducer/cartReducer";
 
@@ -183,7 +183,7 @@ function CreateYourOwn({
           discountAmount: discount,
           taxPer: taxPer,
         };
-        console.log(payload, "crustSelectedcrustSelected");
+        //console.log(payload, "crustSelectedcrustSelected");
 
         dispatch(addToCart([...cartdata, payload]));
         toast.success(`Custom Pizza Added Successfully...`);
@@ -663,7 +663,7 @@ function CreateYourOwn({
         <>
           <h6 className='text-center'>
             {payloadEdit !== undefined &&
-            payloadEdit.productType === "custom_pizza"
+              payloadEdit.productType === "custom_pizza"
               ? "Edit Pizza"
               : "Pizza Selection"}
           </h6>
@@ -723,7 +723,7 @@ function CreateYourOwn({
                 value=''
                 checked={
                   freeToppingsArr?.length ===
-                  allIngredients?.toppings?.freeToppings?.length
+                    allIngredients?.toppings?.freeToppings?.length
                     ? true
                     : false
                 }
@@ -1177,7 +1177,7 @@ function CreateYourOwn({
               onClick={handleAddToCart}
             >
               {payloadEdit !== undefined &&
-              payloadEdit.productType === "custom_pizza"
+                payloadEdit.productType === "custom_pizza"
                 ? "Edit order"
                 : "Add to Cart"}
             </button>
