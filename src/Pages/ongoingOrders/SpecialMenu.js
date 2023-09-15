@@ -334,6 +334,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   //     setPizzaState([...arr]);
   //   }
   // };
+  
   const handleFreeToppingsPlacementChange = (event, count, toppingsCode) => {
     const selectedValue = event.target.value;
     let arr = [...pizzaState];
