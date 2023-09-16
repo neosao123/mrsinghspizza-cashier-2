@@ -44,15 +44,14 @@ function CreateYourOwn({
   const [cheeseSelected, setCheeseSelected] = useState();
   const [specialBasesSelected, setSpecialBasesSelected] = useState();
   const dispatch = useDispatch();
+
   // Calculate Price
   const calculatePrice = () => {
     let calculatePrice = 0;
 
-    let crust_price = crustSelected?.crustPrice ? crustSelected?.crustPrice : 0;
+    let crust_price = crustSelected?.price ? crustSelected?.price : 0;
     let cheese_price = cheeseSelected?.price ? cheeseSelected?.price : 0;
-    let specialbase_price = specialBasesSelected?.price
-      ? specialBasesSelected?.price
-      : 0;
+    let specialbase_price = specialBasesSelected?.price ? specialBasesSelected?.price : 0;
     let totalSidesPrice = Number(0);
     let totalTwoToppings = Number(0);
     let totalOneToppings = Number(0);
@@ -97,7 +96,7 @@ function CreateYourOwn({
       const payloadForEdit = {
         id: payloadEdit?.id,
         productCode: "#NA",
-        productName: "Custom Pizza",
+        productName: "Create Your Own",
         productType: "custom_pizza",
         config: {
           pizza: [
@@ -127,18 +126,19 @@ function CreateYourOwn({
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
       );
-      console.log();
       let tempPayload = [...cartdata];
       tempPayload[updatedCart] = payloadForEdit;
       dispatch(addToCart([...tempPayload]));
       setPayloadEdit();
       setCrustSelected({
         crustCode: allIngredients?.crust[0]?.crustCode,
-        crustPrice: allIngredients?.crust[0]?.crustPrice,
         crustName: allIngredients?.crust[0]?.crustName,
+        price: allIngredients?.crust[0]?.price,
       });
+      console.log("SELECTED CRUST IS ************************", crustSelected);
       setCheeseSelected(allIngredients?.cheese[0]);
-      setSpecialBasesSelected();
+      console.log("SELECTED CHEESE IS ************************", cheeseSelected);
+      setSpecialBasesSelected({});
       setDips([]);
       setDrinks([]);
       setSideArr([]);
@@ -156,7 +156,7 @@ function CreateYourOwn({
         const payload = {
           id: uuidv4(),
           productCode: "#NA",
-          productName: "Custom Pizza",
+          productName: "Create Your Own",
           productType: "custom_pizza",
           config: {
             pizza: [
@@ -183,25 +183,25 @@ function CreateYourOwn({
           discountAmount: discount,
           taxPer: taxPer,
         };
-        //console.log(payload, "crustSelectedcrustSelected");
-
         dispatch(addToCart([...cartdata, payload]));
         toast.success(`Custom Pizza Added Successfully...`);
         setCrustSelected({
           crustCode: allIngredients?.crust[0]?.crustCode,
-          crustPrice: allIngredients?.crust[0]?.crustPrice,
           crustName: allIngredients?.crust[0]?.crustName,
+          price: allIngredients?.crust[0]?.price
         });
+        console.log("SELECTED CRUST IS ************************", crustSelected);
         setCheeseSelected(allIngredients?.cheese[0]);
-        setSpecialBasesSelected();
+        console.log("SELECTED CHEESE IS ************************", cheeseSelected);
+        setSpecialBasesSelected({});
         setDips([]);
         setDrinks([]);
-        setComments("");
         setSideArr([]);
         setCountTwoToppingsArr([]);
         setCountOneToppingsArr([]);
         setFreeToppingsArr([]);
         setPrice(0);
+        setComments("");
 
         uncheckAllCheckboxes();
       } else {
@@ -230,10 +230,11 @@ function CreateYourOwn({
       setSideArr(payloadEdit?.config?.sides);
       setDips(payloadEdit?.config?.dips);
       setDrinks(payloadEdit?.config?.drinks);
-      console.log(payloadEdit?.comments, "payloadEdit");
       setComments(payloadEdit?.comments);
+      //console.log(payloadEdit?.comments, "payloadEdit");
     }
   }, [payloadEdit]);
+
   // handle Two Toppings
   const handleTwoToppings = (e, toppingCode) => {
     const { checked } = e.target;
@@ -323,6 +324,7 @@ function CreateYourOwn({
       )
     );
   };
+
   // handle One Toppings Placement
   const handleCountOnePlacementChange = (e, countAsOneToppings) => {
     const selectedValue = e.target.value;
@@ -380,6 +382,7 @@ function CreateYourOwn({
       )
     );
   };
+
   // handle Free Toppings Placement
   const handleFreePlacementChange = (e, toppingCode) => {
     const placement = e.target.value;
@@ -410,11 +413,11 @@ function CreateYourOwn({
         .attr("data-price");
       const sidesObj = {
         sideCode: selectSides[0].sideCode,
-        sidesName: selectSides[0].sideName,
-        sidesType: selectSides[0].type,
+        sideName: selectSides[0].sideName,
+        sideType: selectSides[0].type,
         lineCode: lineCode,
-        sidesPrice: price ? price : "0",
-        sidesSize: size,
+        sidePrice: price ? price : "0",
+        sideSize: size,
       };
       setSideArr((prevSides) => [...prevSides, sidesObj]);
     } else {
@@ -428,6 +431,7 @@ function CreateYourOwn({
       )
     );
   };
+
   // handle Sides Placement
   const handleSidePlacementChange = (e, sideCode) => {
     const lineCode = $("#placement-" + sideCode)
@@ -451,6 +455,7 @@ function CreateYourOwn({
     setCount((prevCount) => prevCount + 1);
   };
 
+  // handle dips
   const handleDips = (e, code) => {
     const { checked } = e.target;
     if (checked) {
@@ -462,6 +467,8 @@ function CreateYourOwn({
           dipsCode: selectedDips[0].dipsCode,
           dipsName: selectedDips[0].dipsName,
           dipsPrice: selectedDips[0].price ? selectedDips[0].price : "0",
+          quantity: 1,
+          totalPrice: selectedDips[0].price ? selectedDips[0].price : "0"
         };
         setDips([...dips, dipsObj]);
       }
@@ -469,7 +476,6 @@ function CreateYourOwn({
       const newDips = dips.filter((newDips) => newDips.dipsCode !== code);
       setDips(newDips);
     }
-
     setAllCheckBoxes((prevCheckboxes) =>
       prevCheckboxes.map((checkbox) =>
         checkbox.id === code ? { ...checkbox, checked } : checkbox
@@ -488,6 +494,8 @@ function CreateYourOwn({
         drinksCode: selectedDrinks[0].softdrinkCode,
         drinksName: selectedDrinks[0].softDrinksName,
         drinksPrice: selectedDrinks[0].price ? selectedDrinks[0].price : "0",
+        quantity: 1,
+        totalPrice: selectedDrinks[0].price ? selectedDrinks[0].price : "0"
       };
       if (checked) {
         setDrinks([...drinks, drinksObj]);
@@ -505,6 +513,7 @@ function CreateYourOwn({
     );
   };
 
+  // rest checkboxes
   const uncheckAllCheckboxes = () => {
     setAllCheckBoxes((prevCheckboxes) =>
       prevCheckboxes.map((checkbox) => ({ ...checkbox, checked: false }))
@@ -561,10 +570,12 @@ function CreateYourOwn({
 
   // --------------using react only
 
+  //pizza size (large or extra-large)
   const handleSizeOfPizza = (e) => {
     setSizesOfPizzaSelected(e.target.value);
   };
 
+  //crust
   const handleCrustChange = (event) => {
     const selectedValue = event.target.value;
     const selectedObject = allIngredients?.crust?.find(
@@ -574,9 +585,11 @@ function CreateYourOwn({
     setCrustSelected({
       crustCode: selectedObject?.crustCode,
       crustName: selectedObject?.crustName,
-      crustPrice: selectedObject?.price,
+      price: selectedObject?.price,
     });
   };
+
+  // cheese 
   const handleCheeseChange = (event) => {
     const selectedValue = event.target.value;
     const selectedObject = allIngredients?.cheese?.find(
@@ -584,14 +597,19 @@ function CreateYourOwn({
     );
     setCheeseSelected(selectedObject);
   };
+
+  //special base
   const handleSpecialBasesChange = (event) => {
     const selectedValue = event.target.value;
-    const selectedObject = allIngredients?.specialbases?.find(
-      (option) => option.specialbaseCode === selectedValue
-    );
-
-    setSpecialBasesSelected(selectedObject);
+    if (selectedValue !== undefined) {
+      const selectedObject = allIngredients?.specialbases?.find(
+        (option) => option.specialbaseCode === selectedValue
+      );
+      setSpecialBasesSelected(selectedObject);
+      console.log("SELECTED SPECIAL-BASE IS ************************", selectedObject);
+    }
   };
+
   // all indian toppings
   const handleChangeAllIndianToppins = (e) => {
     if (e.target.checked) {
@@ -615,6 +633,7 @@ function CreateYourOwn({
       setFreeToppingsArr([]);
     }
   };
+
   const handleFreeToppingsPlacementChange = (event, toppingsCode) => {
     const selectedValue = event.target.value;
     let arr = [...freeToppingsArr];
@@ -637,11 +656,11 @@ function CreateYourOwn({
   useEffect(() => {
     setCrustSelected({
       crustCode: allIngredients?.crust[0]?.crustCode,
-      crustPrice: allIngredients?.crust[0]?.price,
       crustName: allIngredients?.crust[0]?.crustName,
+      price: allIngredients?.crust[0]?.price,
     });
     setCheeseSelected(allIngredients?.cheese[0]);
-    setSpecialBasesSelected();
+    setSpecialBasesSelected({});
   }, [allIngredients]);
 
   return (
@@ -715,28 +734,28 @@ function CreateYourOwn({
                 allIngredients={allIngredients}
               />
             </div>
-            <div className='col-lg-4 col-md-4 d-flex align-items-center mt-2'>
-              <input
-                className='my-2 form-check-input'
-                type='checkbox'
-                value=''
-                checked={
-                  freeToppingsArr?.length ===
-                    allIngredients?.toppings?.freeToppings?.length
-                    ? true
-                    : false
-                }
-                id='allIndianTps'
-                onChange={handleChangeAllIndianToppins}
-              />
-              <label className='m-2' htmlFor='allIndianTps'>
-                All Indian Style
-              </label>
+            <div className='col-lg-12 mt-3'>
+              <div class="form-check">
+                <input class="form-check-input"
+                  type='checkbox'
+                  value=''
+                  checked={
+                    freeToppingsArr?.length ===
+                      allIngredients?.toppings?.freeToppings?.length
+                      ? true
+                      : false
+                  }
+                  id='allIndianTps'
+                  onChange={handleChangeAllIndianToppins} />
+                <label class="form-check-label" for="allIndianTps">
+                  All Indian Style
+                </label>
+              </div>
             </div>
             {/* Tabs */}
-            <div className='mt-1 mb-3'>
+            <div className='mt-3'>
               {/* Tabs Headings */}
-              <ul className='nav nav-tabs mt-2' role='tablist'>
+              <ul className='nav nav-tabs' role='tablist'>
                 <li className='nav-item'>
                   <Link
                     className='nav-link active py-2 px-4'
@@ -792,7 +811,6 @@ function CreateYourOwn({
                   </Link>
                 </li>
               </ul>
-
               {/* Tab Content */}
               <div className='tab-content m-0 p-0 w-100'>
                 {/* Count 2 Toppings */}
@@ -813,17 +831,19 @@ function CreateYourOwn({
                             className='list-group-item d-flex justify-content-between align-items-center'
                             key={countAsTwoToppings.toppingsCode}
                           >
-                            <label className=''>
-                              <input
+                            <div class="form-check">
+                              <input class="form-check-input"
                                 type='checkbox'
-                                className='mx-3 d-inline-block'
+                                value=''
+                                id={countAsTwoToppings.toppingsCode}
                                 checked={comm !== -1 ? true : false}
                                 onChange={(e) =>
                                   handleTwoToppings(e, toppingCode)
-                                }
-                              />
-                              {countAsTwoToppings.toppingsName}
-                            </label>
+                                } />
+                              <label class="form-check-label" for={countAsTwoToppings.toppingsCode}>
+                                {countAsTwoToppings.toppingsName}
+                              </label>
+                            </div>
                             <div
                               className='d-flex justify-content-between align-items-center'
                               style={{ width: "12rem" }}
@@ -879,7 +899,7 @@ function CreateYourOwn({
                       const toppingCode = countAsOneToppings.toppingsCode;
                       const comm = countOneToppingsArr?.findIndex(
                         (item) =>
-                          item.toppingsCode == countAsOneToppings.toppingsCode
+                          item.toppingsCode === countAsOneToppings.toppingsCode
                       );
                       return (
                         <>
@@ -887,17 +907,19 @@ function CreateYourOwn({
                             className='list-group-item d-flex justify-content-between align-items-center'
                             key={toppingCode}
                           >
-                            <label className=''>
-                              <input
+                            <div class="form-check">
+                              <input class="form-check-input"
                                 type='checkbox'
-                                className='mx-3 d-inline-block toppingsChk'
+                                value=''
+                                id={countAsOneToppings.toppingsCode}
                                 checked={comm !== -1 ? true : false}
                                 onChange={(e) =>
                                   handleOneToppings(e, toppingCode)
-                                }
-                              />
-                              {countAsOneToppings.toppingsName}
-                            </label>
+                                } />
+                              <label class="form-check-label" for={countAsOneToppings.toppingsCode}>
+                                {countAsOneToppings.toppingsName}
+                              </label>
+                            </div>
                             <div
                               className='d-flex justify-content-between align-items-center'
                               style={{ width: "12rem" }}
@@ -963,17 +985,19 @@ function CreateYourOwn({
                             className='list-group-item d-flex justify-content-between align-items-center'
                             key={toppingCode}
                           >
-                            <label className='d-flex align-items-center'>
-                              <input
+                            <div class="form-check">
+                              <input class="form-check-input"
                                 type='checkbox'
-                                className='mx-3 d-inline-block toppingsChk'
+                                value=''
+                                id={freeToppings.toppingsCode}
                                 checked={comm !== -1 ? true : false}
                                 onChange={(e) =>
                                   handleFreeToppings(e, toppingCode)
-                                }
-                              />
-                              {freeToppings.toppingsName}
-                            </label>
+                                } />
+                              <label class="form-check-label" for={freeToppings.toppingsCode}>
+                                {freeToppings.toppingsName}
+                              </label>
+                            </div>
                             <div
                               className='d-flex justify-content-between align-items-center'
                               style={{ width: "12rem" }}
@@ -1155,7 +1179,6 @@ function CreateYourOwn({
                 </div>
               </div>
             </div>
-
             {/* Comments */}
             <h6 className='text-left mt-1'>Comments</h6>
             <div className=''>

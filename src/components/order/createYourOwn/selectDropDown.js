@@ -48,7 +48,6 @@ export const SelectDropDownCheese = ({
       required
     >
       <option value={""}>--- choose any one ---</option>
-
       {allIngredients?.cheese?.map((item, index) => {
         return (
           <option
@@ -78,10 +77,7 @@ export const SelectDropDownSpecialBases = ({
       value={specialBasesSelected?.specialbaseCode}
       required
     >
-      <option value={""} selected={specialBasesSelected ? false : true}>
-        --- choose any one ---
-      </option>
-
+      <option value={""}>--- choose any one ---</option>
       {allIngredients?.specialbases?.map((specialbasesData) => {
         return (
           <>

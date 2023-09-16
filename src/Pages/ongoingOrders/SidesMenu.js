@@ -33,6 +33,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
       ]);
     }
   };
+
   const handleSidesLineChange = (e, data) => {
     let index = sidesArr?.findIndex((item) => item.sideCode === data.sideCode);
     let selectedSideLine = sidesArr[index]?.combination?.filter(
@@ -60,9 +61,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     let cart = JSON.parse(localStorage.getItem("CartData"));
     let cartCode;
     let customerCode;
-    let lineCode = $("#combination-" + sideCode)
-      .find(":selected")
-      .attr("data-key");
+    let lineCode = $("#combination-" + sideCode).find(":selected").attr("data-key");
 
     if (cart !== null && cart !== undefined) {
       cartCode = cart.cartCode;
@@ -72,17 +71,28 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     const selectedSideForNewItem = sidesArr?.filter(
       (sides) => sides.sideCode === sideCode
     );
+
+    //console.log("lineCode", lineCode, " SELECTED SIDE ", selectedSideForNewItem);
+
     const selectedCombination = selectedSideForNewItem[0]?.combination?.filter(
       (data) => data.lineCode === lineCode
     );
+
     const selectedCombinationObj = Obj?.combination?.filter(
       (data) => data.lineCode === lineCode
     );
+
+    //console.log("Selected Side combination *********** ", selectedCombination);
+
+    //console.log("Selected Side combination obj *********** ", selectedCombinationObj);
+
     let price =
-      selectedCombination !== undefined
+      selectedCombination !== undefined && selectedCombination[0].price
         ? selectedCombination[0]?.price
         : selectedCombinationObj[0]?.price;
+
     let totalAmount = 0;
+
     totalAmount =
       Number(price) *
       (selectedSideForNewItem[0]?.qty !== undefined
@@ -93,6 +103,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
       const payload = {
         id: uuidv4(),
         customerCode: customerCode ? customerCode : "#NA",
+        cashierCode: localStorage.getItem("cashierCode"),
         productCode: Obj.sideCode,
         productName: Obj?.sideName,
         productType: "side",
@@ -117,7 +128,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
       setSidesData(temp);
       setSidesArr([]);
       dispatch(addToCart([...cartdata, payload]));
-      toast.success(`${Obj.sideName} ` + "Added Successfully");
+      toast.success(`${Obj.sideName} Added Successfully`);
       return;
     }
 
@@ -133,16 +144,17 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
       (sides) => sides.sideCode === sideCode
     );
 
-    if (payloadEdit !== undefined && payloadEdit.productType === "side") {
+    if (payloadEdit !== undefined && payloadEdit.productType === "side") { 
       const payloadForEdit = {
         id: payloadEdit?.id,
         customerCode: customerCode ? customerCode : "#NA",
+        cashierCode: localStorage.getItem("cashierCode"),
         productCode: selectedSide[0].sideCode,
         productName: selectedSide[0].sideName,
         productType: "side",
         config: {
           lineCode: selectedSide[0].combination[0].lineCode,
-          sidesSize: selectedSide[0].combination[0].size,
+          sidesSize: selectedSide[0].combination[0].sidesSize ? selectedSide[0].combination[0].sidesSize : selectedSide[0].combination[0].size,
         },
         quantity: selectedSide[0].qty,
         price: selectedSide[0].price,
@@ -167,12 +179,12 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
       });
       setSidesData(temp);
       setSidesArr([]);
-
       setQuantity(1);
-    } else {
+    } else { 
       const payload = {
         id: uuidv4(),
         customerCode: customerCode ? customerCode : "#NA",
+        cashierCode: localStorage.getItem("cashierCode"),
         productCode: selectedSideForNewItem[0]?.sideCode,
         productName: selectedSideForNewItem[0]?.sideName,
         productType: "side",
@@ -200,10 +212,11 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
       setSidesArr([]);
       dispatch(addToCart([...cartdata, payload]));
       toast.success(
-        `${selectedSideForNewItem[0]?.sideName} ` + "Added Successfully"
+        `${selectedSideForNewItem[0]?.sideName} Added Successfully`
       );
     }
   };
+
   useEffect(() => {
     if (payloadEdit !== undefined && payloadEdit.productType === "side") {
       setSidesArr([
@@ -248,18 +261,21 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
             (item) => item.sideCode === data.sideCode
           );
           let obj = sidesArr?.find((item) => item.sideCode === data.sideCode);
-
           return (
             <li className='list-group-item' key={data.sideCode}>
               <div className='d-flex justify-content-between align-items-end py-2 px-1'>
                 <div className='d-flex justify-content-center w-auto'>
-                  {/* <img
-                    className='rounded'
-                    src={data.image === "" ? `${specialImg1}` : data.image}
-                    width='50px'
-                    height='50px'
-                    alt=''
-                  ></img> */}
+                  {
+                    /* 
+                    <img
+                      className='rounded'
+                      src={data.image === "" ? `${specialImg1}` : data.image}
+                      width='50px'
+                      height='50px'
+                      alt=''
+                    /> 
+                    */
+                  }
                 </div>
                 <div className='d-flex justify-content-center flex-column py-1 w-100'>
                   <div className='d-flex justify-content-between align-items-center'>
@@ -317,10 +333,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                       onClick={(e) => handleAddToCart(e, data.sideCode, data)}
                     >
                       {payloadEdit !== undefined &&
-                      payloadEdit.productType === "side" &&
-                      obj !== undefined
-                        ? "Edit"
-                        : "Add To Cart"}
+                        payloadEdit.productType === "side" && obj !== undefined ? "Edit" : "Add To Cart"}
                     </button>
                   </div>
                 </div>

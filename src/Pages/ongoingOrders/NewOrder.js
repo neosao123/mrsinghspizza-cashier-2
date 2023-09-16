@@ -77,7 +77,7 @@ function NewOrder() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleProductClick = (productType) => {
-    const prType = productType.toLowerCase();
+    const prType = productType;
     switch (prType) {
       case "custom_pizza":
         createYourOwnRef.current.click();

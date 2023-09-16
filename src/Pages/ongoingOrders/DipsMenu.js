@@ -79,18 +79,18 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       (dips) => dips.dipsCode === dipsitem.dipsCode
     );
     if (selectedDips.length === 0) {
+      // config: {
+      //   dips: dipsArr,
+      // },
       const payload = {
         id: uuidv4(),
-        cartCode: cartCode ? cartCode : "#NA",
         customerCode: customerCode ? customerCode : "#NA",
         cashierCode: localStorage.getItem("cashierCode"),
         productCode: dipsitem?.dipsCode,
         productName: dipsitem?.dipsName,
         productType: "dips",
+        config: {},
         quantity: 1,
-        config: {
-          dips: dipsArr,
-        },
         price: dipsitem?.price,
         amount: dipsitem?.price,
         discountAmount: discount,
@@ -125,6 +125,9 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       (selectedDips[0]?.qty !== undefined ? Number(selectedDips[0]?.qty) : 1);
 
     if (payloadEdit !== undefined && payloadEdit.productType === "dips") {
+      // config: {
+      //   dips: dipsArr,
+      // },
       const payloadForEdit = {
         id: payloadEdit?.id,
         cartCode: cartCode ? cartCode : "#NA",
@@ -133,9 +136,7 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productCode: selectedDips[0].dipsCode,
         productName: selectedDips[0].dipsName,
         productType: "dips",
-        config: {
-          dips: dipsArr,
-        },
+        config: {},
         quantity: selectedDips[0].qty ? selectedDips[0].qty : 1,
         price: selectedDips[0].price,
         amount: totalAmount.toFixed(2),
@@ -163,6 +164,9 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
 
       setPayloadEdit();
     } else {
+      // config: {
+      //   dips: dipsArr,
+      // },
       const payload = {
         id: uuidv4(),
         cartCode: cartCode ? cartCode : "#NA",
@@ -170,10 +174,8 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         cashierCode: localStorage.getItem("cashierCode"),
         productCode: selectedDips[0].dipsCode,
         productName: selectedDips[0].dipsName,
-        config: {
-          dips: dipsArr,
-        },
         productType: "dips",
+        config: {},
         quantity: selectedDips[0].qty ? selectedDips[0].qty : 1,
         price: selectedDips[0].price,
         amount: totalAmount.toFixed(2),
@@ -234,8 +236,8 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
                       onClick={(e) => handleAddToCart(e, data)}
                     >
                       {payloadEdit !== undefined &&
-                      payloadEdit.productType === "dips" &&
-                      obj !== undefined
+                        payloadEdit.productType === "dips" &&
+                        obj !== undefined
                         ? "Edit"
                         : "Add To Cart"}
                     </button>

@@ -95,6 +95,15 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         : 1);
 
     if (drinksArr.length === 0) {
+      // config: {
+      //   drinks: [
+      //     {
+      //       drinksCode: drink?.softdrinkCode,
+      //       drinksName: drink?.softDrinksName,
+      //       drinksPrice: drink?.price,
+      //     },
+      //   ],
+      // },
       const payload = {
         id: uuidv4(),
         cartCode: cartCode ? cartCode : "#NA",
@@ -104,15 +113,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productName: drink?.softDrinksName,
         productType: "drinks",
         quantity: 1,
-        config: {
-          drinks: [
-            {
-              drinksCode: drink?.softdrinkCode,
-              drinksName: drink?.softDrinksName,
-              drinksPrice: drink?.price,
-            },
-          ],
-        },
+        config: {},
         price: drink?.price,
         amount: drink?.price,
         discountAmount: discount,
@@ -136,6 +137,9 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
     }
 
     if (payloadEdit !== undefined && payloadEdit.productType === "drinks") {
+      // config: {
+      //   drinks: drinksArr,
+      // },
       const payloadForEdit = {
         id: payloadEdit?.id,
         cartCode: cartCode ? cartCode : "#NA",
@@ -144,9 +148,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productCode: selectedDrinks[0].softdrinkCode,
         productName: selectedDrinks[0].softDrinksName,
         productType: "drinks",
-        config: {
-          drinks: drinksArr,
-        },
+        config: {},
         quantity: selectedDrinks[0].qty ? selectedDrinks[0].qty : 1,
         price: selectedDrinks[0].price,
         amount: totalAmount.toFixed(2),
@@ -175,6 +177,9 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       setSoftDrinksData(temp);
       setDrinksArr([]);
     } else {
+      // config: {
+      //   drinks: drinksArr,
+      // },
       const payload = {
         id: uuidv4(),
         cartCode: cartCode ? cartCode : "#NA",
@@ -183,9 +188,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productCode: selectedDrinks[0]?.softdrinkCode,
         productName: selectedDrinks[0]?.softDrinksName,
         productType: "drinks",
-        config: {
-          drinks: drinksArr,
-        },
+        config: {},
         quantity: selectedDrinks[0]?.qty ? selectedDrinks[0]?.qty : 1,
         price: selectedDrinks[0]?.price,
         amount: totalAmount.toFixed(2),
@@ -251,8 +254,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
                       onClick={(e) => handleAddToCart(e, data)}
                     >
                       {payloadEdit !== undefined &&
-                      payloadEdit.productType === "drinks" &&
-                      obj !== undefined
+                        payloadEdit.productType === "drinks" &&
+                        obj !== undefined
                         ? "Edit"
                         : "Add To Cart"}
                     </button>

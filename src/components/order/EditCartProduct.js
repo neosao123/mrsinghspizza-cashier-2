@@ -915,15 +915,18 @@ function EditCartProduct({
                         className='list-group-item d-flex justify-content-between align-items-center'
                         key={countAsTwoToppings.toppingsCode}
                       >
-                        <label className=''>
-                          <input
+                        <div class="form-check">
+                          <input class="form-check-input"
                             type='checkbox'
-                            className='mx-3 d-inline-block'
+                            value=''
+                            id={countAsTwoToppings.toppingsCode}
                             checked={st.checked}
                             onChange={(e) => handleTwoToppings(e, toppingCode)}
                           />
-                          {countAsTwoToppings.toppingsName}
-                        </label>
+                          <label class="form-check-label" for={countAsTwoToppings.toppingsCode}>
+                            {countAsTwoToppings.toppingsName}
+                          </label>
+                        </div>
                         <div
                           className='d-flex justify-content-between align-items-center'
                           style={{ width: "12rem" }}
@@ -993,15 +996,18 @@ function EditCartProduct({
                         className='list-group-item d-flex justify-content-between align-items-center'
                         key={toppingCode}
                       >
-                        <label className=''>
-                          <input
+                        <div class="form-check">
+                          <input class="form-check-input"
                             type='checkbox'
-                            className='mx-3 d-inline-block'
+                            value=''
+                            id={countAsOneToppings.toppingsCode}
                             checked={st.checked}
                             onChange={(e) => handleOneToppings(e, toppingCode)}
                           />
-                          {countAsOneToppings.toppingsName}
-                        </label>
+                          <label class="form-check-label" for={countAsOneToppings.toppingsCode}>
+                            {countAsOneToppings.toppingsName}
+                          </label>
+                        </div>
                         <div
                           className='d-flex justify-content-between align-items-center'
                           style={{ width: "12rem" }}
@@ -1077,16 +1083,19 @@ function EditCartProduct({
                       <li
                         className='list-group-item d-flex justify-content-between align-items-center'
                         key={toppingCode}
-                      >
-                        <label className='d-flex align-items-center'>
-                          <input
+                      > 
+                        <div class="form-check">
+                          <input class="form-check-input"
                             type='checkbox'
-                            className='mx-3 d-inline-block'
+                            value=''
+                            id={freeToppings.toppingsCode}
                             checked={st.checked}
                             onChange={(e) => handleFreeToppings(e, toppingCode)}
                           />
-                          {freeToppings.toppingsName}
-                        </label>
+                          <label class="form-check-label" for={freeToppings.toppingsCode}>
+                            {freeToppings.toppingsName}
+                          </label>
+                        </div>
                         <div
                           className='d-flex justify-content-between align-items-center'
                           style={{ width: "12rem" }}

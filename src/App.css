@@ -19,9 +19,24 @@
 }
 
 .text-large-pizza-price {
-  color: #3d007e; 
+  color: #3d007e;
 }
 
 .text-xlarge-pizza-price {
-  color: #00657e; 
+  color: #00657e;
+}
+
+.form-check-input {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.form-check-label {
+  margin-top: 0.1rem;
+  margin-left: 0.2rem;
+} 
+
+.form-check-input:checked {
+  background-color: #ff8c00;
+  border-color: #ff8c00;
 }

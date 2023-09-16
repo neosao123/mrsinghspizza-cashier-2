@@ -26,7 +26,7 @@ function SpecialPizzaSelection({
             <label className='mt-2 mb-1'>Crust</label>
             <select
               className='form-select'
-              value={pizzaState[count - 1]?.crust?.code}
+              value={pizzaState[count - 1]?.crust?.crustCode}
               onChange={(e) => {
                 handleCrustChange(e, count);
               }}
@@ -46,7 +46,7 @@ function SpecialPizzaSelection({
             <label className='mt-2 mb-1'>Cheese</label>
             <select
               className='form-select'
-              value={pizzaState[count - 1]?.cheese?.code}
+              value={pizzaState[count - 1]?.cheese?.cheeseCode}
               onChange={(e) => {
                 handleCheeseChange(e, count);
               }}
@@ -67,7 +67,7 @@ function SpecialPizzaSelection({
             <select
               className='form-select'
               defaultValue={""}
-              value={pizzaState[count - 1]?.specialbases?.code}
+              value={pizzaState[count - 1]?.specialbases?.specialbasesCode}
               onChange={(e) => {
                 handleSpecialBasesChange(e, count);
               }}
@@ -91,24 +91,23 @@ function SpecialPizzaSelection({
               })}
             </select>
           </div>
-          <div className='row'>
-            <div className=' d-flex align-items-center mt-2'>
-              <input
-                className='my-2 form-check-input'
+          <div className='col-sm-12 mt-3'>
+            <div class="form-check">
+              <input class="form-check-input"
                 type='checkbox'
                 value=''
                 checked={
                   pizzaState[count - 1]?.toppings?.freeToppings.length ===
-                  toppingsData?.toppings?.freeToppings?.length
+                    toppingsData?.toppings?.freeToppings?.length
                     ? true
                     : false
                 }
-                id='allIndianTps'
+                id={`allIndianTps-${count}`}
                 onChange={(e) => {
                   handleChangeAllIndianToppings(e, count);
                 }}
               />
-              <label className='m-2' htmlFor='allIndianTps'>
+              <label class="form-check-label" for={`allIndianTps-${count}`}>
                 All Indian Style
               </label>
             </div>
@@ -132,7 +131,7 @@ function SpecialPizzaSelection({
                   className='nav-link py-2 px-4'
                   data-bs-toggle='tab'
                   to={`#toppings-count-1-tab-special${count}`}
-                  // to='#toppings-count-1-tab-special'
+                // to='#toppings-count-1-tab-special'
                 >
                   Toppings (1)
                 </Link>
@@ -142,7 +141,7 @@ function SpecialPizzaSelection({
                   className='nav-link py-2 px-4'
                   data-bs-toggle='tab'
                   to={`#toppings-free-tab-special${count}`}
-                  // to='#toppings-free-tab-special'
+                // to='#toppings-free-tab-special'
                 >
                   Indian Style (Free)
                 </Link>
@@ -169,17 +168,20 @@ function SpecialPizzaSelection({
                         className='list-group-item d-flex justify-content-between align-items-center'
                         key={countAsTwoToppings.toppingsCode}
                       >
-                        <label className=''>
-                          <input
+                        <div class="form-check">
+                          <input class="form-check-input"
                             type='checkbox'
-                            className='mx-3 d-inline-block'
+                            value=''
+                            id={`${countAsTwoToppings.toppingsCode}-${index}`}
                             checked={comm !== -1 ? true : false}
                             onChange={(e) =>
                               handleTwoToppings(e, count, countAsTwoToppings)
                             }
                           />
-                          {countAsTwoToppings.toppingsName}
-                        </label>
+                          <label class="form-check-label" for={`${countAsTwoToppings.toppingsCode}-${index}`}>
+                            {countAsTwoToppings.toppingsName}
+                          </label>
+                        </div>
                         <div
                           className='d-flex justify-content-between align-items-center'
                           style={{ width: "12rem" }}
@@ -244,17 +246,20 @@ function SpecialPizzaSelection({
                         className='list-group-item d-flex justify-content-between align-items-center'
                         key={countAsOneToppings.toppingsCode}
                       >
-                        <label className=''>
-                          <input
+                        <div class="form-check">
+                          <input class="form-check-input"
                             type='checkbox'
-                            className='mx-3 d-inline-block'
+                            value=''
+                            id={`${countAsOneToppings.toppingsCode}-${index}`}
+                            checked={comm !== -1 ? true : false}
                             onChange={(e) =>
                               handleOneToppings(e, count, countAsOneToppings)
                             }
-                            checked={comm !== -1 ? true : false}
                           />
-                          {countAsOneToppings.toppingsName}
-                        </label>
+                          <label class="form-check-label" for={`${countAsOneToppings.toppingsCode}-${index}`}>
+                            {countAsOneToppings.toppingsName}
+                          </label>
+                        </div>
                         <div
                           className='d-flex justify-content-between align-items-center'
                           style={{ width: "12rem" }}
@@ -318,17 +323,20 @@ function SpecialPizzaSelection({
                         className='list-group-item d-flex justify-content-between align-items-center'
                         key={freeToppings.toppingsCode}
                       >
-                        <label className=''>
-                          <input
+                        <div class="form-check">
+                          <input class="form-check-input"
                             type='checkbox'
-                            className='mx-3 d-inline-block'
+                            value=''
+                            id={`${freeToppings.toppingsCode}-${index}`}
+                            checked={comm !== -1 ? true : false}
                             onChange={(e) =>
                               handleFreeToppings(e, count, freeToppings)
                             }
-                            checked={comm !== -1 ? true : false}
                           />
-                          {freeToppings.toppingsName}
-                        </label>
+                          <label class="form-check-label" for={`${freeToppings.toppingsCode}-${index}`}>
+                            {freeToppings.toppingsName}
+                          </label>
+                        </div>
                         <div
                           className='d-flex justify-content-between align-items-center'
                           style={{ width: "12rem" }}
