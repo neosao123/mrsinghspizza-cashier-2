@@ -17,9 +17,9 @@ import { handlePops } from "./specialMenuFunctions";
 import { specialMenuParamsFn } from "./specialMenuParameters";
 
 function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
-  
-  sessionStorage.setItem("welcome","Test");
-  
+
+  sessionStorage.setItem("welcome", "Test");
+
   const [pizzaState, setPizzaState] = useState();
   const [show, setShow] = useState(false);
   const displaySpecialForm = useSelector(
@@ -334,7 +334,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   //     setPizzaState([...arr]);
   //   }
   // };
-  
+
   const handleFreeToppingsPlacementChange = (event, count, toppingsCode) => {
     const selectedValue = event.target.value;
     let arr = [...pizzaState];
@@ -370,6 +370,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     }
     setPizzaState(arr);
   };
+
   const handleCountAsOneToppingsPlacementChange = (
     event,
     count,
@@ -488,7 +489,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   useEffect(() => {
     if (
       payloadEdit !== undefined &&
-      payloadEdit?.productType === "Special_Pizza"
+      payloadEdit?.productType.toLowerCase() === "special_pizza"
     ) {
       console.log(payloadEdit, "edit item on click");
       handleGetSpecial({ code: payloadEdit?.productCode });
@@ -666,7 +667,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   const handleAddToCart = () => {
     if (
       payloadEdit !== undefined &&
-      payloadEdit?.productType === "Special_Pizza"
+      payloadEdit?.productType.toLowerCase() === "special_pizza"
     ) {
       let payloadForEdit = {
         id: payloadEdit?.id,
@@ -730,7 +731,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             tpsObj,
           ];
         });
-      }      
+      }
       let payload = {
         id: uuidv4(),
         code: getSpecialData.code,
@@ -1279,7 +1280,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                     onClick={handleAddToCart}
                   >
                     {payloadEdit !== undefined &&
-                      payloadEdit?.productType === "Special_Pizza"
+                      payloadEdit?.productType.toLowerCase() === "special_pizza"
                       ? "Edit"
                       : " Add to Cart"}
                   </button>

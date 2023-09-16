@@ -453,7 +453,6 @@ function CreateYourOwn({
 
   const handleDips = (e, code) => {
     const { checked } = e.target;
-
     if (checked) {
       const selectedDips = allIngredients?.dips.filter(
         (dips) => dips.dipsCode === code

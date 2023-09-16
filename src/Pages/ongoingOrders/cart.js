@@ -29,8 +29,8 @@ const Cart = ({ setPayloadEdit, onProductClick }) => {
               </div>
               <div className='d-flex justify-content-between'>
                 <div className='d-flex justify-content-left'>
-                  {data.productType === "custom_pizza" ||
-                  data.productType === "Special_Pizza" ? (
+                  {data.productType.toLowerCase() === "custom_pizza" ||
+                  data.productType.toLowerCase() === "special_pizza" ? (
                     <>
                       <h6>Size: </h6>
                       <span className='mx-1'>{data.pizzaSize}</span>
@@ -47,8 +47,8 @@ const Cart = ({ setPayloadEdit, onProductClick }) => {
                   <span className=''>{data.quantity}</span>
                 </div>
               </div>
-              {data.productType === "Special_Pizza" ||
-              data.productType === "custom_pizza" ? (
+              {data.productType.toLowerCase() === "special_pizza" ||
+              data.productType.toLowerCase() === "custom_pizza" ? (
                 <div className='row d-flex'>
                   <div className='d-flex justify-content-left'>
                     <h6 className='me-1 col-auto'>Toppings : </h6>

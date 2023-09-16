@@ -1022,25 +1022,25 @@ function EditCartProduct({
                           >
                             <option
                               value='whole'
-                              // selected={
-                              //   toppingPlacement === "whole" ? true : false
-                              // }
+                            // selected={
+                            //   toppingPlacement === "whole" ? true : false
+                            // }
                             >
                               Whole
                             </option>
                             <option
                               value='lefthalf'
-                              // selected={
-                              //   toppingPlacement === "lefthalf" ? true : false
-                              // }
+                            // selected={
+                            //   toppingPlacement === "lefthalf" ? true : false
+                            // }
                             >
                               Left Half
                             </option>
                             <option
                               value='righthalf'
-                              // selected={
-                              //   toppingPlacement === "righthalf" ? true : false
-                              // }
+                            // selected={
+                            //   toppingPlacement === "righthalf" ? true : false
+                            // }
                             >
                               Right Half
                             </option>
@@ -1108,25 +1108,25 @@ function EditCartProduct({
                           >
                             <option
                               value='whole'
-                              // selected={
-                              //   toppingPlacement === "whole" ? true : false
-                              // }
+                            // selected={
+                            //   toppingPlacement === "whole" ? true : false
+                            // }
                             >
                               Whole
                             </option>
                             <option
                               value='lefthalf'
-                              // selected={
-                              //   toppingPlacement === "lefthalf" ? true : false
-                              // }
+                            // selected={
+                            //   toppingPlacement === "lefthalf" ? true : false
+                            // }
                             >
                               Left Half
                             </option>
                             <option
                               value='righthalf'
-                              // selected={
-                              //   toppingPlacement === "righthalf" ? true : false
-                              // }
+                            // selected={
+                            //   toppingPlacement === "righthalf" ? true : false
+                            // }
                             >
                               Right Half
                             </option>
