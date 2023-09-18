@@ -637,9 +637,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setPopsArr([]);
       setComments("");
       setPayloadEdit();
-      setPizzaSize(
-        getSpecialData?.largePizzaPrice > 0 ? "Large" : "Extra Large"
-      );
+      // setPizzaSize(
+      //   getSpecialData?.largePizzaPrice > 0 ? "Large" : "Extra Large"
+      // );
       createEmptyObjects(Number(getSpecialData?.noofPizzas));
       toast.success(
         `${payloadForEdit.productName} updated to cart successfully...`
@@ -698,9 +698,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setDipsArr([]);
       setPopsArr([]);
       setComments("");
-      setPizzaSize(
-        getSpecialData?.largePizzaPrice > 0 ? "Large" : "Extra Large"
-      );
+      // setPizzaSize(
+      //   getSpecialData?.largePizzaPrice > 0 ? "Large" : "Extra Large"
+      // );
       setAdditionalToppingsCount(0);
       setOfferedFreeToppings(Number(getSpecialData?.noofToppings));
       setPrice(Number(getSpecialData?.price));

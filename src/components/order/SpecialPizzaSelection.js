@@ -72,10 +72,6 @@ function SpecialPizzaSelection({
                 handleSpecialBasesChange(e, count);
               }}
             >
-              {console.log(
-                pizzaState[count - 1]?.specialBases,
-                "special base empty"
-              )}
               <option value={""}>---choose special base---</option>
               {getSpecialData?.specialbases?.map((data) => {
                 return (
@@ -95,7 +91,7 @@ function SpecialPizzaSelection({
                 type='checkbox'
                 value=''
                 checked={
-                  pizzaState[count - 1]?.toppings?.freeToppings.length ===
+                  pizzaState[count - 1]?.toppings?.freeToppings?.length ===
                   toppingsData?.toppings?.freeToppings?.length
                     ? true
                     : false
@@ -157,7 +153,7 @@ function SpecialPizzaSelection({
                   (countAsTwoToppings, index) => {
                     const comm = pizzaState[
                       count - 1
-                    ]?.toppings?.countAsTwoToppings.findIndex(
+                    ]?.toppings?.countAsTwoToppings?.findIndex(
                       (item) =>
                         item.toppingsCode === countAsTwoToppings.toppingsCode
                     );
@@ -239,7 +235,7 @@ function SpecialPizzaSelection({
                   (countAsOneToppings, index) => {
                     const comm = pizzaState[
                       count - 1
-                    ]?.toppings?.countAsOneToppings.findIndex(
+                    ]?.toppings?.countAsOneToppings?.findIndex(
                       (item) =>
                         item.toppingsCode === countAsOneToppings.toppingsCode
                     );
@@ -321,7 +317,7 @@ function SpecialPizzaSelection({
                   (freeToppings, index) => {
                     const comm = pizzaState[
                       count - 1
-                    ]?.toppings?.freeToppings.findIndex(
+                    ]?.toppings?.freeToppings?.findIndex(
                       (item) => item.toppingsCode === freeToppings.toppingsCode
                     );
                     return (
