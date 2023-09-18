@@ -67,7 +67,7 @@ function SpecialPizzaSelection({
             <select
               className='form-select'
               defaultValue={""}
-              value={pizzaState[count - 1]?.specialBases?.specialbasesCode}
+              value={pizzaState[count - 1]?.specialBases?.specialbaseCode}
               onChange={(e) => {
                 handleSpecialBasesChange(e, count);
               }}

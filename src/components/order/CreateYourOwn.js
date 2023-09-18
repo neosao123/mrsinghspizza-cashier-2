@@ -138,7 +138,7 @@ function CreateYourOwn({
         price: allIngredients?.crust[0]?.price,
       });
       setSizesOfPizzaSelected(sizesOfPizza[0]);
-      setSpecialBasesSelected({});
+      setSpecialBasesSelected({ specialbaseCode: "" });
       setDips([]);
       setDrinks([]);
       setSideArr([]);

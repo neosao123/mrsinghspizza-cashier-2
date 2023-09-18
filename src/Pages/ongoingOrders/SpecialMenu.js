@@ -106,7 +106,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       (option) => option.code === selectedValue
     );
     let specialBaseObject = {
-      specialbasesCode: selectedSpecialBase?.code,
+      specialbaseCode: selectedSpecialBase?.code,
       specialbaseName: selectedSpecialBase?.specialbaseName,
       price: selectedSpecialBase?.price,
     };
@@ -466,7 +466,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         cheeseName: getSpecialData?.cheese[0].cheeseName,
         price: getSpecialData?.cheese[0].price ?? 0,
       },
-      specialBases: { specialbasesCode: "" },
+      specialBases: { specialbaseCode: "" },
       toppings: {
         countAsTwoToppings: [],
         countAsOneToppings: [],
