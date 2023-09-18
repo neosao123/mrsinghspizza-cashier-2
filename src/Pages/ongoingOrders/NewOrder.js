@@ -48,7 +48,7 @@ function NewOrder() {
   const [deliveryType, setDeliveryType] = useState("pickup");
   const [storesLocationData, setStoreLocationData] = useState();
   const [storesCode, setStoresCode] = useState();
-  const [discount, setDiscount] = useState();
+  const [discount, setDiscount] = useState(0);
   const [taxPer, setTaxPer] = useState(0);
   const [cartListData, setCartListData] = useState();
   const [deliverExectiveList, setDeliverExectiveList] = useState();
@@ -108,8 +108,8 @@ function NewOrder() {
   const delivery_charges =
     cartdata.length !== 0 && deliveryType !== "pickup"
       ? settingsData?.filter(
-        (item) => item.settingName === "Delivery Charges"
-      )[0].settingValue
+          (item) => item.settingName === "Delivery Charges"
+        )[0].settingValue
       : 0;
 
   const discountedTotalPrice = totalPrice - (discount ? discount : 0);
@@ -212,11 +212,11 @@ function NewOrder() {
       deliveryType === "pickup"
         ? null
         : Yup.string()
-          .required("Customer Name is Required.")
-          .matches(
-            /^[A-Za-z\s]+$/,
-            "Customer Name must contain only letters and spaces"
-          ),
+            .required("Customer Name is Required.")
+            .matches(
+              /^[A-Za-z\s]+$/,
+              "Customer Name must contain only letters and spaces"
+            ),
     address:
       deliveryType === "pickup"
         ? null
@@ -255,8 +255,8 @@ function NewOrder() {
           deliveryCharges:
             cartdata.length !== 0 && deliveryType !== "pickup"
               ? settingsData?.filter(
-                (item) => item.settingName === "Delivery Charges"
-              )[0].settingValue
+                  (item) => item.settingName === "Delivery Charges"
+                )[0].settingValue
               : 0,
           extraDeliveryCharges: extraDeliveryCharges ? extraDeliveryCharges : 0,
           grandTotal: grandTotal,
@@ -265,7 +265,7 @@ function NewOrder() {
         if (response.status === 200) {
           resetForm();
           dispatch(addToCart([]));
-          setDiscount();
+          setDiscount(0);
           setPrevOrders([]);
           setExtraDeliveryCharges(0);
           orderDetails({ orderCode: response.data.orderCode }).then((data) => {
@@ -558,7 +558,7 @@ function NewOrder() {
                   </select>
 
                   {formik.touched.deliveryExecutive &&
-                    formik.errors.deliveryExecutive ? (
+                  formik.errors.deliveryExecutive ? (
                     <div className='text-danger my-1'>
                       {formik.errors.deliveryExecutive}
                     </div>
@@ -849,9 +849,9 @@ function NewOrder() {
                           <span className='input-group-text inputGroupTxt px-2'>
                             {cartdata.length !== 0
                               ? settingsData?.filter(
-                                (item) =>
-                                  item.settingName === "Tax Percentage"
-                              )[0].settingValue
+                                  (item) =>
+                                    item.settingName === "Tax Percentage"
+                                )[0].settingValue
                               : 0}{" "}
                             %
                           </span>
@@ -867,8 +867,8 @@ function NewOrder() {
                           value={
                             cartdata.length !== 0
                               ? ((discountedTotalPrice * taxPer) / 100).toFixed(
-                                2
-                              )
+                                  2
+                                )
                               : 0
                           }
                         ></input>
@@ -902,9 +902,9 @@ function NewOrder() {
                               cartdata.length === 0 || deliveryType == "pickup"
                                 ? 0
                                 : settingsData?.filter(
-                                  (item) =>
-                                    item.settingName === "Delivery Charges"
-                                )[0].settingValue
+                                    (item) =>
+                                      item.settingName === "Delivery Charges"
+                                  )[0].settingValue
                             }
                             readOnly
                           ></input>
@@ -1000,7 +1000,7 @@ function NewOrder() {
                             </button>
                           )}
                           content={() => printRef2?.current}
-                          onBeforePrint={() => { }}
+                          onBeforePrint={() => {}}
                         ></ReactToPrint>
                       </div>
                     </div>

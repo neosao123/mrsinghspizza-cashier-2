@@ -67,19 +67,16 @@ function SpecialPizzaSelection({
             <select
               className='form-select'
               defaultValue={""}
-              value={pizzaState[count - 1]?.specialbases?.specialbasesCode}
+              value={pizzaState[count - 1]?.specialBases?.specialbasesCode}
               onChange={(e) => {
                 handleSpecialBasesChange(e, count);
               }}
             >
-              <option
-                value={""}
-                selected={
-                  pizzaState[count - 1]?.specialbases?.code ? false : true
-                }
-              >
-                ---choose special base---
-              </option>
+              {console.log(
+                pizzaState[count - 1]?.specialBases,
+                "special base empty"
+              )}
+              <option value={""}>---choose special base---</option>
               {getSpecialData?.specialbases?.map((data) => {
                 return (
                   <>
@@ -92,13 +89,14 @@ function SpecialPizzaSelection({
             </select>
           </div>
           <div className='col-sm-12 mt-3'>
-            <div class="form-check">
-              <input class="form-check-input"
+            <div class='form-check'>
+              <input
+                class='form-check-input'
                 type='checkbox'
                 value=''
                 checked={
                   pizzaState[count - 1]?.toppings?.freeToppings.length ===
-                    toppingsData?.toppings?.freeToppings?.length
+                  toppingsData?.toppings?.freeToppings?.length
                     ? true
                     : false
                 }
@@ -107,7 +105,7 @@ function SpecialPizzaSelection({
                   handleChangeAllIndianToppings(e, count);
                 }}
               />
-              <label class="form-check-label" for={`allIndianTps-${count}`}>
+              <label class='form-check-label' for={`allIndianTps-${count}`}>
                 All Indian Style
               </label>
             </div>
@@ -131,7 +129,7 @@ function SpecialPizzaSelection({
                   className='nav-link py-2 px-4'
                   data-bs-toggle='tab'
                   to={`#toppings-count-1-tab-special${count}`}
-                // to='#toppings-count-1-tab-special'
+                  // to='#toppings-count-1-tab-special'
                 >
                   Toppings (1)
                 </Link>
@@ -141,7 +139,7 @@ function SpecialPizzaSelection({
                   className='nav-link py-2 px-4'
                   data-bs-toggle='tab'
                   to={`#toppings-free-tab-special${count}`}
-                // to='#toppings-free-tab-special'
+                  // to='#toppings-free-tab-special'
                 >
                   Indian Style (Free)
                 </Link>
@@ -168,8 +166,9 @@ function SpecialPizzaSelection({
                         className='list-group-item d-flex justify-content-between align-items-center'
                         key={countAsTwoToppings.toppingsCode}
                       >
-                        <div class="form-check">
-                          <input class="form-check-input"
+                        <div class='form-check'>
+                          <input
+                            class='form-check-input'
                             type='checkbox'
                             value=''
                             id={`${countAsTwoToppings.toppingsCode}-${index}`}
@@ -178,7 +177,10 @@ function SpecialPizzaSelection({
                               handleTwoToppings(e, count, countAsTwoToppings)
                             }
                           />
-                          <label class="form-check-label" for={`${countAsTwoToppings.toppingsCode}-${index}`}>
+                          <label
+                            class='form-check-label'
+                            for={`${countAsTwoToppings.toppingsCode}-${index}`}
+                          >
                             {countAsTwoToppings.toppingsName}
                           </label>
                         </div>
@@ -246,8 +248,9 @@ function SpecialPizzaSelection({
                         className='list-group-item d-flex justify-content-between align-items-center'
                         key={countAsOneToppings.toppingsCode}
                       >
-                        <div class="form-check">
-                          <input class="form-check-input"
+                        <div class='form-check'>
+                          <input
+                            class='form-check-input'
                             type='checkbox'
                             value=''
                             id={`${countAsOneToppings.toppingsCode}-${index}`}
@@ -256,7 +259,10 @@ function SpecialPizzaSelection({
                               handleOneToppings(e, count, countAsOneToppings)
                             }
                           />
-                          <label class="form-check-label" for={`${countAsOneToppings.toppingsCode}-${index}`}>
+                          <label
+                            class='form-check-label'
+                            for={`${countAsOneToppings.toppingsCode}-${index}`}
+                          >
                             {countAsOneToppings.toppingsName}
                           </label>
                         </div>
@@ -323,8 +329,9 @@ function SpecialPizzaSelection({
                         className='list-group-item d-flex justify-content-between align-items-center'
                         key={freeToppings.toppingsCode}
                       >
-                        <div class="form-check">
-                          <input class="form-check-input"
+                        <div class='form-check'>
+                          <input
+                            class='form-check-input'
                             type='checkbox'
                             value=''
                             id={`${freeToppings.toppingsCode}-${index}`}
@@ -333,7 +340,10 @@ function SpecialPizzaSelection({
                               handleFreeToppings(e, count, freeToppings)
                             }
                           />
-                          <label class="form-check-label" for={`${freeToppings.toppingsCode}-${index}`}>
+                          <label
+                            class='form-check-label'
+                            for={`${freeToppings.toppingsCode}-${index}`}
+                          >
                             {freeToppings.toppingsName}
                           </label>
                         </div>

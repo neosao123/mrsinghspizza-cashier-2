@@ -9,7 +9,7 @@ import {
   SelectDropDownCrust,
   SelectDropDownSpecialBases,
 } from "./createYourOwn/selectDropDown";
-import { } from "./createYourOwn/selectDropDown";
+import {} from "./createYourOwn/selectDropDown";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, setCart } from "../../reducer/cartReducer";
 
@@ -51,7 +51,9 @@ function CreateYourOwn({
 
     let crust_price = crustSelected?.price ? crustSelected?.price : 0;
     let cheese_price = cheeseSelected?.price ? cheeseSelected?.price : 0;
-    let specialbase_price = specialBasesSelected?.price ? specialBasesSelected?.price : 0;
+    let specialbase_price = specialBasesSelected?.price
+      ? specialBasesSelected?.price
+      : 0;
     let totalSidesPrice = Number(0);
     let totalTwoToppings = Number(0);
     let totalOneToppings = Number(0);
@@ -137,7 +139,10 @@ function CreateYourOwn({
       });
       console.log("SELECTED CRUST IS ************************", crustSelected);
       setCheeseSelected(allIngredients?.cheese[0]);
-      console.log("SELECTED CHEESE IS ************************", cheeseSelected);
+      console.log(
+        "SELECTED CHEESE IS ************************",
+        cheeseSelected
+      );
       setSpecialBasesSelected({});
       setDips([]);
       setDrinks([]);
@@ -188,12 +193,18 @@ function CreateYourOwn({
         setCrustSelected({
           crustCode: allIngredients?.crust[0]?.crustCode,
           crustName: allIngredients?.crust[0]?.crustName,
-          price: allIngredients?.crust[0]?.price
+          price: allIngredients?.crust[0]?.price,
         });
-        console.log("SELECTED CRUST IS ************************", crustSelected);
+        console.log(
+          "SELECTED CRUST IS ************************",
+          crustSelected
+        );
         setCheeseSelected(allIngredients?.cheese[0]);
-        console.log("SELECTED CHEESE IS ************************", cheeseSelected);
-        setSpecialBasesSelected({});
+        console.log(
+          "SELECTED CHEESE IS ************************",
+          cheeseSelected
+        );
+        setSpecialBasesSelected({ specialbaseCode: "" });
         setDips([]);
         setDrinks([]);
         setSideArr([]);
@@ -468,7 +479,7 @@ function CreateYourOwn({
           dipsName: selectedDips[0].dipsName,
           dipsPrice: selectedDips[0].price ? selectedDips[0].price : "0",
           quantity: 1,
-          totalPrice: selectedDips[0].price ? selectedDips[0].price : "0"
+          totalPrice: selectedDips[0].price ? selectedDips[0].price : "0",
         };
         setDips([...dips, dipsObj]);
       }
@@ -495,7 +506,7 @@ function CreateYourOwn({
         drinksName: selectedDrinks[0].softDrinksName,
         drinksPrice: selectedDrinks[0].price ? selectedDrinks[0].price : "0",
         quantity: 1,
-        totalPrice: selectedDrinks[0].price ? selectedDrinks[0].price : "0"
+        totalPrice: selectedDrinks[0].price ? selectedDrinks[0].price : "0",
       };
       if (checked) {
         setDrinks([...drinks, drinksObj]);
@@ -589,7 +600,7 @@ function CreateYourOwn({
     });
   };
 
-  // cheese 
+  // cheese
   const handleCheeseChange = (event) => {
     const selectedValue = event.target.value;
     const selectedObject = allIngredients?.cheese?.find(
@@ -606,7 +617,6 @@ function CreateYourOwn({
         (option) => option.specialbaseCode === selectedValue
       );
       setSpecialBasesSelected(selectedObject);
-      console.log("SELECTED SPECIAL-BASE IS ************************", selectedObject);
     }
   };
 
@@ -681,7 +691,7 @@ function CreateYourOwn({
         <>
           <h6 className='text-center'>
             {payloadEdit !== undefined &&
-              payloadEdit.productType === "custom_pizza"
+            payloadEdit.productType === "custom_pizza"
               ? "Edit Pizza"
               : "Pizza Selection"}
           </h6>
@@ -735,19 +745,21 @@ function CreateYourOwn({
               />
             </div>
             <div className='col-lg-12 mt-3'>
-              <div class="form-check">
-                <input class="form-check-input"
+              <div class='form-check'>
+                <input
+                  class='form-check-input'
                   type='checkbox'
                   value=''
                   checked={
                     freeToppingsArr?.length ===
-                      allIngredients?.toppings?.freeToppings?.length
+                    allIngredients?.toppings?.freeToppings?.length
                       ? true
                       : false
                   }
                   id='allIndianTps'
-                  onChange={handleChangeAllIndianToppins} />
-                <label class="form-check-label" for="allIndianTps">
+                  onChange={handleChangeAllIndianToppins}
+                />
+                <label class='form-check-label' for='allIndianTps'>
                   All Indian Style
                 </label>
               </div>
@@ -831,16 +843,21 @@ function CreateYourOwn({
                             className='list-group-item d-flex justify-content-between align-items-center'
                             key={countAsTwoToppings.toppingsCode}
                           >
-                            <div class="form-check">
-                              <input class="form-check-input"
+                            <div class='form-check'>
+                              <input
+                                class='form-check-input'
                                 type='checkbox'
                                 value=''
                                 id={countAsTwoToppings.toppingsCode}
                                 checked={comm !== -1 ? true : false}
                                 onChange={(e) =>
                                   handleTwoToppings(e, toppingCode)
-                                } />
-                              <label class="form-check-label" for={countAsTwoToppings.toppingsCode}>
+                                }
+                              />
+                              <label
+                                class='form-check-label'
+                                for={countAsTwoToppings.toppingsCode}
+                              >
                                 {countAsTwoToppings.toppingsName}
                               </label>
                             </div>
@@ -907,16 +924,21 @@ function CreateYourOwn({
                             className='list-group-item d-flex justify-content-between align-items-center'
                             key={toppingCode}
                           >
-                            <div class="form-check">
-                              <input class="form-check-input"
+                            <div class='form-check'>
+                              <input
+                                class='form-check-input'
                                 type='checkbox'
                                 value=''
                                 id={countAsOneToppings.toppingsCode}
                                 checked={comm !== -1 ? true : false}
                                 onChange={(e) =>
                                   handleOneToppings(e, toppingCode)
-                                } />
-                              <label class="form-check-label" for={countAsOneToppings.toppingsCode}>
+                                }
+                              />
+                              <label
+                                class='form-check-label'
+                                for={countAsOneToppings.toppingsCode}
+                              >
                                 {countAsOneToppings.toppingsName}
                               </label>
                             </div>
@@ -985,16 +1007,21 @@ function CreateYourOwn({
                             className='list-group-item d-flex justify-content-between align-items-center'
                             key={toppingCode}
                           >
-                            <div class="form-check">
-                              <input class="form-check-input"
+                            <div class='form-check'>
+                              <input
+                                class='form-check-input'
                                 type='checkbox'
                                 value=''
                                 id={freeToppings.toppingsCode}
                                 checked={comm !== -1 ? true : false}
                                 onChange={(e) =>
                                   handleFreeToppings(e, toppingCode)
-                                } />
-                              <label class="form-check-label" for={freeToppings.toppingsCode}>
+                                }
+                              />
+                              <label
+                                class='form-check-label'
+                                for={freeToppings.toppingsCode}
+                              >
                                 {freeToppings.toppingsName}
                               </label>
                             </div>
@@ -1199,7 +1226,7 @@ function CreateYourOwn({
               onClick={handleAddToCart}
             >
               {payloadEdit !== undefined &&
-                payloadEdit.productType === "custom_pizza"
+              payloadEdit.productType === "custom_pizza"
                 ? "Edit order"
                 : "Add to Cart"}
             </button>
