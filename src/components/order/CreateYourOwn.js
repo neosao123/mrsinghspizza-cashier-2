@@ -121,7 +121,7 @@ function CreateYourOwn({
         price: price,
         amount: price,
         comments: comments,
-        pizzaSize: pizzaSize,
+        pizzaSize: sizesOfPizzaSelected,
         discountAmount: discount,
         taxPer: taxPer,
       };
@@ -137,12 +137,7 @@ function CreateYourOwn({
         crustName: allIngredients?.crust[0]?.crustName,
         price: allIngredients?.crust[0]?.price,
       });
-      console.log("SELECTED CRUST IS ************************", crustSelected);
-      setCheeseSelected(allIngredients?.cheese[0]);
-      console.log(
-        "SELECTED CHEESE IS ************************",
-        cheeseSelected
-      );
+      setSizesOfPizzaSelected(sizesOfPizza[0]);
       setSpecialBasesSelected({});
       setDips([]);
       setDrinks([]);
@@ -190,20 +185,13 @@ function CreateYourOwn({
         };
         dispatch(addToCart([...cartdata, payload]));
         toast.success(`Custom Pizza Added Successfully...`);
+        setSizesOfPizzaSelected(sizesOfPizza[0]);
         setCrustSelected({
           crustCode: allIngredients?.crust[0]?.crustCode,
           crustName: allIngredients?.crust[0]?.crustName,
           price: allIngredients?.crust[0]?.price,
         });
-        console.log(
-          "SELECTED CRUST IS ************************",
-          crustSelected
-        );
         setCheeseSelected(allIngredients?.cheese[0]);
-        console.log(
-          "SELECTED CHEESE IS ************************",
-          cheeseSelected
-        );
         setSpecialBasesSelected({ specialbaseCode: "" });
         setDips([]);
         setDrinks([]);
