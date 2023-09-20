@@ -981,7 +981,7 @@ function NewOrder() {
                         type='button'
                         onClick={formik.handleSubmit}
                         disabled={formik.isSubmitting}
-                        className='submitOrderbtn btn btn-sm my-3 px-4 py-2'
+                        className='submitOrderbtn btn btn-sm mb-4 px-4 py-2'
                       >
                         {formik.isSubmitting
                           ? "Please wait..."

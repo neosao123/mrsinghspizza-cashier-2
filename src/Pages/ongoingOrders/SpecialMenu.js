@@ -25,7 +25,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     (state) => state.cart.displaySpecialForm
   );
   const [getSpecialData, setGetSpecialData] = useState();
-  const [pizzaSize, setPizzaSize] = useState("Large");
+  const [pizzaSize, setPizzaSize] = useState();
   // For Data
   const [selectedLineEntries, setSelectedLineEntries] = useState();
   const [specialData, setSpecialData] = useState();
@@ -48,7 +48,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   const [allToppings, setAllToppings] = useState([]);
   const [totalPriceOfToppings, setTotalPriceOfToppings] = useState(0);
   const [totalPriceOfDips, setTotalPriceOfDips] = useState(0);
-  const [totalPriceOfDipsFinal, setTotalPriceOfDipsFinal] = useState(0);
   let calcOneTpsArr = [];
   let calcTwoTpsArr = [];
   let calcDipsArr = [];
@@ -484,8 +483,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         ...sides,
         lineEntries: [sides.lineEntries[0]],
         quantity: 1,
+        sideType: sides.type,
       };
-      //console.log("SPECIAL PIZZA SIDES ********************************", obj);
+      // console.log("SPECIAL PIZZA SIDES ********************************", obj);
       setSidesArr([obj]);
     } else {
       let filteredSides = sidesArr?.filter((item) => item.code !== sides.code);
@@ -499,6 +499,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       let selectedEntry = sides?.lineEntries?.filter(
         (item) => item.code === e.target.value
       );
+
       let updatedSide = {
         ...sides,
         lineEntries: selectedEntry,
@@ -637,9 +638,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setPopsArr([]);
       setComments("");
       setPayloadEdit();
-      // setPizzaSize(
-      //   getSpecialData?.largePizzaPrice > 0 ? "Large" : "Extra Large"
-      // );
+      setPizzaSize(
+        getSpecialData?.largePizzaPrice > 0 ? "Large" : "Extra Large"
+      );
       createEmptyObjects(Number(getSpecialData?.noofPizzas));
       toast.success(
         `${payloadForEdit.productName} updated to cart successfully...`
@@ -698,9 +699,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setDipsArr([]);
       setPopsArr([]);
       setComments("");
-      // setPizzaSize(
-      //   getSpecialData?.largePizzaPrice > 0 ? "Large" : "Extra Large"
-      // );
+      setPizzaSize(
+        getSpecialData?.largePizzaPrice > 0 ? "Large" : "Extra Large"
+      );
       setAdditionalToppingsCount(0);
       setOfferedFreeToppings(Number(getSpecialData?.noofToppings));
       setPrice(Number(getSpecialData?.price));
@@ -715,6 +716,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       { code: code },
       getSpecialDetailsApi,
       setGetSpecialData,
+      pizzaSize,
       setPizzaSize
     );
     toppings();
@@ -846,12 +848,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     });
 
     calcOneTpsArr?.map((tps) => {
-      //console.log("one tps", tps);
       totalOneTpsPrice += Number(tps?.amount);
     });
 
     calcTwoTpsArr?.map((tps) => {
-      //console.log("two tps", tps);
       totalTwoTpsPrice += Number(tps?.amount);
     });
 
@@ -929,6 +929,15 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   useEffect(() => {
     if (getSpecialData) {
       calculatePrice();
+      if (pizzaSize === undefined) {
+        setPizzaSize(
+          Number(getSpecialData?.largePizzaPrice) > 0
+            ? "Large"
+            : Number(getSpecialData?.extraLargePizzaPrice) > 0
+            ? "Extra Large"
+            : ""
+        );
+      }
     }
   }, [getSpecialData]);
 
@@ -973,7 +982,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   } else {
                     setPayloadEdit();
                     setShow(false);
-                    setPizzaState();
+                    setPizzaState([]);
                     dispatch(setDisplaySpecialForm(false));
                   }
                 }}

@@ -68,7 +68,7 @@ function CreateYourOwn({
       (one) => (totalOneToppings += Number(one.toppingsPrice))
     );
     freeToppingsArr.map((free) => (totalFreeToppings += 0));
-    sidesArr.map((side) => (totalSidesPrice += Number(side.sidesPrice)));
+    sidesArr.map((side) => (totalSidesPrice += Number(side.sidePrice)));
     dips.map((dips) => (totalDips += Number(dips.dipsPrice)));
     drinks.map((drinks) => (totalDrinks += Number(drinks.drinksPrice)));
 
@@ -125,6 +125,8 @@ function CreateYourOwn({
         discountAmount: discount,
         taxPer: taxPer,
       };
+      console.log(payloadForEdit.config, "payload conffig");
+
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
       );
@@ -183,6 +185,8 @@ function CreateYourOwn({
           discountAmount: discount,
           taxPer: taxPer,
         };
+        console.log(payload.config, "payload conffig");
+
         dispatch(addToCart([...cartdata, payload]));
         toast.success(`Custom Pizza Added Successfully...`);
         setSizesOfPizzaSelected(sizesOfPizza[0]);
@@ -415,9 +419,10 @@ function CreateYourOwn({
         sideName: selectSides[0].sideName,
         sideType: selectSides[0].type,
         lineCode: lineCode,
-        sidePrice: price ? price : "0",
+        sidePrice: price ? price : 0,
         sideSize: size,
       };
+      console.log(sidesObj, "sidesObj");
       setSideArr((prevSides) => [...prevSides, sidesObj]);
     } else {
       setSideArr((prevSides) =>

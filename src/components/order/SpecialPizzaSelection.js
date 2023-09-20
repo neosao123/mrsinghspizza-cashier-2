@@ -34,8 +34,8 @@ function SpecialPizzaSelection({
               {getSpecialData?.crust?.map((data) => {
                 return (
                   <>
-                    <option key={data.code} value={data.code}>
-                      {data.crustName}- $ {data.price}
+                    <option key={data?.code} value={data?.code}>
+                      {data?.crustName}- $ {data?.price}
                     </option>
                   </>
                 );
@@ -54,7 +54,7 @@ function SpecialPizzaSelection({
               {getSpecialData?.cheese?.map((data) => {
                 return (
                   <>
-                    <option key={data.code} value={data.code}>
+                    <option key={data?.code} value={data?.code}>
                       {data.cheeseName}- $ {data.price}
                     </option>
                   </>
