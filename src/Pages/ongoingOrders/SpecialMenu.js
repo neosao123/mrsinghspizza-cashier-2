@@ -489,7 +489,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           : 0,
         sideSize: sides?.lineEntries[0]?.size,
         quantity: 1,
-        totalPrice: sides.lineEntries[0].price * 1,
+        totalPrice: Number(0).toFixed(2),
       };
       setSidesArr([obj]);
     } else {
@@ -520,7 +520,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   const handleDips = (e, dips) => {
     let { checked } = e.target;
     delete dips.image;
-
+    
     if (checked) {
       let obj = {
         ...dips,
@@ -559,7 +559,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     let drinksObj = {
       drinksCode: drink.code,
       drinksName: drink.softDrinkName,
-      drinksPrice: drink.price ? drink.price : 0,
+      //drinksPrice: drink.price ? drink.price : 0,
+      drinksPrice: Number(0).toFixed(2)
     };
     if (checked) {
       setDrinksArr([drinksObj]);
@@ -775,8 +776,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       pizzaSize === "Large"
         ? Number(getSpecialData?.largePizzaPrice)
         : pizzaSize === "Extra Large"
-        ? Number(getSpecialData?.extraLargePizzaPrice)
-        : 0;
+          ? Number(getSpecialData?.extraLargePizzaPrice)
+          : 0;
 
     let pizzaCartons = [];
     for (let i = 0; i < getSpecialData?.noofPizzas; i++) {
@@ -941,8 +942,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           Number(getSpecialData?.largePizzaPrice) > 0
             ? "Large"
             : Number(getSpecialData?.extraLargePizzaPrice) > 0
-            ? "Extra Large"
-            : ""
+              ? "Extra Large"
+              : ""
         );
       }
     }
@@ -1157,14 +1158,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                     dipsArr[comm]?.qty
                                       ? dipsArr[comm]?.qty
                                       : getSpecialData?.noofDips !==
-                                          undefined ||
+                                        undefined ||
                                         getSpecialData?.noofDips !== "0"
-                                      ? Number(getSpecialData?.noofDips)
-                                      : 1
+                                        ? Number(getSpecialData?.noofDips)
+                                        : 1
                                   }
                                   className='form-control mx-2'
                                   style={{ width: "75px" }}
-                                  // onChange={(e) => handleDipsCount(e, data)}
+                                // onChange={(e) => handleDipsCount(e, data)}
                                 />
                               </div>
                             </li>
@@ -1180,8 +1181,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   <>
                     {(getSpecialData?.pops.length > 0 ||
                       getSpecialData.bottle.length > 0) && (
-                      <h6 className='text-left mt-1 mb-2'>Drinks</h6>
-                    )}
+                        <h6 className='text-left mt-1 mb-2'>Drinks</h6>
+                      )}
 
                     <div id='drinks' className='mb-3'>
                       <ul className='list-group'>
@@ -1264,7 +1265,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                     onClick={handleAddToCart}
                   >
                     {payloadEdit !== undefined &&
-                    payloadEdit?.productType.toLowerCase() === "special_pizza"
+                      payloadEdit?.productType.toLowerCase() === "special_pizza"
                       ? "Edit"
                       : " Add to Cart"}
                   </button>

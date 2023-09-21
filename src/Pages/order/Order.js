@@ -13,6 +13,8 @@ import { ToastContainer, toast } from "react-toastify";
 import Print from "./Print";
 import { useSelector } from "react-redux";
 
+const sideTypeArr = ["poutine", "subs"];
+
 function Order() {
   const [listData, setListData] = useState();
   const [orderFrom, setOrderFrom] = useState("all");
@@ -91,7 +93,7 @@ function Order() {
       })
       .catch((err) => console.log(err));
   };
-  useEffect(() => {}, [orderDetail]);
+  useEffect(() => { }, [orderDetail]);
 
   useEffect(() => {
     if (orderId !== undefined) {
@@ -189,7 +191,7 @@ function Order() {
                               <div className='d-flex flex-wrap'>
                                 {" "}
                                 {data?.orderStatus !== "cancelled" &&
-                                data?.orderStatus === "placed" ? (
+                                  data?.orderStatus === "placed" ? (
                                   <div className='d-flex  my-1 justify-content-end '>
                                     <span
                                       className='mx-2 py-2 badge bg-secondary'
@@ -208,8 +210,8 @@ function Order() {
                                   </div>
                                 ) : null}
                                 {data?.orderStatus !== "cancelled" &&
-                                data?.orderStatus !== "delivered" &&
-                                data?.orderStatus === "placed" ? (
+                                  data?.orderStatus !== "delivered" &&
+                                  data?.orderStatus === "placed" ? (
                                   <div className='d-flex my-1 justify-content-end'>
                                     <span
                                       className='mx-2 py-2 badge bg-danger'
@@ -353,13 +355,13 @@ function Order() {
                         <button
                           style={{ backgroundColor: "#ff8c00" }}
                           className='btn text-white mx-3'
-                          onClick={() => {}}
+                          onClick={() => { }}
                         >
                           Print
                         </button>
                       )}
                       content={() => printRef?.current}
-                      onBeforePrint={() => {}}
+                      onBeforePrint={() => { }}
                     ></ReactToPrint>
                   </div>
                 </div>
@@ -425,7 +427,6 @@ function Order() {
                             {order?.productType === "custom_pizza"
                               ? ""
                               : order.productName}
-                            {console.log(order)}
                             {objectToArray?.map((item, index) => {
                               if (item.key === "dips") {
                                 return (
@@ -451,15 +452,14 @@ function Order() {
                                                       {dips.dipsName}
                                                     </div>
                                                     {order?.productType !==
-                                                      "Special_Pizza" && (
-                                                      <div className='col-3 text-end me-0 pe-0'>
-                                                        $
-                                                        {dips.dipsPrice !==
-                                                        undefined
-                                                          ? dips?.dipsPrice
-                                                          : dips?.price}
-                                                      </div>
-                                                    )}
+                                                      "special_pizza" && (
+                                                        <div className='col-3 text-end me-0 pe-0'>
+                                                          {dips.dipsPrice !==
+                                                            undefined
+                                                            ? `$ ${dips?.dipsPrice}`
+                                                            : null}
+                                                        </div>
+                                                      )}
                                                   </div>
                                                 </div>
                                               </>
@@ -472,16 +472,13 @@ function Order() {
                                 );
                               }
                               if (item.key === "sides") {
-                                console.log(
-                                  item?.value,
-                                  item?.value[0]?.sidesName !== undefined ||
-                                    item?.value[0]?.sideName !== undefined,
-                                  "item?.value"
-                                );
+                                // console.log(
+                                //   item?.value,
+                                // );
                                 return (
                                   <>
                                     {item?.value[0]?.sidesName !== undefined ||
-                                    item?.value[0]?.sideName !== undefined ? (
+                                      item?.value[0]?.sideName !== undefined ? (
                                       <>
                                         <strong
                                           className='m-0'
@@ -499,32 +496,18 @@ function Order() {
                                                       className='col-7 text-capitalize'
                                                       key={index}
                                                     >
-                                                      {side?.sidesName !==
-                                                      undefined
-                                                        ? side?.sidesName
-                                                        : null}
-                                                      {side?.sideName} (
-                                                      {side?.lineEntries !==
-                                                      undefined
-                                                        ? side?.lineEntries[0]
-                                                            ?.size
-                                                        : side?.sidesSize}
-                                                      )
+                                                      {sideTypeArr.includes(side?.sideType) ? `(${side?.sideType}) ` : ""}
+                                                      {side?.sideName}
+                                                      {side?.sideSize ? ` (${side.sideSize})` : ""}
                                                     </div>
                                                     {order?.productType !==
-                                                      "Special_Pizza" && (
-                                                      <div className='col-5 text-end'>
-                                                        $
-                                                        {side?.sidesPrice !==
-                                                        undefined
-                                                          ? side?.sidesPrice
-                                                          : side?.lineEntries !==
-                                                            undefined
-                                                          ? side?.lineEntries[0]
-                                                              ?.price
-                                                          : null}
-                                                      </div>
-                                                    )}
+                                                      "special_pizza" && (
+                                                        <div className='col-5 text-end'>
+                                                          {side?.totalPrice > 0
+                                                            ? `$ ${side?.totalPrice}`
+                                                            : null}
+                                                        </div>
+                                                      )}
                                                   </div>
                                                 </div>
                                               </>
@@ -556,31 +539,31 @@ function Order() {
                                 return (
                                   <>
                                     {order?.productType === "custom_pizza" ||
-                                    order?.productType === "Special_Pizza"
+                                      order?.productType === "Special_Pizza"
                                       ? item?.value[0]?.drinksName !==
-                                          undefined && (
-                                          <>
-                                            <strong
-                                              className='m-0'
-                                              style={{ color: "#191919" }}
-                                            >
-                                              Drinks :{" "}
-                                            </strong>
-                                            <div className='col-12 text-capitalize'>
-                                              {item.value?.map(
-                                                (drink, index) => {
-                                                  return (
-                                                    <>
-                                                      <div>
-                                                        <div className='row'>
-                                                          <div
-                                                            className='col-9 text-capitalize'
-                                                            key={index}
-                                                          >
-                                                            {drink.drinksName}
-                                                          </div>
-                                                          {order?.productType !==
-                                                            "Special_Pizza" && (
+                                      undefined && (
+                                        <>
+                                          <strong
+                                            className='m-0'
+                                            style={{ color: "#191919" }}
+                                          >
+                                            Drinks :{" "}
+                                          </strong>
+                                          <div className='col-12 text-capitalize'>
+                                            {item.value?.map(
+                                              (drink, index) => {
+                                                return (
+                                                  <>
+                                                    <div>
+                                                      <div className='row'>
+                                                        <div
+                                                          className='col-9 text-capitalize'
+                                                          key={index}
+                                                        >
+                                                          {drink.drinksName}
+                                                        </div>
+                                                        {order?.productType !==
+                                                          "Special_Pizza" && (
                                                             <div className='col-3 text-end'>
                                                               $
                                                               {
@@ -588,15 +571,15 @@ function Order() {
                                                               }
                                                             </div>
                                                           )}
-                                                        </div>
                                                       </div>
-                                                    </>
-                                                  );
-                                                }
-                                              )}
-                                            </div>
-                                          </>
-                                        )
+                                                    </div>
+                                                  </>
+                                                );
+                                              }
+                                            )}
+                                          </div>
+                                        </>
+                                      )
                                       : null}
                                   </>
                                 );
@@ -732,10 +715,20 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
       {pizzaData.value.map((ele, index) => (
         <div key={index}>
           {productType === "special_pizza" && index > 0 ? (
-            <p className='p-0 m-0 fw-bold mt-1' style={{ color: "#191919" }}>
+            <p className='p-0 m-0 fw-bold mt-2' style={{ color: "#191919" }}>
               Next Pizza
             </p>
           ) : null}
+          {
+            ele?.toppings?.freeToppings.length >= 6 &&
+            (
+              <div className='row'>
+                <div className='col-9 text-capitalize'>
+                  <strong style={{ color: "#191919" }}>Indian Style</strong>
+                </div>
+              </div>
+            )
+          }
 
           {ele?.cheese?.cheeseName !== "Mozzarella" && (
             <div className='row'>
@@ -746,7 +739,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
               </div>
               <div className='col-3 text-end m-0 p-0'>
                 {ele?.cheese?.price === undefined ||
-                ele?.cheese?.price === "0.00"
+                  ele?.cheese?.price === "0.00"
                   ? ""
                   : `$ ${ele?.cheese?.price}`}
               </div>
@@ -760,7 +753,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
               </div>
               <div className='col-3 text-end m-0 p-0'>
                 {ele?.crust?.crustPrice === undefined ||
-                ele?.crust?.crustPrice === "0.00"
+                  ele?.crust?.crustPrice === "0.00"
                   ? ""
                   : `$ ${ele?.crust?.crustPrice}`}
                 {ele?.crust?.price === undefined || ele?.crust?.price === "0.00"
@@ -780,11 +773,11 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
                   </div>
                   <div className='col-3 pe-0 text-end'>
                     {ele?.specialBases?.price === undefined ||
-                    ele?.specialBases?.price === "0.00"
+                      ele?.specialBases?.price === "0.00"
                       ? ""
                       : `$ ${ele?.specialBases?.price}`}
                     {ele?.specialbases?.price === undefined ||
-                    ele?.specialbases?.price === "0.00"
+                      ele?.specialbases?.price === "0.00"
                       ? ""
                       : `$ ${ele?.specialbases?.price}`}
                   </div>
@@ -815,15 +808,7 @@ export const ToppingsList = ({ toppingsData }) => {
   );
 
   function renderToppingsList(toppingsList, countAs) {
-    if (toppingsList.length === 6 && countAs === "") {
-      return (
-        <div className='row'>
-          <div className='col-9 text-capitalize'>
-            <strong style={{ color: "#191919" }}>Indian Style</strong>
-          </div>
-        </div>
-      );
-    } else {
+    if (toppingsList.length < 6 && countAs === "") {
       return (
         <div>
           {toppingsList?.map((topping, index) => (

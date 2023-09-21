@@ -4,9 +4,11 @@ import { useSelector } from "react-redux";
 import Barcode from "../../assets/Barcode.jpg";
 import Logo from "../../assets/logo.png";
 
+const sideTypeArr = ["poutine", "subs"];
+
 const Print = ({ orderDetail, printRef }) => {
   return (
-    <div className=' fs-6'>
+    <div className='d-none fs-6'>
       <div className='col-12 m-1' style={{ width: "273px" }} ref={printRef}>
         <div className='row'>
           <div className='d-flex justify-content-center'>
@@ -16,7 +18,7 @@ const Print = ({ orderDetail, printRef }) => {
               width={"30px"}
               height={"30px"}
               className='m-1'
-            ></img>
+            />
             <div className='d-flex flex-column'>
               <h3 className='text-center m-0 '>Mr Singh's Pizza</h3>
               <p className='text-center m-0 p-0'>Pure vegetarian</p>
@@ -59,14 +61,12 @@ const Print = ({ orderDetail, printRef }) => {
               </div>
               <div className='col-12 d-flex justify-content-between'>
                 <div className="col-6">
-
                   {orderDetail?.customerName !== "" && (
                     <p className='m-0 fw-bold'>{orderDetail?.customerName}</p>
                   )}
                   <p className='m-0 fw-bold'>Ph. {orderDetail?.mobileNumber}</p>
                 </div>
                 <div className="col-6">
-
                   <p className='m-0 fw-bold text-capitalize text-end'>
                     {orderDetail?.deliveryType}
                   </p>
@@ -111,6 +111,7 @@ const Print = ({ orderDetail, printRef }) => {
         </div>
         {orderDetail?.orderItems?.map((order, index) => {
           const product_type = order.productType.toLowerCase();
+          const orderConfig = order.config;
           const objectToArray = Object.entries(order?.config).map(
             ([key, value]) => ({ key, value })
           );
@@ -122,7 +123,19 @@ const Print = ({ orderDetail, printRef }) => {
               {product_type === "custom_pizza" ? (
                 <div className='col-10'>
                   <div className='row g-0 m-0 p-0'>
-                    <div className='col-9'>Pizza {order?.pizzaSize}</div>
+                    <div className='col-9'>
+                      <div className="">
+                        Pizza {order?.pizzaSize}
+                      </div>
+                      {
+                        order?.config?.toppings?.freeToppings.length >= 6 &&
+                        (
+                          <div className="">
+                            <b>Indian Style</b>
+                          </div>
+                        )
+                      }
+                    </div>
                     <div className='col-3 text-end'>$ {order.amount}</div>
                   </div>
                 </div>
@@ -130,6 +143,11 @@ const Print = ({ orderDetail, printRef }) => {
                 <div className='col-10'>
                   <div className='row g-0 m-0 p-0'>
                     <div className='col-9'>
+                      <b style={{ textTransform: "capitalize" }}>
+                        {
+                          product_type === "side" && sideTypeArr.includes(orderConfig?.sideType) ? `(${orderConfig?.sideType}) ` : ""
+                        }
+                      </b>
                       {product_type === "custom_pizza" ? "" : order.productName}
                     </div>
                     <div className='col-3 text-end '>
@@ -206,7 +224,7 @@ const Print = ({ orderDetail, printRef }) => {
                               <>
                                 <div className='col-2 d-flex align-items-end'>
                                   <span className='p-0 m-0'>
-                                    {side.quantity}{" "}
+                                    {side.quantity}
                                   </span>
                                 </div>
                                 <div className='col-10'>
@@ -226,17 +244,13 @@ const Print = ({ orderDetail, printRef }) => {
                                           key={index}
                                         >
                                           <span className='me-1 fw-bold'>
-                                            ({side?.sideType})
-                                            {product_type === "custom_pizza"
-                                              ? side?.sideName !== undefined
-                                                ? ` ` + side?.sideName
-                                                : null
-                                              : null}
-                                            {side?.lineEntries !== undefined
-                                              ? ` ` + side?.sideName
-                                              : null}
+                                            {
+                                              sideTypeArr.includes(side?.sideType) ? `(${side?.sideType})` : ""
+                                            }
+                                            {
+                                              side?.sideName
+                                            }
                                           </span>
-
                                           <span>
                                             {side?.sideSize === undefined
                                               ? `(${side?.lineEntries[0]?.size})`
