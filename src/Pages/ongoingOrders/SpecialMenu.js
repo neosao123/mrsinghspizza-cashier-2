@@ -480,15 +480,22 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     delete sides.image;
     if (checked) {
       let obj = {
-        ...sides,
-        lineEntries: [sides.lineEntries[0]],
+        sideCode: sides?.code,
+        sideName: sides?.sideName,
+        sideType: sides?.type,
+        lineCode: sides?.lineEntries[0]?.code,
+        sidePrice: sides?.lineEntries[0]?.price
+          ? sides?.lineEntries[0]?.price
+          : 0,
+        sideSize: sides?.lineEntries[0]?.size,
         quantity: 1,
-        sideType: sides.type,
+        totalPrice: sides.lineEntries[0].price * 1,
       };
-      // console.log("SPECIAL PIZZA SIDES ********************************", obj);
       setSidesArr([obj]);
     } else {
-      let filteredSides = sidesArr?.filter((item) => item.code !== sides.code);
+      let filteredSides = sidesArr?.filter(
+        (item) => item.sideCode !== sides.code
+      );
       setSidesArr(filteredSides);
     }
   };
@@ -873,7 +880,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
     sidesArr?.forEach((item) => {
       let ind = freeSides?.findIndex(
-        (side) => side.lineEntries[0].code === item?.lineEntries[0]?.code
+        (side) => side.lineEntries[0].code === item?.lineCode
       );
       if (ind === -1) {
         totalPrice += Number(item?.lineEntries[0]?.price)
@@ -1046,7 +1053,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                       <ul className='list-group'>
                         {getSpecialData?.freesides?.map((sidesData) => {
                           const comm = sidesArr.findIndex(
-                            (item) => item.code === sidesData.code
+                            (item) => item.sideCode === sidesData.code
                           );
                           return (
                             <>
@@ -1075,7 +1082,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                   <select
                                     value={
                                       comm !== -1
-                                        ? sidesArr[comm]?.lineEntries[0]?.code
+                                        ? sidesArr[comm]?.lineCode
                                         : ""
                                     }
                                     className='form-select w-100 d-inline-block'

@@ -87,7 +87,9 @@ function CreateYourOwn({
     setPrice(calculatePrice.toFixed(2));
   };
   let cartdata = useSelector((state) => state.cart.cart);
-
+  useEffect(() => {
+    console.log(sidesArr, "sidesArr array");
+  }, [sidesArr]);
   // Onclick Add To Cart Button
   const handleAddToCart = async (e) => {
     e.preventDefault();
@@ -414,6 +416,7 @@ function CreateYourOwn({
       let price = $("#placement-" + sideCode)
         .find(":selected")
         .attr("data-price");
+      console.log(selectSides, "sidesArr array");
       const sidesObj = {
         sideCode: selectSides[0].sideCode,
         sideName: selectSides[0].sideName,
@@ -421,8 +424,10 @@ function CreateYourOwn({
         lineCode: lineCode,
         sidePrice: price ? price : 0,
         sideSize: size,
+        quantity: 1,
+        totalPrice: price * 1,
       };
-      console.log(sidesObj, "sidesObj");
+      console.log(sidesObj, "sidesArr array obj");
       setSideArr((prevSides) => [...prevSides, sidesObj]);
     } else {
       setSideArr((prevSides) =>
@@ -438,23 +443,33 @@ function CreateYourOwn({
 
   // handle Sides Placement
   const handleSidePlacementChange = (e, sideCode) => {
-    const lineCode = $("#placement-" + sideCode)
-      .find(":selected")
-      .attr("data-key");
-    let size = $("#placement-" + sideCode)
-      .find(":selected")
-      .attr("data-size");
-    let price = $("#placement-" + sideCode)
-      .find(":selected")
-      .attr("data-price");
-    const filteredSides = sidesArr.filter(
+    const sideIndex = sidesArr?.findIndex(
       (sides) => sides.sideCode === sideCode
     );
-    if (filteredSides.length > 0) {
-      let filteredSide = filteredSides[0];
-      filteredSide.lineCode = lineCode;
-      filteredSide.sidesPrice = price;
-      filteredSide.sidesSize = size;
+    const selectSides = sidesData?.filter(
+      (sides) => sides.sideCode === sideCode
+    );
+    const selectedLineEntries = selectSides[0]?.combination?.filter(
+      (side) => side?.lineCode === e.target.value
+    );
+
+    let tempSideArr = [...sidesArr];
+    if (sideIndex !== -1) {
+      const sidesObj = {
+        sideCode: selectSides[0].sideCode,
+        sideName: selectSides[0].sideName,
+        sideType: selectSides[0].type,
+        lineCode: selectedLineEntries[0].lineCode,
+        sidePrice: selectedLineEntries[0]?.price
+          ? selectedLineEntries[0]?.price
+          : 0,
+        sideSize: selectedLineEntries[0]?.size,
+        quantity: 1,
+        totalPrice: selectedLineEntries[0]?.price * 1,
+      };
+      console.log(sidesObj, "selected side ");
+      tempSideArr[sideIndex] = sidesObj;
+      setSideArr(tempSideArr);
     }
     setCount((prevCount) => prevCount + 1);
   };
