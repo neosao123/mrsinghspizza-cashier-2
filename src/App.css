@@ -34,9 +34,18 @@
 .form-check-label {
   margin-top: 0.1rem;
   margin-left: 0.2rem;
-} 
+}
 
 .form-check-input:checked {
   background-color: #ff8c00;
   border-color: #ff8c00;
+}
+
+.store-highlight {
+  color: #b22b00;
+  font-weight: 600;
+  background: #f5e6d4;
+  padding: 0.15rem;
+  border-radius: 5px;
+  text-align: left;
 }

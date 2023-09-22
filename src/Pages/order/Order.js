@@ -12,6 +12,7 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import Print from "./Print";
 import { useSelector } from "react-redux";
+import moment from 'moment/moment';
 
 const sideTypeArr = ["poutine", "subs"];
 
@@ -168,20 +169,27 @@ function Order() {
                           key={data.code}
                           onClick={() => setOrderId(data.code)}
                         >
+
                           <div className='d-flex my-1 justify-content-between align-items-center'>
                             <div>
-                              <span>
-                                <b>
-                                  <span
-                                    className='text-capitalize'
-                                    style={{ fontSize: "12px" }}
-                                  >
-                                    {data?.orderFrom}
-                                  </span>
-                                </b>
-                              </span>
-                              <b className='mx-1'>Order #{data.orderCode}</b>
+                              <div style={{textAlign:"left"}}>
+                                <span>
+                                  <b>
+                                    <span
+                                      className='text-capitalize'
+                                      style={{ fontSize: "12px" }}
+                                    >
+                                      {data?.orderFrom}
+                                    </span>
+                                  </b>
+                                </span>
+                                <b className='mx-1'>Order #{data.orderCode}</b>
+                              </div>
+                              <div className="store-highlight">
+                                {data?.storeName}
+                              </div>
                             </div>
+
                             <div>
                               <b className='mx-3 text-dark'>
                                 $ {data.grandTotal}
@@ -367,39 +375,36 @@ function Order() {
                 </div>
                 <div className='col-12 d-flex '>
                   <div className='col-4'>
-                    <h6 className='py-2'>
+                    <h6 className='mb-2'>
                       Order No : {orderDetail?.orderCode}
                     </h6>
-                    <h6 className='py-2'>
+                    <h6 className='mb-2'>
                       Phone No : {orderDetail?.mobileNumber}
                     </h6>
-                    <h6 className='py-2'>Address : {orderDetail?.address}</h6>
-                    <h6 className='py-2'>Postal Code : not received </h6>
-                    <h6 className='py-2'>
-                      Delivery Type : {orderDetail?.deliveryType}
+                    <h6 className='mb-2'>Address : {orderDetail?.address}</h6>
+                    <h6 className='mb-2'>Postal Code : {orderDetail?.zipCode} </h6>
+                    <h6 className='mb-2'>
+                      Delivery Type : {orderDetail?.deliveryType.toUpperCase()}
                     </h6>
                   </div>
                   <div className='col-4 text-left'>
-                    <h6 className='py-2'>
+                    <h6 className='mb-2'>
                       Date :{" "}
-                      {new Date(orderDetail?.created_at)
-                        .toISOString()
-                        .replace(/T/, " ")
-                        .replace(/\.\d+Z$/, "")}
+                      {moment(orderDetail?.created_at).format("DD-MM-YYYY hh:mm A")}
                     </h6>
-                    <h6 className='py-2'>Name : {orderDetail?.customerName}</h6>
-                    <h6 className='py-2'>
+                    <h6 className='mb-2'>Name : {orderDetail?.customerName}</h6>
+                    <h6 className='mb-2'>
                       Store Location : {orderDetail?.storeLocation}
                     </h6>
                     {orderDetail?.deliveryType === "delivery" && (
-                      <h6 className='py-2'>
+                      <h6 className='mb-2'>
                         Delivery Executive :{" "}
                         {orderDetail?.deliveryExecutiveName}
                       </h6>
                     )}
                   </div>
                   <div className='col-4'>
-                    <h6 className='py-2'>Type : {orderDetail?.orderFrom}</h6>
+                    <h6 className='mb-2'>Type : {orderDetail?.orderFrom.toUpperCase()}</h6>
                   </div>
                 </div>
 
@@ -719,6 +724,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
               Next Pizza
             </p>
           ) : null}
+
           {
             ele?.toppings?.freeToppings.length >= 6 &&
             (
@@ -808,7 +814,28 @@ export const ToppingsList = ({ toppingsData }) => {
   );
 
   function renderToppingsList(toppingsList, countAs) {
-    if (toppingsList.length < 6 && countAs === "") {
+    if (countAs === "" && toppingsList.length < 6) {
+      return (
+        <div>
+          {toppingsList?.map((topping, index) => (
+            <div className='row'>
+              <div className='col-9 text-capitalize pe-0' key={index}>
+                {countAs === "2" && "(2) "}
+                {topping.toppingsName}
+                {topping.toppingsPlacement === "lefthalf" && " (L)"}
+                {topping.toppingsPlacement === "righthalf" && " (R)"}
+                {topping.toppingsPlacement === "1/4" && " (1/4)"}
+              </div>
+              <div className='col-3 text-end m-0 p-0'>
+                {topping.amount === undefined || topping.amount === 0
+                  ? ""
+                  : `$ ${topping.amount}`}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    } else {
       return (
         <div>
           {toppingsList?.map((topping, index) => (

@@ -3,6 +3,7 @@ import { PizzaDetails, ToppingsList } from "./Order";
 import { useSelector } from "react-redux";
 import Barcode from "../../assets/Barcode.jpg";
 import Logo from "../../assets/logo.png";
+import moment from "moment/moment";
 
 const sideTypeArr = ["poutine", "subs"];
 
@@ -41,21 +42,13 @@ const Print = ({ orderDetail, printRef }) => {
                   {" "}
                   Date :{" "}
                   {
-                    new Date(orderDetail?.created_at)
-                      .toISOString()
-                      .replace(/T/, " ")
-                      .replace(/\.\d+Z$/, "")
-                      .split(" ")[0]
+                    moment(orderDetail?.created_at).format("DD-MM-YYYY")
                   }
                 </p>
                 <p className='m-0'>
                   Time :{" "}
                   {
-                    new Date(orderDetail?.created_at)
-                      .toISOString()
-                      .replace(/T/, " ")
-                      .replace(/\.\d+Z$/, "")
-                      .split(" ")[1]
+                    moment(orderDetail?.created_at).format("hh:mm A")
                   }
                 </p>
               </div>
@@ -125,7 +118,7 @@ const Print = ({ orderDetail, printRef }) => {
                   <div className='row g-0 m-0 p-0'>
                     <div className='col-9'>
                       <div className="">
-                        Pizza {order?.pizzaSize}
+                        <b>Pizza {order?.pizzaSize}</b>
                       </div>
                       {
                         order?.config?.toppings?.freeToppings.length >= 6 &&
@@ -148,7 +141,7 @@ const Print = ({ orderDetail, printRef }) => {
                           product_type === "side" && sideTypeArr.includes(orderConfig?.sideType) ? `(${orderConfig?.sideType}) ` : ""
                         }
                       </b>
-                      {product_type === "custom_pizza" ? "" : order.productName}
+                      <b>{product_type === "custom_pizza" ? "" : order.productName}</b>
                     </div>
                     <div className='col-3 text-end '>
                       ${" "}
