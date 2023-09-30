@@ -4,6 +4,8 @@ export const handlePops = ({ e, pop, setDrinksArr, drinksArr }) => {
     drinksCode: pop.code,
     drinksName: pop.softDrinkName,
     drinksPrice: pop.price ? pop.price : "0",
+    quantity: 1,
+    totalPrice: Number(0).toFixed(2),
   };
   if (checked) {
     setDrinksArr([drinksObj]);

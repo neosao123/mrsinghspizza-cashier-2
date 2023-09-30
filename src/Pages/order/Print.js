@@ -4,11 +4,13 @@ import { useSelector } from "react-redux";
 import Barcode from "../../assets/Barcode.jpg";
 import Logo from "../../assets/logo.png";
 import moment from "moment/moment";
+import "./print.css";
 
 const sideTypeArr = ["poutine", "subs"];
 
 const Print = ({ orderDetail, printRef }) => {
   return (
+    // style={{ fontSize: ".8rem" }}
     <div className="d-none fs-6">
       <div className="col-12 m-1" style={{ width: "273px" }} ref={printRef}>
         <div className="row">
@@ -103,26 +105,38 @@ const Print = ({ orderDetail, printRef }) => {
           const objectToArray = Object.entries(order?.config).map(
             ([key, value]) => ({ key, value })
           );
-          {
-            console.log(order);
-          }
+          // {
+          //   console.log(order);
+          // }
           return (
             <div className="row" key={index + order?.productName}>
               <div className="col-2">
                 <span className="m-0">{order.quantity}</span>
               </div>
+              {product_type === "special_pizza" && (
+                <div className="col-10">
+                  <div className="row g-0 m-0 p-0">
+                    <div className="col-9">
+                      <div className="">
+                        <b>Pizza ({order?.pizzaSize})</b>
+                      </div>
+                    </div>
+                    <div className="col-3 text-end">$ {order.amount}</div>
+                  </div>
+                </div>
+              )}
               {product_type === "custom_pizza" ? (
                 <div className="col-10">
                   <div className="row g-0 m-0 p-0">
                     <div className="col-9">
                       <div className="">
-                        <b>Pizza {order?.pizzaSize}</b>
+                        <b>Pizza ({order?.pizzaSize})</b>
                       </div>
-                      {order?.config?.toppings?.freeToppings.length >= 6 && (
+                      {/* {order?.config?.toppings?.freeToppings.length >= 6 && (
                         <div className="">
                           <b>Indian Style</b>
                         </div>
-                      )}
+                      )} */}
                     </div>
                     <div className="col-3 text-end">$ {order.amount}</div>
                   </div>
@@ -133,21 +147,46 @@ const Print = ({ orderDetail, printRef }) => {
                     <div className="col-9">
                       <b style={{ textTransform: "capitalize" }}>
                         {product_type === "side" &&
-                        sideTypeArr.includes(orderConfig?.sideType)
-                          ? `(${orderConfig?.sideType}) `
+                        sideTypeArr.includes(orderConfig?.sidesType)
+                          ? `(${orderConfig?.sidesType}) `
                           : ""}
                       </b>
-                      <b>
-                        {product_type === "custom_pizza"
-                          ? ""
-                          : order.productName}
-                      </b>
+
+                      {product_type === "custom_pizza" ||
+                      product_type === "special_pizza" ? (
+                        ""
+                      ) : (
+                        <>
+                          <b>{order.productName}</b>
+                        </>
+                      )}
                     </div>
-                    <div className="col-3 text-end ">
-                      ${" "}
-                      {product_type !== "special_pizza"
-                        ? order.amount
-                        : order.pizzaPrice}
+                    {product_type !== "special_pizza" ? (
+                      <div className="col-3 text-end ">$ {order.amount}</div>
+                    ) : (
+                      ""
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {product_type === "side" && (
+                <div className="row pe-0">
+                  <div className="col-2 d-flex align-items-end">
+                    <span className="p-0 m-0"> </span>
+                  </div>
+                  <div className="col-10">
+                    <div className="col-12 text-capitalize">
+                      <div>
+                        <div className="row">
+                          <div className="col-9 text-capitalize" key={index}>
+                            {order?.config?.sidesSize}
+                          </div>
+                          {product_type !== "side" && (
+                            <div className="col-3 text-end pe-0 ">$ {}</div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -213,6 +252,7 @@ const Print = ({ orderDetail, printRef }) => {
                         item.value[0]?.sidesName !== undefined) ? (
                         <div className="row pe-0">
                           {item.value.map((side, index) => {
+                            console.log("side array data : ", side)
                             return (
                               <>
                                 <div className="col-2 d-flex align-items-end">
@@ -242,15 +282,15 @@ const Print = ({ orderDetail, printRef }) => {
                                         >
                                           <span className="me-1 fw-bold">
                                             {sideTypeArr.includes(
-                                              side?.sideType
+                                              side?.sidesType
                                             )
-                                              ? `(${side?.sideType})`
+                                              ? `(${side?.sidesType})`
                                               : ""}
                                             {side?.sideName}
                                           </span>
                                           <span>
                                             {side?.sideSize === undefined
-                                              ? `(${side?.lineEntries[0]?.size})`
+                                              ? `(${side?.lineEntries[0]?.sidesSize})`
                                               : `(${side?.sideSize})`}
                                           </span>
                                         </div>
@@ -316,11 +356,12 @@ const Print = ({ orderDetail, printRef }) => {
                     <div className="row pe-0">
                       <div className="col-2"></div>
                       <div className="col-10">
-                        {product_type !== "custom_pizza" && (
+                        {/* {(product_type !== "custom_pizza" ||
+                          product_type !== "special_pizza") && (
                           <p className="m-0 text-capitalize p-0 fw-bold">
                             {item.key} ({order?.pizzaSize})
                           </p>
-                        )}
+                        )} */}
                         <PizzaDetails
                           pizzaData={item}
                           productType={product_type}

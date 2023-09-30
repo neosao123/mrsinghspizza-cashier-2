@@ -43,6 +43,7 @@ function CreateYourOwn({
   const [crustSelected, setCrustSelected] = useState();
   const [cheeseSelected, setCheeseSelected] = useState();
   const [specialBasesSelected, setSpecialBasesSelected] = useState();
+  const [isAllIndiansTps, setIsAllIndiansTps] = useState(false);
   const dispatch = useDispatch();
 
   // Calculate Price
@@ -112,6 +113,7 @@ function CreateYourOwn({
                 countAsTwoToppings: countTwoToppingsArr,
                 countAsOneToppings: countOneToppingsArr,
                 freeToppings: freeToppingsArr,
+                isAllIndiansTps: isAllIndiansTps,
               },
             },
           ],
@@ -172,6 +174,7 @@ function CreateYourOwn({
                   countAsTwoToppings: countTwoToppingsArr,
                   countAsOneToppings: countOneToppingsArr,
                   freeToppings: freeToppingsArr,
+                  isAllIndiansTps: isAllIndiansTps,
                 },
               },
             ],
@@ -198,7 +201,7 @@ function CreateYourOwn({
           price: allIngredients?.crust[0]?.price,
         });
         setCheeseSelected(allIngredients?.cheese[0]);
-        setSpecialBasesSelected({ specialbaseCode: "" });
+        setSpecialBasesSelected({});
         setDips([]);
         setDrinks([]);
         setSideArr([]);
@@ -350,7 +353,6 @@ function CreateYourOwn({
     }
     setCountOneToppingsArr(arr);
   };
-
   // handle Free Toppings
   const handleFreeToppings = (e, toppingCode) => {
     const { checked } = e.target;
@@ -571,6 +573,13 @@ function CreateYourOwn({
 
   useEffect(() => {
     calculatePrice();
+    if (
+      freeToppingsArr.length === allIngredients?.toppings?.freeToppings?.length
+    ) {
+      setIsAllIndiansTps(true);
+    } else {
+      setIsAllIndiansTps(false);
+    }
   }, [
     sidesArr,
     countTwoToppingsArr,
@@ -647,8 +656,10 @@ function CreateYourOwn({
         }
       );
       setFreeToppingsArr(tempAllBoxes);
+      setIsAllIndiansTps(true);
     } else {
       setFreeToppingsArr([]);
+      setIsAllIndiansTps(false);
     }
   };
 
@@ -697,17 +708,17 @@ function CreateYourOwn({
         </>
       ) : (
         <>
-          <h6 className='text-center'>
+          <h6 className="text-center">
             {payloadEdit !== undefined &&
             payloadEdit.productType === "custom_pizza"
               ? "Edit Pizza"
               : "Pizza Selection"}
           </h6>
-          <div className='d-flex justify-content-between'>
-            <div className='d-flex justify-content-center align-items-center'>
+          <div className="d-flex justify-content-between">
+            <div className="d-flex justify-content-center align-items-center">
               <span>Size: </span>
               <select
-                className='form-select mx-2'
+                className="form-select mx-2"
                 value={sizesOfPizzaSelected}
                 onChange={handleSizeOfPizza}
               >
@@ -720,14 +731,14 @@ function CreateYourOwn({
                 })}
               </select>
             </div>
-            <h6 className=''>
-              <span className='mx-2'>$ {price}</span>
+            <h6 className="">
+              <span className="mx-2">$ {price}</span>
             </h6>
           </div>
-          <div className='row my-2'>
+          <div className="row my-2">
             {/* Crust, Cheese, SpecialBases */}
-            <div className='col-lg-4 col-md-4'>
-              <label className='mt-2 mb-1'>Crust</label>
+            <div className="col-lg-4 col-md-4">
+              <label className="mt-2 mb-1">Crust</label>
 
               <SelectDropDownCrust
                 crustSelected={crustSelected}
@@ -735,8 +746,8 @@ function CreateYourOwn({
                 allIngredients={allIngredients}
               />
             </div>
-            <div className='col-lg-4 col-md-4'>
-              <label className='mt-2 mb-1'>Cheese</label>
+            <div className="col-lg-4 col-md-4">
+              <label className="mt-2 mb-1">Cheese</label>
 
               <SelectDropDownCheese
                 cheeseSelected={cheeseSelected}
@@ -744,99 +755,99 @@ function CreateYourOwn({
                 allIngredients={allIngredients}
               />
             </div>
-            <div className='col-lg-4 col-md-4'>
-              <label className='mt-2 mb-1'>Special Bases</label>
+            <div className="col-lg-4 col-md-4">
+              <label className="mt-2 mb-1">Special Bases</label>
               <SelectDropDownSpecialBases
                 specialBasesSelected={specialBasesSelected}
                 handleSpecialBasesChange={handleSpecialBasesChange}
                 allIngredients={allIngredients}
               />
             </div>
-            <div className='col-lg-12 mt-3'>
-              <div class='form-check'>
+            <div className="col-lg-12 mt-3">
+              <div class="form-check">
                 <input
-                  class='form-check-input'
-                  type='checkbox'
-                  value=''
+                  class="form-check-input"
+                  type="checkbox"
+                  value=""
                   checked={
                     freeToppingsArr?.length ===
                     allIngredients?.toppings?.freeToppings?.length
                       ? true
                       : false
                   }
-                  id='allIndianTps'
+                  id="allIndianTps"
                   onChange={handleChangeAllIndianToppins}
                 />
-                <label class='form-check-label' for='allIndianTps'>
+                <label class="form-check-label" for="allIndianTps">
                   All Indian Style
                 </label>
               </div>
             </div>
             {/* Tabs */}
-            <div className='mt-3'>
+            <div className="mt-3">
               {/* Tabs Headings */}
-              <ul className='nav nav-tabs' role='tablist'>
-                <li className='nav-item'>
+              <ul className="nav nav-tabs" role="tablist">
+                <li className="nav-item">
                   <Link
-                    className='nav-link active py-2 px-4'
-                    data-bs-toggle='tab'
-                    to='#toppings-count-2-tab'
+                    className="nav-link active py-2 px-4"
+                    data-bs-toggle="tab"
+                    to="#toppings-count-2-tab"
                   >
                     Toppings (2)
                   </Link>
                 </li>
-                <li className='nav-item'>
+                <li className="nav-item">
                   <Link
-                    className='nav-link py-2 px-4'
-                    data-bs-toggle='tab'
-                    to='#toppings-count-1-tab'
+                    className="nav-link py-2 px-4"
+                    data-bs-toggle="tab"
+                    to="#toppings-count-1-tab"
                   >
                     Toppings (1)
                   </Link>
                 </li>
-                <li className='nav-item'>
+                <li className="nav-item">
                   <Link
-                    className='nav-link py-2 px-4'
-                    data-bs-toggle='tab'
-                    to='#toppings-free-tab'
+                    className="nav-link py-2 px-4"
+                    data-bs-toggle="tab"
+                    to="#toppings-free-tab"
                   >
                     Indian Style (Free)
                   </Link>
                 </li>
-                <li className='nav-item'>
+                <li className="nav-item">
                   <Link
-                    className='nav-link py-2 px-4'
-                    data-bs-toggle='tab'
-                    to='#sides'
+                    className="nav-link py-2 px-4"
+                    data-bs-toggle="tab"
+                    to="#sides"
                   >
                     Sides
                   </Link>
                 </li>
-                <li className='nav-item'>
+                <li className="nav-item">
                   <Link
-                    className='nav-link py-2 px-4'
-                    data-bs-toggle='tab'
-                    to='#dips'
+                    className="nav-link py-2 px-4"
+                    data-bs-toggle="tab"
+                    to="#dips"
                   >
                     Dips
                   </Link>
                 </li>
-                <li className='nav-item'>
+                <li className="nav-item">
                   <Link
-                    className='nav-link py-2 px-4'
-                    data-bs-toggle='tab'
-                    to='#drinks'
+                    className="nav-link py-2 px-4"
+                    data-bs-toggle="tab"
+                    to="#drinks"
                   >
                     Drinks
                   </Link>
                 </li>
               </ul>
               {/* Tab Content */}
-              <div className='tab-content m-0 p-0 w-100'>
+              <div className="tab-content m-0 p-0 w-100">
                 {/* Count 2 Toppings */}
                 <div
-                  id='toppings-count-2-tab'
-                  className='container tab-pane active m-0 p-0 topping-list'
+                  id="toppings-count-2-tab"
+                  className="container tab-pane active m-0 p-0 topping-list"
                 >
                   {allIngredients?.toppings?.countAsTwo?.map(
                     (countAsTwoToppings, index) => {
@@ -848,14 +859,14 @@ function CreateYourOwn({
                       return (
                         <>
                           <li
-                            className='list-group-item d-flex justify-content-between align-items-center'
+                            className="list-group-item d-flex justify-content-between align-items-center"
                             key={countAsTwoToppings.toppingsCode}
                           >
-                            <div class='form-check'>
+                            <div class="form-check">
                               <input
-                                class='form-check-input'
-                                type='checkbox'
-                                value=''
+                                class="form-check-input"
+                                type="checkbox"
+                                value=""
                                 id={countAsTwoToppings.toppingsCode}
                                 checked={comm !== -1 ? true : false}
                                 onChange={(e) =>
@@ -863,24 +874,24 @@ function CreateYourOwn({
                                 }
                               />
                               <label
-                                class='form-check-label'
+                                class="form-check-label"
                                 for={countAsTwoToppings.toppingsCode}
                               >
                                 {countAsTwoToppings.toppingsName}
                               </label>
                             </div>
                             <div
-                              className='d-flex justify-content-between align-items-center'
+                              className="d-flex justify-content-between align-items-center"
                               style={{ width: "12rem" }}
                             >
                               <p
-                                className='mx-2 mb-0 text-end'
+                                className="mx-2 mb-0 text-end"
                                 style={{ width: "35%" }}
                               >
                                 $ {countAsTwoToppings.price}
                               </p>
                               <select
-                                className='form-select d-inline-block'
+                                className="form-select d-inline-block"
                                 style={{ width: "65%" }}
                                 id={"placement-" + toppingCode}
                                 value={
@@ -894,7 +905,7 @@ function CreateYourOwn({
                                 }}
                               >
                                 <option
-                                  value='whole'
+                                  value="whole"
                                   selected={
                                     countTwoToppingsArr.length === 0
                                       ? true
@@ -903,9 +914,9 @@ function CreateYourOwn({
                                 >
                                   Whole
                                 </option>
-                                <option value='lefthalf'>Left Half</option>
-                                <option value='righthalf'>Right Half</option>
-                                <option value='1/4'>1/4</option>
+                                <option value="lefthalf">Left Half</option>
+                                <option value="righthalf">Right Half</option>
+                                <option value="1/4">1/4</option>
                               </select>
                             </div>
                           </li>
@@ -916,8 +927,8 @@ function CreateYourOwn({
                 </div>
                 {/* Count 1 Toppings */}
                 <div
-                  id='toppings-count-1-tab'
-                  className='container tab-pane m-0 p-0 topping-list'
+                  id="toppings-count-1-tab"
+                  className="container tab-pane m-0 p-0 topping-list"
                 >
                   {allIngredients?.toppings?.countAsOne?.map(
                     (countAsOneToppings, index) => {
@@ -929,14 +940,14 @@ function CreateYourOwn({
                       return (
                         <>
                           <li
-                            className='list-group-item d-flex justify-content-between align-items-center'
+                            className="list-group-item d-flex justify-content-between align-items-center"
                             key={toppingCode}
                           >
-                            <div class='form-check'>
+                            <div class="form-check">
                               <input
-                                class='form-check-input'
-                                type='checkbox'
-                                value=''
+                                class="form-check-input"
+                                type="checkbox"
+                                value=""
                                 id={countAsOneToppings.toppingsCode}
                                 checked={comm !== -1 ? true : false}
                                 onChange={(e) =>
@@ -944,24 +955,24 @@ function CreateYourOwn({
                                 }
                               />
                               <label
-                                class='form-check-label'
+                                class="form-check-label"
                                 for={countAsOneToppings.toppingsCode}
                               >
                                 {countAsOneToppings.toppingsName}
                               </label>
                             </div>
                             <div
-                              className='d-flex justify-content-between align-items-center'
+                              className="d-flex justify-content-between align-items-center"
                               style={{ width: "12rem" }}
                             >
                               <p
-                                className='mx-2 mb-0 text-end'
+                                className="mx-2 mb-0 text-end"
                                 style={{ width: "35%" }}
                               >
                                 $ {countAsOneToppings.price}
                               </p>
                               <select
-                                className='form-select d-inline-block'
+                                className="form-select d-inline-block"
                                 style={{ width: "65%" }}
                                 id={"placement-" + toppingCode}
                                 value={
@@ -975,7 +986,7 @@ function CreateYourOwn({
                                 }}
                               >
                                 <option
-                                  value='whole'
+                                  value="whole"
                                   selected={
                                     countOneToppingsArr.length === 0
                                       ? true
@@ -984,9 +995,9 @@ function CreateYourOwn({
                                 >
                                   Whole
                                 </option>
-                                <option value='lefthalf'>Left Half</option>
-                                <option value='righthalf'>Right Half</option>
-                                <option value='1/4'>1/4</option>
+                                <option value="lefthalf">Left Half</option>
+                                <option value="righthalf">Right Half</option>
+                                <option value="1/4">1/4</option>
                               </select>
                             </div>
                           </li>
@@ -997,8 +1008,8 @@ function CreateYourOwn({
                 </div>
                 {/* Free Toppings */}
                 <div
-                  id='toppings-free-tab'
-                  className='container tab-pane m-0 p-0 topping-list'
+                  id="toppings-free-tab"
+                  className="container tab-pane m-0 p-0 topping-list"
                 >
                   {allIngredients?.toppings?.freeToppings?.map(
                     (freeToppings, index) => {
@@ -1012,14 +1023,14 @@ function CreateYourOwn({
                       return (
                         <>
                           <li
-                            className='list-group-item d-flex justify-content-between align-items-center'
+                            className="list-group-item d-flex justify-content-between align-items-center"
                             key={toppingCode}
                           >
-                            <div class='form-check'>
+                            <div class="form-check">
                               <input
-                                class='form-check-input'
-                                type='checkbox'
-                                value=''
+                                class="form-check-input"
+                                type="checkbox"
+                                value=""
                                 id={freeToppings.toppingsCode}
                                 checked={comm !== -1 ? true : false}
                                 onChange={(e) =>
@@ -1027,25 +1038,25 @@ function CreateYourOwn({
                                 }
                               />
                               <label
-                                class='form-check-label'
+                                class="form-check-label"
                                 for={freeToppings.toppingsCode}
                               >
                                 {freeToppings.toppingsName}
                               </label>
                             </div>
                             <div
-                              className='d-flex justify-content-between align-items-center'
+                              className="d-flex justify-content-between align-items-center"
                               style={{ width: "12rem" }}
                             >
                               <p
-                                className='mx-2 mb-0 text-end'
+                                className="mx-2 mb-0 text-end"
                                 style={{ width: "35%" }}
                               >
                                 $ 0
                               </p>
                               <select
                                 data-topping-area={toppingCode}
-                                className='form-select d-inline-block'
+                                className="form-select d-inline-block"
                                 style={{ width: "65%" }}
                                 value={freeToppingsArr[comm]?.placement}
                                 id={"placement-" + toppingCode}
@@ -1069,16 +1080,16 @@ function CreateYourOwn({
                                 }}
                               >
                                 <option
-                                  value='whole'
+                                  value="whole"
                                   selected={
                                     freeToppingsArr?.length === 0 ? true : false
                                   }
                                 >
                                   Whole
                                 </option>
-                                <option value='lefthalf'>Left Half</option>
-                                <option value='righthalf'>Right Half</option>
-                                <option value='1/4'>1/4</option>
+                                <option value="lefthalf">Left Half</option>
+                                <option value="righthalf">Right Half</option>
+                                <option value="1/4">1/4</option>
                               </select>
                             </div>
                           </li>
@@ -1090,8 +1101,8 @@ function CreateYourOwn({
 
                 {/* Sides */}
                 <div
-                  id='sides'
-                  className='container tab-pane m-0 p-0 topping-list'
+                  id="sides"
+                  className="container tab-pane m-0 p-0 topping-list"
                 >
                   {sidesData?.map((sidesData) => {
                     const sideCode = sidesData.sideCode;
@@ -1101,13 +1112,13 @@ function CreateYourOwn({
                     return (
                       <>
                         <li
-                          className='list-group-item d-flex justify-content-between align-items-center'
+                          className="list-group-item d-flex justify-content-between align-items-center"
                           key={sidesData.sideCode}
                         >
-                          <label className='d-flex align-items-center'>
+                          <label className="d-flex align-items-center">
                             <input
-                              type='checkbox'
-                              className='mx-3 d-inline-block sidesChk'
+                              type="checkbox"
+                              className="mx-3 d-inline-block sidesChk"
                               checked={comm !== -1 ? true : false}
                               onChange={(e) => {
                                 handleSides(e, sideCode);
@@ -1122,7 +1133,7 @@ function CreateYourOwn({
                           </label>
                           <div style={{ width: "12rem" }}>
                             <select
-                              className='form-select w-100 d-inline-block'
+                              className="form-select w-100 d-inline-block"
                               id={"placement-" + sideCode}
                               onChange={(e) => {
                                 if (comm !== -1) {
@@ -1153,8 +1164,8 @@ function CreateYourOwn({
 
                 {/* Dips */}
                 <div
-                  id='dips'
-                  className='container tab-pane m-0 p-0 topping-list'
+                  id="dips"
+                  className="container tab-pane m-0 p-0 topping-list"
                 >
                   {allIngredients?.dips?.map((dipsData) => {
                     const dipCode = dipsData.dipsCode;
@@ -1163,13 +1174,13 @@ function CreateYourOwn({
                     );
                     return (
                       <li
-                        className='list-group-item d-flex justify-content-between align-items-center'
+                        className="list-group-item d-flex justify-content-between align-items-center"
                         key={dipCode}
                       >
-                        <label className='d-flex align-items-center'>
+                        <label className="d-flex align-items-center">
                           <input
-                            type='checkbox'
-                            className='mx-3 d-inline-block dipsChk'
+                            type="checkbox"
+                            className="mx-3 d-inline-block dipsChk"
                             checked={comm !== -1 ? true : false}
                             onChange={(e) => {
                               handleDips(e, dipCode);
@@ -1177,7 +1188,7 @@ function CreateYourOwn({
                           />
                           {dipsData.dipsName}
                         </label>
-                        <p className='mb-0 mx-2'>$ {dipsData.price}</p>
+                        <p className="mb-0 mx-2">$ {dipsData.price}</p>
                       </li>
                     );
                   })}
@@ -1185,8 +1196,8 @@ function CreateYourOwn({
 
                 {/* Drinks */}
                 <div
-                  id='drinks'
-                  className='container tab-pane m-0 p-0 topping-list'
+                  id="drinks"
+                  className="container tab-pane m-0 p-0 topping-list"
                 >
                   {allIngredients?.softdrinks?.map((drinksData) => {
                     const softdrinkCode = drinksData.softdrinkCode;
@@ -1195,19 +1206,19 @@ function CreateYourOwn({
                     );
                     return (
                       <li
-                        className='list-group-item d-flex justify-content-between align-items-center'
+                        className="list-group-item d-flex justify-content-between align-items-center"
                         key={softdrinkCode}
                       >
-                        <label className='d-flex align-items-center'>
+                        <label className="d-flex align-items-center">
                           <input
-                            type='checkbox'
-                            className='mx-3 d-inline-block drinksChk'
+                            type="checkbox"
+                            className="mx-3 d-inline-block drinksChk"
                             checked={comm !== -1 ? true : false}
                             onChange={(e) => handleDrinks(e, softdrinkCode)}
                           />
                           {drinksData.softDrinksName}
                         </label>
-                        <p className='mb-0 mx-2'>$ {drinksData.price}</p>
+                        <p className="mb-0 mx-2">$ {drinksData.price}</p>
                       </li>
                     );
                   })}
@@ -1215,22 +1226,22 @@ function CreateYourOwn({
               </div>
             </div>
             {/* Comments */}
-            <h6 className='text-left mt-1'>Comments</h6>
-            <div className=''>
+            <h6 className="text-left mt-1">Comments</h6>
+            <div className="">
               <textarea
-                className='form-control'
-                rows='2'
-                cols='50'
+                className="form-control"
+                rows="2"
+                cols="50"
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
               />
             </div>
           </div>
           {/* Add to Cart Button */}
-          <div className='d-flex flex-row justify-content-center align-items-center addToCartDiv position-sticky bottom-0 mb-3 '>
+          <div className="d-flex flex-row justify-content-center align-items-center addToCartDiv position-sticky bottom-0 mb-3 ">
             <button
-              type='button'
-              className='btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn'
+              type="button"
+              className="btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn"
               onClick={handleAddToCart}
             >
               {payloadEdit !== undefined &&

@@ -427,6 +427,7 @@ function Order() {
                       <th>Amount</th>
                     </tr>
                     {orderDetail?.orderItems?.map((order, index) => {
+                      console.log("order", order);
                       const objectToArray = Object.entries(order?.config).map(
                         ([key, value]) => ({ key, value })
                       );
@@ -507,9 +508,9 @@ function Order() {
                                                       key={index}
                                                     >
                                                       {sideTypeArr.includes(
-                                                        side?.sideType
+                                                        side?.sidesType
                                                       )
-                                                        ? `(${side?.sideType}) `
+                                                        ? `(${side?.sidesType}) `
                                                         : ""}
                                                       {side?.sideName}
                                                       {side?.sideSize
@@ -736,10 +737,12 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
             </p>
           ) : null}
 
-          {ele?.toppings?.freeToppings.length >= 6 && (
+          {ele?.toppings?.isAllIndiansTps === true && (
             <div className="row">
               <div className="col-9 text-capitalize">
-                <strong style={{ color: "#191919" }}>Indian Style</strong>
+                <strong style={{ color: "#191919" }}>
+                  Indian Style Toppings
+                </strong>
               </div>
             </div>
           )}
@@ -822,52 +825,41 @@ export const ToppingsList = ({ toppingsData }) => {
   );
 
   function renderToppingsList(toppingsList, countAs) {
-    if (countAs === "" && toppingsList.length < 6) {
-      return (
-        <div>
-          {toppingsList?.map((topping, index) => (
-            <div className="row">
-              <div className="col-9 text-capitalize pe-0" key={index}>
-                {countAs === "2" && "(2) "}
-                {topping.toppingsName}
-                {topping.toppingsPlacement === "lefthalf" && " (L)"}
-                {topping.toppingsPlacement === "righthalf" && " (R)"}
-                {topping.toppingsPlacement === "1/4" && " (1/4)"}
-              </div>
-              <div className="col-3 text-end m-0 p-0">
-                {topping.amount === undefined || topping.amount === 0
-                  ? ""
-                  : `$ ${topping.amount}`}
-              </div>
-            </div>
-          ))}
-        </div>
-      );
+    if (countAs === "" && toppingsData?.isAllIndiansTps === true) {
+      return <div></div>;
     } else {
       return (
         <div>
-          {toppingsList?.map((topping, index) => (
-            <div className="row">
-              {/* <div>{topping}</div> */}
-              <div className="col-9 text-capitalize pe-0" key={index}>
-                {countAs === "2" && "(2) "}
-                {topping.toppingsName}
-                <span className="fw-bold">
-                  {topping.toppingsPlacement === "whole" && " (W)"}
-                </span>
-                <span>
-                  {topping.toppingsPlacement === "lefthalf" && " (L)"}
-                </span>
-                {topping.toppingsPlacement === "righthalf" && " (R)"}
-                <span>{topping.toppingsPlacement === "1/4" && " (1/4)"}</span>
-              </div>
-              <div className="col-3 text-end m-0 p-0">
-                {topping.amount === undefined || topping.amount === 0
+          {toppingsList?.map((topping, index) => {
+            const keyToCheck = "amount";
+            const keyExists = topping.hasOwnProperty(keyToCheck);
+
+            return (
+              <div className="row">
+                {/* <div>{topping}</div> */}
+                <div className="col-9 text-capitalize pe-0" key={index}>
+                  {countAs === "2" && "(2) "}
+                  {topping.toppingsName}
+                  <span className="fw-bold">
+                    {topping.toppingsPlacement === "lefthalf" && " (L)"}
+                    {topping.toppingsPlacement === "righthalf" && " (R)"}
+                    {topping.toppingsPlacement === "1/4" && " (1/4)"}
+                  </span>
+                </div>
+                {/* {console.log("topping :", topping, topping.amount)} */}
+                <div className="col-3 text-end m-0 p-0">
+                  {/* {topping.amount === undefined || topping.amount === 0
                   ? ""
-                  : `$ ${topping.price}`}
+                  : `$ ${topping.price}`} */}
+                  {countAs === ""
+                    ? ""
+                    : keyExists
+                    ? "$ " + Number(topping?.amount).toFixed(2)
+                    : "$ " + topping?.toppingsPrice}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       );
     }

@@ -61,7 +61,9 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     let cart = JSON.parse(localStorage.getItem("CartData"));
     let cartCode;
     let customerCode;
-    let lineCode = $("#combination-" + sideCode).find(":selected").attr("data-key");
+    let lineCode = $("#combination-" + sideCode)
+      .find(":selected")
+      .attr("data-key");
 
     if (cart !== null && cart !== undefined) {
       cartCode = cart.cartCode;
@@ -110,7 +112,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
         config: {
           lineCode: selectedCombinationObj[0].lineCode,
           sidesSize: selectedCombinationObj[0].size,
-          sideType: Obj?.type,
+          sidesType: Obj?.type,
         },
         quantity: 1,
         price: selectedCombinationObj[0].price,
@@ -155,8 +157,10 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
         productType: "side",
         config: {
           lineCode: selectedSide[0].combination[0].lineCode,
-          sidesSize: selectedSide[0].combination[0].sidesSize ? selectedSide[0].combination[0].sidesSize : selectedSide[0].combination[0].size,
-          sideType: selectedSide[0].type
+          sidesSize: selectedSide[0].combination[0].sidesSize
+            ? selectedSide[0].combination[0].sidesSize
+            : selectedSide[0].combination[0].size,
+          sideType: selectedSide[0].type,
         },
         quantity: selectedSide[0].qty,
         price: selectedSide[0].price,
@@ -193,7 +197,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
         config: {
           lineCode: selectedCombination[0]?.lineCode,
           sidesSize: selectedCombination[0]?.size,
-          sideType: selectedSideForNewItem[0]?.type
+          sideType: selectedSideForNewItem[0]?.type,
         },
         quantity: selectedSideForNewItem[0]?.qty
           ? selectedSideForNewItem[0]?.qty
@@ -256,7 +260,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
   return (
     <>
       <ul
-        className='list-group'
+        className="list-group"
         style={{ overflowY: "scroll", height: "30rem" }}
       >
         {sidesData?.map((data, index) => {
@@ -265,11 +269,10 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
           );
           let obj = sidesArr?.find((item) => item.sideCode === data.sideCode);
           return (
-            <li className='list-group-item' key={data.sideCode}>
-              <div className='d-flex justify-content-between align-items-end py-2 px-1'>
-                <div className='d-flex justify-content-center w-auto'>
-                  {
-                    /* 
+            <li className="list-group-item" key={data.sideCode}>
+              <div className="d-flex justify-content-between align-items-end py-2 px-1">
+                <div className="d-flex justify-content-center w-auto">
+                  {/* 
                     <img
                       className='rounded'
                       src={data.image === "" ? `${specialImg1}` : data.image}
@@ -277,21 +280,20 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                       height='50px'
                       alt=''
                     /> 
-                    */
-                  }
+                    */}
                 </div>
-                <div className='d-flex justify-content-center flex-column py-1 w-100'>
-                  <div className='d-flex justify-content-between align-items-center'>
-                    <h6 className='mb-2'>
+                <div className="d-flex justify-content-center flex-column py-1 w-100">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <h6 className="mb-2">
                       {data.sideName}{" "}
                       <span className={"badge-" + data.type}>
                         ({data.type})
                       </span>
                     </h6>
                   </div>
-                  <div className='d-flex justify-content-between align-items-center'>
+                  <div className="d-flex justify-content-between align-items-center">
                     <select
-                      className='form-select'
+                      className="form-select"
                       style={{ width: "35%" }}
                       id={"combination-" + data.sideCode}
                       onChange={(e) => {
@@ -319,8 +321,8 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                       })}
                     </select>
                     <input
-                      type='number'
-                      className='form-control'
+                      type="number"
+                      className="form-control"
                       style={{ width: "20%" }}
                       onChange={(e) => handleQuantity(e, data)}
                       step={1}
@@ -330,13 +332,16 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                       defaultValue={1}
                     />
                     <button
-                      type='button'
-                      className='btn btn-sm customize py-1 px-2'
+                      type="button"
+                      className="btn btn-sm customize py-1 px-2"
                       style={{ width: "auto" }}
                       onClick={(e) => handleAddToCart(e, data.sideCode, data)}
                     >
                       {payloadEdit !== undefined &&
-                        payloadEdit.productType === "side" && obj !== undefined ? "Edit" : "Add To Cart"}
+                      payloadEdit.productType === "side" &&
+                      obj !== undefined
+                        ? "Edit"
+                        : "Add To Cart"}
                     </button>
                   </div>
                 </div>
