@@ -553,10 +553,11 @@ function Order() {
                                 );
                               }
                               if (item.key === "drinks") {
+                                console.log(item);
                                 return (
                                   <>
                                     {order?.productType === "custom_pizza" ||
-                                    order?.productType === "Special_Pizza"
+                                    order?.productType === "special_pizza"
                                       ? item?.value[0]?.drinksName !==
                                           undefined && (
                                           <>
