@@ -740,9 +740,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
           {ele?.toppings?.isAllIndiansTps === true && (
             <div className="row">
               <div className="col-9 text-capitalize">
-                <strong style={{ color: "#191919" }}>
-                  Indian Style Toppings
-                </strong>
+                <strong style={{ color: "#191919" }}>Indian Style</strong>
               </div>
             </div>
           )}

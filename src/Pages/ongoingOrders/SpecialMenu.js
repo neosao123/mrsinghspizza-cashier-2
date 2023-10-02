@@ -643,34 +643,35 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     ) {
       //code: getSpecialData.code,
 
-      // Update The Values of isAllIndianTps
-      if (pizzaState?.length > 0) {
-        let arr = [...pizzaState];
+      let arr = [...pizzaState];
 
-        arr = arr.map((item, index) => {
-          if (
-            toppingsData?.toppings?.freeToppings?.length ===
-            item?.toppings?.freeToppings?.length
-          ) {
-            return {
-              ...item,
+      pizzaState?.map((item, index) => {
+        if (
+          toppingsData?.toppings?.freeToppings.length ===
+          item?.toppings?.freeToppings.length
+        ) {
+          if (arr[index]) {
+            arr[index] = {
+              ...arr[index],
               toppings: {
-                ...item.toppings,
+                ...arr[index].toppings,
                 isAllIndiansTps: true,
               },
             };
-          } else {
-            return {
-              ...item,
+          }
+        } else {
+          if (arr[index]) {
+            arr[index] = {
+              ...arr[index],
               toppings: {
-                ...item.toppings,
+                ...arr[index].toppings,
                 isAllIndiansTps: false,
               },
             };
           }
-        });
-        setPizzaState(arr);
-      }
+        }
+      });
+      //setPizzaState(arr);
 
       let payloadForEdit = {
         id: payloadEdit?.id,
@@ -678,7 +679,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         productName: getSpecialData?.name,
         productType: "special_pizza",
         config: {
-          pizza: pizzaState,
+          pizza: arr,
           sides: sidesArr,
           dips: dipsArr,
           drinks: [drinksArr, popsArr],
