@@ -1,38 +1,51 @@
-.App {
-  text-align: center;
+.button-primary {
+  border: none;
+  padding: 0.35rem 0.75rem;
+  color: #ffffff;
+  background-color: #ff8c00;
+  border-radius: 5px;
+  transition: all 0.3s ease-in-out;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.button-primary:hover {
+  background-color: #f07502;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.profile-picture {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.text-large-pizza-price {
+  color: #3d007e;
 }
 
-.App-link {
-  color: #61dafb;
+.text-xlarge-pizza-price {
+  color: #00657e;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.form-check-input {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.form-check-label {
+  margin-top: 0.1rem;
+  margin-left: 0.2rem;
+}
+
+.form-check-input:checked {
+  background-color: #ff8c00;
+  border-color: #ff8c00;
+}
+
+.store-highlight {
+  color: #b22b00;
+  font-weight: 600;
+  background: #f5e6d4;
+  padding: 0.15rem;
+  border-radius: 5px;
+  text-align: left;
 }
