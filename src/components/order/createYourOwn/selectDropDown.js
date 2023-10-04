@@ -94,3 +94,96 @@ export const SelectDropDownSpecialBases = ({
     </select>
   );
 };
+export const SelectDropDownCook = ({
+  allIngredients,
+  handleCookChange,
+  cookSelected,
+}) => {
+  return (
+    <select
+      className='form-select'
+      id='cook'
+      onChange={handleCookChange}
+      defaultValue={""}
+      value={cookSelected?.cookCode}
+      required
+    >
+      <option value={""}>--- choose any one ---</option>
+      {allIngredients?.cook?.map((cook) => {
+        return (
+          <>
+            <option
+              key={cook.cookCode}
+              data-price={cook.price}
+              value={cook?.cookCode}
+            >
+              {cook.cook} - ${cook.price}
+            </option>
+          </>
+        );
+      })}
+    </select>
+  );
+};
+export const SelectDropDownSause = ({
+  allIngredients,
+  handleSauseChange,
+  sauseSelected,
+}) => {
+  return (
+    <select
+      className='form-select'
+      id='sause'
+      onChange={handleSauseChange}
+      defaultValue={""}
+      value={sauseSelected?.sauceCode}
+      required
+    >
+      <option value={""}>--- choose any one ---</option>
+      {allIngredients?.sauce?.map((sauce) => {
+        return (
+          <>
+            <option
+              key={sauce.sauceCode}
+              data-price={sauce.price}
+              value={sauce?.sauceCode}
+            >
+              {sauce.sauce} - ${sauce.price}
+            </option>
+          </>
+        );
+      })}
+    </select>
+  );
+};
+export const SelectDropDownSpicy = ({
+  allIngredients,
+  handleSpicyChange,
+  spicySelected,
+}) => {
+  return (
+    <select
+      className='form-select'
+      id='Spicy'
+      onChange={handleSpicyChange}
+      defaultValue={""}
+      value={spicySelected?.spicyCode}
+      required
+    >
+      <option value={""}>--- choose any one ---</option>
+      {allIngredients?.spices?.map((spices) => {
+        return (
+          <>
+            <option
+              key={spices.spicyCode}
+              data-price={spices.price}
+              value={spices?.spicyCode}
+            >
+              {spices.spicy} - ${spices.price}
+            </option>
+          </>
+        );
+      })}
+    </select>
+  );
+};

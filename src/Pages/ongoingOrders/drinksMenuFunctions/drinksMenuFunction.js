@@ -1,4 +1,5 @@
 export const addToCartAndResetQty = (
+  // setComment,
   dispatch,
   addToCart,
   arr,
@@ -18,7 +19,7 @@ export const addToCartAndResetQty = (
       qty: 1,
     };
   });
-  console.log(temp, "temp");
   setSoftDrinksData(temp);
   setDrinksArr([]);
+  // setComment("");
 };

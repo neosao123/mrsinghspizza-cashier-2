@@ -20,7 +20,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
 
   // handle Quantity
   const handleQuantity = (e, side) => {
-    const inputValue = e.target.value;
+    // const inputValue = e.target.value;
     let index = sidesArr?.findIndex((item) => item.sideCode === side.sideCode);
     if (index !== -1) {
       let arr = [...sidesArr];
@@ -73,9 +73,6 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     const selectedSideForNewItem = sidesArr?.filter(
       (sides) => sides.sideCode === sideCode
     );
-
-    //console.log("lineCode", lineCode, " SELECTED SIDE ", selectedSideForNewItem);
-
     const selectedCombination = selectedSideForNewItem[0]?.combination?.filter(
       (data) => data.lineCode === lineCode
     );
@@ -83,10 +80,6 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     const selectedCombinationObj = Obj?.combination?.filter(
       (data) => data.lineCode === lineCode
     );
-
-    //console.log("Selected Side combination *********** ", selectedCombination);
-
-    //console.log("Selected Side combination obj *********** ", selectedCombinationObj);
 
     let price =
       selectedCombination !== undefined && selectedCombination[0].price
@@ -126,6 +119,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
         return {
           ...item,
           qty: 1,
+          comment: "",
         };
       });
       setSidesData(temp);
@@ -168,7 +162,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
         discountAmount: discount,
         taxPer: taxPer,
         pizzaSize: "",
-        comments: "",
+        comments: selectedSide[0].comment,
       };
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
@@ -207,7 +201,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
         discountAmount: discount,
         taxPer: taxPer,
         pizzaSize: "",
-        comments: "",
+        comments: selectedSideForNewItem[0].comment,
       };
       let temp = sidesData.map((item) => {
         return {
@@ -234,6 +228,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
           price: payloadEdit?.price,
           qty: payloadEdit?.quantity,
           combination: [payloadEdit?.config],
+          comment: payloadEdit?.comments,
         },
       ]);
     }
@@ -256,11 +251,29 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
         console.log("ERROR From SidesMenu API: ", err);
       });
   };
+  const handleComment = (e, data) => {
+    let index = sidesArr?.findIndex((item) => item.sideCode === data.sideCode);
+    let selectedSideLine = sidesArr[index]?.combination?.filter(
+      (item) => item.lineCode === e.target.value
+    );
+    let obj = sidesData.find((item) => item.sideCode === data.sideCode);
+    if (index !== -1) {
+      let arr = [...sidesArr];
+
+      arr[index] = { ...arr[index], comment: e.target.value };
+      setSidesArr(arr);
+    } else {
+      // let selectedSideLine = data?.combination?.filter(
+      //   (item) => item.lineCode === e.target.value
+      // );
+      setSidesArr([{ ...obj, comment: e.target.value }]);
+    }
+  };
 
   return (
     <>
       <ul
-        className="list-group"
+        className='list-group'
         style={{ overflowY: "scroll", height: "30rem" }}
       >
         {sidesData?.map((data, index) => {
@@ -269,9 +282,9 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
           );
           let obj = sidesArr?.find((item) => item.sideCode === data.sideCode);
           return (
-            <li className="list-group-item" key={data.sideCode}>
-              <div className="d-flex justify-content-between align-items-end py-2 px-1">
-                <div className="d-flex justify-content-center w-auto">
+            <li className='list-group-item' key={data.sideCode}>
+              <div className='d-flex justify-content-between align-items-end py-2 px-1'>
+                <div className='d-flex justify-content-center w-auto'>
                   {/* 
                     <img
                       className='rounded'
@@ -282,18 +295,18 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                     /> 
                     */}
                 </div>
-                <div className="d-flex justify-content-center flex-column py-1 w-100">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <h6 className="mb-2">
+                <div className='d-flex justify-content-center flex-column py-1 w-100'>
+                  <div className='d-flex justify-content-between align-items-center'>
+                    <h6 className='mb-2'>
                       {data.sideName}{" "}
                       <span className={"badge-" + data.type}>
                         ({data.type})
                       </span>
                     </h6>
                   </div>
-                  <div className="d-flex justify-content-between align-items-center">
+                  <div className='d-flex justify-content-between align-items-center'>
                     <select
-                      className="form-select"
+                      className='form-select'
                       style={{ width: "35%" }}
                       id={"combination-" + data.sideCode}
                       onChange={(e) => {
@@ -321,8 +334,8 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                       })}
                     </select>
                     <input
-                      type="number"
-                      className="form-control"
+                      type='number'
+                      className='form-control'
                       style={{ width: "20%" }}
                       onChange={(e) => handleQuantity(e, data)}
                       step={1}
@@ -332,8 +345,8 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                       defaultValue={1}
                     />
                     <button
-                      type="button"
-                      className="btn btn-sm customize py-1 px-2"
+                      type='button'
+                      className='btn btn-sm customize py-1 px-2'
                       style={{ width: "auto" }}
                       onClick={(e) => handleAddToCart(e, data.sideCode, data)}
                     >
@@ -343,6 +356,17 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
                         ? "Edit"
                         : "Add To Cart"}
                     </button>
+                  </div>
+                  <div className='d-flex justify-content-between align-items-center'>
+                    {/* <label htmlFor="comment">comment </label> */}
+                    <input
+                      id='comment'
+                      type='text'
+                      value={obj?.comment !== undefined ? obj?.comment : ""}
+                      className='form-control mt-2'
+                      onChange={(e) => handleComment(e, data)}
+                      placeholder='eg. comment'
+                    />
                   </div>
                 </div>
               </div>

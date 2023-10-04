@@ -29,9 +29,10 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
     if (itemToUpdate !== -1) {
       let arr = [...dipsArr];
       arr[itemToUpdate] = {
-        ...data,
+        ...arr[itemToUpdate],
         qty: inputValue < 0 ? 1 : inputValue,
       };
+
       setDipsArr(arr);
     } else {
       setDipsArr([
@@ -57,6 +58,7 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
 
   useEffect(() => {
     if (payloadEdit !== undefined && payloadEdit.productType === "dips") {
+      console.log(payloadEdit, "payloadEdit");
       setDipsArr([
         ...dipsArr,
         {
@@ -64,10 +66,14 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           dipsName: payloadEdit?.productName,
           price: payloadEdit?.price,
           qty: payloadEdit?.quantity,
+          comment: payloadEdit?.comments,
         },
       ]);
     }
   }, [payloadEdit]);
+  useEffect(() => {
+    console.log(dipsArr, "dipsArr");
+  }, [dipsArr]);
 
   // Onclick Add To Cart - API Add To Cart
   const handleAddToCart = async (e, dipsitem) => {
@@ -78,6 +84,8 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
     const selectedDips = dipsArr?.filter(
       (dips) => dips.dipsCode === dipsitem.dipsCode
     );
+
+    // console.log(first);
     if (selectedDips.length === 0) {
       // config: {
       //   dips: dipsArr,
@@ -143,7 +151,7 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         discountAmount: discount,
         taxPer: taxPer,
         pizzaSize: "",
-        comments: "",
+        comments: selectedDips[0].comment,
       };
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
@@ -182,8 +190,9 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         discountAmount: discount,
         taxPer: taxPer,
         pizzaSize: "",
-        comments: "",
+        comments: selectedDips[0].comment,
       };
+      console.log(selectedDips, "selected dips");
       addToCartAndResetQty(
         dispatch,
         addToCart,
@@ -195,6 +204,19 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         selectedDips,
         "Added Successfully"
       );
+    }
+  };
+  const handleComment = (e, data) => {
+    let index = dipsArr?.findIndex((item) => item.dipsCode === data.dipsCode);
+
+    let obj = dipsData.find((item) => item.dipsCode === data.dipsCode);
+    if (index !== -1) {
+      let arr = [...dipsArr];
+
+      arr[index] = { ...arr[index], comment: e.target.value };
+      setDipsArr(arr);
+    } else {
+      setDipsArr([{ ...obj, comment: e.target.value }]);
     }
   };
 
@@ -236,11 +258,22 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
                       onClick={(e) => handleAddToCart(e, data)}
                     >
                       {payloadEdit !== undefined &&
-                        payloadEdit.productType === "dips" &&
-                        obj !== undefined
+                      payloadEdit.productType === "dips" &&
+                      obj !== undefined
                         ? "Edit"
                         : "Add To Cart"}
                     </button>
+                  </div>
+                  <div className='d-flex justify-content-between align-items-center'>
+                    {/* <label htmlFor="comment">comment </label> */}
+                    <input
+                      id='comment'
+                      type='text'
+                      value={obj?.comment !== undefined ? obj?.comment : ""}
+                      className='form-control mt-2'
+                      onChange={(e) => handleComment(e, data)}
+                      placeholder='eg. comment'
+                    />
                   </div>
                 </div>
               </div>
