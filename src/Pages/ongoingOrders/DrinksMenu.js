@@ -39,8 +39,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
     if (itemToUpdate !== -1) {
       let arr = [...drinksArr];
       arr[itemToUpdate] = {
-        ...data,
-        drinkType: e.target.value,
+        ...arr[itemToUpdate],
+        drinkType: [e.target.value],
       };
 
       setDrinksArr(arr);
@@ -50,7 +50,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         ...drinksArr,
         {
           ...data,
-          drinkType: e.target.value,
+          drinkType: [e.target.value],
+          qty: 1,
         },
       ]);
       setSelectedTypes([e.target.value]);
@@ -71,13 +72,18 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         qty: inputValue < 0 ? 1 : inputValue,
       };
       setDrinksArr(arr);
-      // setSelectedTypes([...selectedTypes, inputValue])
     } else {
       setDrinksArr([
         ...drinksArr,
         {
           ...data,
           qty: inputValue < 0 ? 1 : inputValue,
+          drinkType:
+            selectedTypes.length == 0
+              ? data?.softDrinksName === "Juice"
+                ? [JuiceType[0]]
+                : [PopsType[0]]
+              : null,
         },
       ]);
     }
@@ -128,6 +134,13 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         {
           ...data,
           comment: e.target.value,
+          qty: 1,
+          drinkType:
+            selectedTypes.length == 0
+              ? data?.softDrinksName === "Juice"
+                ? [JuiceType[0]]
+                : [PopsType[0]]
+              : null,
         },
       ]);
     }

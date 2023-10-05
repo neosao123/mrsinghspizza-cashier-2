@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { addToCart } from "../../reducer/cartReducer";
+import { v4 as uuidv4 } from "uuid";
 
 const Cart = ({ setPayloadEdit, onProductClick }) => {
   const dispatch = useDispatch();
@@ -13,6 +14,10 @@ const Cart = ({ setPayloadEdit, onProductClick }) => {
     dispatch(addToCart([...tmp]));
     toast.error("Item deleted successfully");
   };
+  const duplicateItem = (item) => {
+    console.log(item, "duplicate item");
+    dispatch(addToCart([{ ...item, id: uuidv4() }, ...cartdata]));
+  };
   useEffect(() => {
     setCartListData(cartdata);
   }, [cartdata]);
@@ -22,15 +27,15 @@ const Cart = ({ setPayloadEdit, onProductClick }) => {
       <div>
         {cartdata?.map((data, index) => {
           return (
-            <div key={"cart-div-"+index}>
+            <div key={"cart-div-" + index}>
               <div className='d-flex justify-content-between'>
                 <h6>{data.productName}</h6>
                 <span className='mx-0'>${data.amount}</span>
               </div>
               <div className='d-flex justify-content-between'>
                 <div className='d-flex justify-content-left'>
-                  {data.productType.toLowerCase() === "custom_pizza" ||
-                  data.productType.toLowerCase() === "special_pizza" ? (
+                  {data?.productType?.toLowerCase() === "custom_pizza" ||
+                  data?.productType?.toLowerCase() === "special_pizza" ? (
                     <>
                       <h6>Size: </h6>
                       <span className='mx-1'>{data.pizzaSize}</span>
@@ -47,8 +52,8 @@ const Cart = ({ setPayloadEdit, onProductClick }) => {
                   <span className=''>{data.quantity}</span>
                 </div>
               </div>
-              {data.productType.toLowerCase() === "special_pizza" ||
-              data.productType.toLowerCase() === "custom_pizza" ? (
+              {data?.productType?.toLowerCase() === "special_pizza" ||
+              data?.productType?.toLowerCase() === "custom_pizza" ? (
                 <div className='row d-flex'>
                   <div className='d-flex justify-content-left'>
                     <h6 className='me-1 col-auto'>Toppings : </h6>
@@ -104,6 +109,19 @@ const Cart = ({ setPayloadEdit, onProductClick }) => {
                 >
                   <i
                     className='fa fa-pencil-square-o'
+                    aria-hidden='true'
+                    style={{ fontSize: "1.1rem", color: "#7a3ee7" }}
+                  ></i>
+                </span>
+                <span
+                  className='btn  mx-3'
+                  onClick={() => {
+                    // setPayloadEdit(cartdata[index]);
+                    duplicateItem(cartdata[index]);
+                  }}
+                >
+                  <i
+                    className='fa fa-copy'
                     aria-hidden='true'
                     style={{ fontSize: "1.1rem", color: "#7a3ee7" }}
                   ></i>

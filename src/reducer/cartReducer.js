@@ -6,6 +6,7 @@ const initialState = {
   displaySpecialForm: false,
   printRef: null,
   orderDetail: null,
+  editRef: null,
 };
 
 const cartSlice = createSlice({
@@ -21,12 +22,21 @@ const cartSlice = createSlice({
     setPrintRef: (state, action) => {
       state.printRef = action.payload;
     },
+    setEditRef: (state, action) => {
+      state.editRef = action.payload;
+    },
     setOrderDetail: (state, action) => {
       state.orderDetail = action.payload;
     },
   },
 });
 
-export const { addToCart, setOrderDetail, setPrintRef, setDisplaySpecialForm } = cartSlice.actions;
+export const {
+  addToCart,
+  setOrderDetail,
+  setEditRef,
+  setPrintRef,
+  setDisplaySpecialForm,
+} = cartSlice.actions;
 
 export default cartSlice.reducer;

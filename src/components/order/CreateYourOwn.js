@@ -157,7 +157,6 @@ function CreateYourOwn({
         setCheeseSelected,
         setCrustSelected
       );
-
       // setCrustSelected({
       //   crustCode: allIngredients?.crust[0]?.crustCode,
       //   crustName: allIngredients?.crust[0]?.crustName,
@@ -218,23 +217,13 @@ function CreateYourOwn({
         dispatch(addToCart([...cartdata, payload]));
         toast.success(`Custom Pizza Added Successfully...`);
         setSizesOfPizzaSelected(sizesOfPizza[0]);
-        // setCrustSelected({
-        //   crustCode: allIngredients?.crust[0]?.crustCode,
-        //   crustName: allIngredients?.crust[0]?.crustName,
-        //   price: allIngredients?.crust[0]?.price,
-        // });
-        // setCheeseSelected(allIngredients?.cheese[0]);
-        // setSpecialBasesSelected({});
-        resetFields(
-          allIngredients,
-          setSpecialBasesSelected,
-          setCookSelected,
-          setSauseSelected,
-          setSpicySelected,
-          setCheeseSelected,
-          setCrustSelected
-        );
-
+        setCrustSelected({
+          crustCode: allIngredients?.crust[0]?.crustCode,
+          crustName: allIngredients?.crust[0]?.crustName,
+          price: allIngredients?.crust[0]?.price,
+        });
+        setCheeseSelected(allIngredients?.cheese[0]);
+        setSpecialBasesSelected({});
         setDips([]);
         setDrinks([]);
         setSideArr([]);
@@ -260,9 +249,6 @@ function CreateYourOwn({
       setSizesOfPizzaSelected(payloadEdit?.pizzaSize);
       setCrustSelected(payloadEdit?.config?.pizza[0]?.crust);
       setCheeseSelected(payloadEdit?.config?.pizza[0]?.cheese);
-      setSpicySelected(payloadEdit?.config?.pizza[0]?.spicy);
-      setCookSelected(payloadEdit?.config?.pizza[0]?.cook);
-      setSauseSelected(payloadEdit?.config?.pizza[0]?.sauce);
       setSpecialBasesSelected(payloadEdit?.config?.pizza[0]?.specialBases);
       setCountTwoToppingsArr(
         payloadEdit?.config?.pizza[0]?.toppings?.countAsTwoToppings
@@ -275,6 +261,7 @@ function CreateYourOwn({
       setDips(payloadEdit?.config?.dips);
       setDrinks(payloadEdit?.config?.drinks);
       setComments(payloadEdit?.comments);
+      //console.log(payloadEdit?.comments, "payloadEdit");
     }
   }, [payloadEdit]);
 
@@ -286,6 +273,10 @@ function CreateYourOwn({
         (topping) => topping.toppingsCode === toppingCode
       );
       let placement = "whole";
+      const placementValue = $("#placement-" + toppingCode).val();
+      if (placementValue !== "" && placementValue !== undefined) {
+        placement = placementValue;
+      }
       const toppingObj = {
         toppingsCode: selectedTopping[0].toppingsCode,
         toppingsName: selectedTopping[0].toppingsName,
@@ -294,7 +285,6 @@ function CreateYourOwn({
           : "0",
         toppingsPlacement: placement,
       };
-
       setCountTwoToppingsArr([...countTwoToppingsArr, toppingObj]);
     } else {
       setCountTwoToppingsArr((prevToppings) =>
@@ -310,6 +300,7 @@ function CreateYourOwn({
       )
     );
   };
+
   // handle Two Toppings Placement
   const handleCountAsTwoToppingsPlacementChange = (e, countAsTwoToppings) => {
     const selectedValue = e.target.value;
@@ -388,6 +379,7 @@ function CreateYourOwn({
     }
     setCountOneToppingsArr(arr);
   };
+
   // handle Free Toppings
   const handleFreeToppings = (e, toppingCode) => {
     const { checked } = e.target;
@@ -434,6 +426,31 @@ function CreateYourOwn({
     if (filteredToppings.length > 0) {
       let filteredTopping = filteredToppings[0];
       filteredTopping.toppingsPlacement = placement;
+    }
+  };
+  const handleSauseChange = (event) => {
+    if (event.target.value !== undefined) {
+      const selectedObject = allIngredients?.sauce?.find(
+        (option) => option.sauceCode === event.target.value
+      );
+      setSauseSelected(selectedObject);
+    }
+  };
+  const handleSpicyChange = (event) => {
+    if (event.target.value !== undefined) {
+      const selectedObject = allIngredients?.spices?.find(
+        (option) => option.spicyCode === event.target.value
+      );
+      setSpicySelected(selectedObject);
+    }
+  };
+  const handleCookChange = (event) => {
+    const selectedValue = event.target.value;
+    if (selectedValue !== undefined) {
+      const selectedObject = allIngredients?.cook?.find(
+        (option) => option.cookCode === selectedValue
+      );
+      setCookSelected(selectedObject);
     }
   };
 
@@ -538,22 +555,7 @@ function CreateYourOwn({
       )
     );
   };
-  const handleSauseChange = (event) => {
-    if (event.target.value !== undefined) {
-      const selectedObject = allIngredients?.sauce?.find(
-        (option) => option.sauceCode === event.target.value
-      );
-      setSauseSelected(selectedObject);
-    }
-  };
-  const handleSpicyChange = (event) => {
-    if (event.target.value !== undefined) {
-      const selectedObject = allIngredients?.spices?.find(
-        (option) => option.spicyCode === event.target.value
-      );
-      setSpicySelected(selectedObject);
-    }
-  };
+
   // handle Drinks
   const handleDrinks = (e, code) => {
     const { checked } = e.target;
@@ -686,15 +688,6 @@ function CreateYourOwn({
       setSpecialBasesSelected(selectedObject);
     }
   };
-  const handleCookChange = (event) => {
-    const selectedValue = event.target.value;
-    if (selectedValue !== undefined) {
-      const selectedObject = allIngredients?.cook?.find(
-        (option) => option.cookCode === selectedValue
-      );
-      setCookSelected(selectedObject);
-    }
-  };
 
   // all indian toppings
   const handleChangeAllIndianToppins = (e) => {
@@ -730,7 +723,7 @@ function CreateYourOwn({
     );
     selectedObject = {
       ...selectedObject,
-      placement: selectedValue,
+      toppingsPlacement: selectedValue,
     };
     let indexOfSelectedObject = freeToppingsArr?.findIndex(
       (option) => option.toppingsCode === toppingsCode
@@ -848,7 +841,6 @@ function CreateYourOwn({
                 spicySelected={spicySelected}
               />
             </div>
-
             <div className='col-lg-12 mt-3'>
               <div class='form-check'>
                 <input
@@ -1144,7 +1136,7 @@ function CreateYourOwn({
                                 data-topping-area={toppingCode}
                                 className='form-select d-inline-block'
                                 style={{ width: "65%" }}
-                                value={freeToppingsArr[comm]?.placement}
+                                value={freeToppingsArr[comm]?.toppingsPlacement}
                                 id={"placement-" + toppingCode}
                                 // onChange={(e) => {
                                 //   if (comm !== -1) {

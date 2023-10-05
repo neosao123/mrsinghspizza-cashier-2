@@ -11,52 +11,52 @@ const sideTypeArr = ["poutine", "subs"];
 const Print = ({ orderDetail, printRef }) => {
   return (
     // style={{ fontSize: ".8rem" }}
-    <div className="d-none fs-6">
-      <div className="col-12 m-1" style={{ width: "273px" }} ref={printRef}>
-        <div className="row">
-          <div className="d-flex justify-content-center">
+    <div className='d-none fs-6'>
+      <div className='col-12 m-1' style={{ width: "273px" }} ref={printRef}>
+        <div className='row'>
+          <div className='d-flex justify-content-center'>
             <img
               src={Logo}
               alt="Mr. Singh's Pizza logo"
               width={"30px"}
               height={"30px"}
-              className="m-1"
+              className='m-1'
             />
-            <div className="d-flex flex-column">
-              <h3 className="text-center m-0 ">Mr Singh's Pizza</h3>
-              <p className="text-center m-0 p-0">Pure vegetarian</p>
+            <div className='d-flex flex-column'>
+              <h3 className='text-center m-0 '>Mr Singh's Pizza</h3>
+              <p className='text-center m-0 p-0'>Pure vegetarian</p>
             </div>
           </div>
-          <p className="text-center mb-0">
+          <p className='text-center mb-0'>
             {orderDetail?.storeAddress ? orderDetail?.storeAddress : ""}
           </p>
-          <p className="text-center mb-1">905-500-4000</p>
+          <p className='text-center mb-1'>905-500-4000</p>
         </div>
-        <div className="row">
+        <div className='row'>
           {orderDetail?.created_at !== undefined && (
             <>
-              <div className="d-flex justify-content-between">
-                <p className="m-0"></p>
-                <p className="m-0">#{orderDetail?.orderCode}</p>
+              <div className='d-flex justify-content-between'>
+                <p className='m-0'></p>
+                <p className='m-0'>#{orderDetail?.orderCode}</p>
               </div>
-              <div className="d-flex justify-content-between">
-                <p className="m-0">
+              <div className='d-flex justify-content-between'>
+                <p className='m-0'>
                   {" "}
                   Date : {moment(orderDetail?.created_at).format("DD-MM-YYYY")}
                 </p>
-                <p className="m-0">
+                <p className='m-0'>
                   Time : {moment(orderDetail?.created_at).format("hh:mm A")}
                 </p>
               </div>
-              <div className="col-12 d-flex justify-content-between">
-                <div className="col-6">
+              <div className='col-12 d-flex justify-content-between'>
+                <div className='col-6'>
                   {orderDetail?.customerName !== "" && (
-                    <p className="m-0 fw-bold">{orderDetail?.customerName}</p>
+                    <p className='m-0 fw-bold'>{orderDetail?.customerName}</p>
                   )}
-                  <p className="m-0 fw-bold">Ph. {orderDetail?.mobileNumber}</p>
+                  <p className='m-0 fw-bold'>Ph. {orderDetail?.mobileNumber}</p>
                 </div>
-                <div className="col-6">
-                  <p className="m-0 fw-bold text-capitalize text-end">
+                <div className='col-6'>
+                  <p className='m-0 fw-bold text-capitalize text-end'>
                     {orderDetail?.deliveryType}
                   </p>
                 </div>
@@ -64,13 +64,13 @@ const Print = ({ orderDetail, printRef }) => {
             </>
           )}
           {orderDetail?.deliveryType === "delivery" && (
-            <div className="d-flex">
-              <p className="p-0 m-0 col-12">
+            <div className='d-flex'>
+              <p className='p-0 m-0 col-12'>
                 Delv addr : {orderDetail?.address}
               </p>
             </div>
           )}
-          <div className="d-flex">
+          <div className='d-flex'>
             <p
               className={`p-0 m-0 ${
                 orderDetail?.deliveryType === "delivery" ? "col-6" : "col-12"
@@ -79,21 +79,21 @@ const Print = ({ orderDetail, printRef }) => {
               OrderTakenBy: {orderDetail?.cashierName}
             </p>
             {orderDetail?.deliveryType === "delivery" && (
-              <span className="col-6 text-end">
+              <span className='col-6 text-end'>
                 Delivery Executive : {orderDetail?.deliveryExecutiveName}
               </span>
             )}
           </div>
         </div>
-        <div className="row">
-          <div className="col-2 text-dark" style={{ fontWeight: "600" }}>
+        <div className='row'>
+          <div className='col-2 text-dark' style={{ fontWeight: "600" }}>
             Qty
           </div>
-          <div className="col-7 text-dark" style={{ fontWeight: "600" }}>
+          <div className='col-7 text-dark' style={{ fontWeight: "600" }}>
             Item
           </div>
           <div
-            className="col-3 text-dark text-end"
+            className='col-3 text-dark text-end'
             style={{ fontWeight: "600" }}
           >
             Amount
@@ -109,49 +109,43 @@ const Print = ({ orderDetail, printRef }) => {
           //   console.log(order);
           // }
           return (
-            <div className="row" key={index + order?.productName}>
-              <div className="col-2">
-                <span className="m-0">{order.quantity}</span>
+            <div className='row' key={index + order?.productName}>
+              <div className='col-2'>
+                <span className='m-0'>{order.quantity}</span>
               </div>
               {product_type === "special_pizza" && (
-                <div className="col-10">
-                  <div className="row g-0 m-0 p-0">
-                    <div className="col-9">
-                      <div className="">
+                <div className='col-10'>
+                  <div className='row g-0 m-0 p-0'>
+                    <div className='col-9'>
+                      <div className=''>
                         <b>Pizza ({order?.pizzaSize})</b>
                       </div>
                     </div>
-                    <div className="col-3 text-end">$ {order.amount}</div>
+                    <div className='col-3 text-end'>$ {order.pizzaPrice}</div>
                   </div>
                 </div>
               )}
               {product_type === "custom_pizza" ? (
-                <div className="col-10">
-                  <div className="row g-0 m-0 p-0">
-                    <div className="col-9">
-                      <div className="">
+                <div className='col-10'>
+                  <div className='row g-0 m-0 p-0'>
+                    <div className='col-9'>
+                      <div className=''>
                         <b>Pizza ({order?.pizzaSize})</b>
                       </div>
-                      {/* {order?.config?.toppings?.freeToppings.length >= 6 && (
-                        <div className="">
-                          <b>Indian Style</b>
-                        </div>
-                      )} */}
                     </div>
-                    <div className="col-3 text-end">$ {order.amount}</div>
+                    <div className='col-3 text-end'>$ {order.amount}</div>
                   </div>
                 </div>
               ) : (
-                <div className="col-10">
-                  <div className="row g-0 m-0 p-0">
-                    <div className="col-9">
+                <div className='col-10'>
+                  <div className='row g-0 m-0 p-0'>
+                    <div className='col-9'>
                       <b style={{ textTransform: "capitalize" }}>
                         {product_type === "side" &&
                         sideTypeArr.includes(orderConfig?.sidesType)
                           ? `(${orderConfig?.sidesType}) `
                           : ""}
                       </b>
-
                       {product_type === "custom_pizza" ||
                       product_type === "special_pizza" ? (
                         ""
@@ -162,7 +156,7 @@ const Print = ({ orderDetail, printRef }) => {
                       )}
                     </div>
                     {product_type !== "special_pizza" ? (
-                      <div className="col-3 text-end ">$ {order.amount}</div>
+                      <div className='col-3 text-end '>$ {order.amount}</div>
                     ) : (
                       ""
                     )}
@@ -171,19 +165,19 @@ const Print = ({ orderDetail, printRef }) => {
               )}
 
               {product_type === "side" && (
-                <div className="row pe-0">
-                  <div className="col-2 d-flex align-items-end">
-                    <span className="p-0 m-0"> </span>
+                <div className='row pe-0'>
+                  <div className='col-2 d-flex align-items-end'>
+                    <span className='p-0 m-0'> </span>
                   </div>
-                  <div className="col-10">
-                    <div className="col-12 text-capitalize">
+                  <div className='col-10'>
+                    <div className='col-12 text-capitalize'>
                       <div>
-                        <div className="row">
-                          <div className="col-9 text-capitalize" key={index}>
+                        <div className='row'>
+                          <div className='col-9 text-capitalize' key={index}>
                             {order?.config?.sidesSize}
                           </div>
                           {product_type !== "side" && (
-                            <div className="col-3 text-end pe-0 ">$ {}</div>
+                            <div className='col-3 text-end pe-0 '>$ {}</div>
                           )}
                         </div>
                       </div>
@@ -197,35 +191,35 @@ const Print = ({ orderDetail, printRef }) => {
                   return (
                     <>
                       {item?.value[0]?.dipsName !== undefined && (
-                        <div className="row pe-0">
+                        <div className='row pe-0'>
                           {item?.value?.map((dips, index) => {
                             return (
                               <>
-                                <div className="col-2 d-flex align-items-end">
-                                  <span className="p-0 m-0">
+                                <div className='col-2 d-flex align-items-end'>
+                                  <span className='p-0 m-0'>
                                     {dips.quantity}{" "}
                                   </span>
                                 </div>
-                                <div className="col-10">
+                                <div className='col-10'>
                                   {index === 0 && (
                                     <strong
-                                      className="m-0"
+                                      className='m-0'
                                       style={{ color: "#191919" }}
                                     >
                                       Dips :{" "}
                                     </strong>
                                   )}
-                                  <div className="col-12 text-capitalize">
+                                  <div className='col-12 text-capitalize'>
                                     <div>
-                                      <div className="row">
+                                      <div className='row'>
                                         <div
-                                          className="col-9 text-capitalize"
+                                          className='col-9 text-capitalize'
                                           key={index}
                                         >
                                           {dips.dipsName}
                                         </div>
                                         {product_type !== "special_pizza" && (
-                                          <div className="col-3 text-end pe-0 ">
+                                          <div className='col-3 text-end pe-0 '>
                                             $
                                             {dips.dipsPrice !== undefined
                                               ? dips.dipsPrice
@@ -250,28 +244,28 @@ const Print = ({ orderDetail, printRef }) => {
                       {item.value.length > 0 &&
                       (item.value[0]?.sideName !== undefined ||
                         item.value[0]?.sidesName !== undefined) ? (
-                        <div className="row pe-0">
+                        <div className='row pe-0'>
                           {item.value.map((side, index) => {
-                            console.log("side array data : ", side)
+                            console.log("side array data : ", side);
                             return (
                               <>
-                                <div className="col-2 d-flex align-items-end">
-                                  <span className="p-0 m-0">
+                                <div className='col-2 d-flex align-items-end'>
+                                  <span className='p-0 m-0'>
                                     {side.quantity}
                                   </span>
                                 </div>
-                                <div className="col-10">
+                                <div className='col-10'>
                                   {index === 0 && (
                                     <strong
-                                      className="m-0"
+                                      className='m-0'
                                       style={{ color: "#191919" }}
                                     >
                                       Sides :
                                     </strong>
                                   )}
-                                  <div className="col-12 text-capitalize">
+                                  <div className='col-12 text-capitalize'>
                                     <div>
-                                      <div className="row">
+                                      <div className='row'>
                                         <div
                                           className={`text-capitalize ${
                                             product_type !== "special_pizza"
@@ -280,7 +274,7 @@ const Print = ({ orderDetail, printRef }) => {
                                           } `}
                                           key={index}
                                         >
-                                          <span className="me-1 fw-bold">
+                                          <span className='me-1 fw-bold'>
                                             {sideTypeArr.includes(
                                               side?.sidesType
                                             )
@@ -295,7 +289,7 @@ const Print = ({ orderDetail, printRef }) => {
                                           </span>
                                         </div>
                                         {product_type !== "special_pizza" && (
-                                          <div className="col-3 text-end p-0">
+                                          <div className='col-3 text-end p-0'>
                                             {product_type !== "special_pizza" &&
                                               (side?.sidePrice !== undefined
                                                 ? `$ ` + side?.sidePrice
@@ -311,39 +305,6 @@ const Print = ({ orderDetail, printRef }) => {
                                   </div>
                                 </div>
                               </>
-                              // <div className='col-12 pe-0'>
-                              //   <div className='row pe-0'>
-                              //     <div
-                              //       className='col-9 text-capitalize pe-0'
-                              //       key={index}
-                              //     >
-                              //       <span className='me-1 fw-bold'>
-                              //         ({side?.sideType})
-                              //         {product_type === "custom_pizza"
-                              //           ? side?.sideName !== undefined
-                              //             ? ` ` + side?.sideName
-                              //             : null
-                              //           : null}
-                              //         {side?.lineEntries !== undefined
-                              //           ? ` ` + side?.sideName
-                              //           : null}
-                              //       </span>
-                              //       <span>
-                              //         {side?.sideSize === undefined
-                              //           ? `(${side?.lineEntries[0]?.size})`
-                              //           : `(${side?.sideSize})`}
-                              //       </span>
-                              //     </div>
-                              //     <div className='col-3 text-end p-0'>
-                              //       {product_type !== "special_pizza" &&
-                              //         (side?.sidePrice !== undefined
-                              //           ? `$ ` + side?.sidePrice
-                              //           : side?.lineEntries !== undefined
-                              //           ? `$ ` + side?.lineEntries[0]?.price
-                              //           : null)}
-                              //     </div>
-                              //   </div>
-                              // </div>
                             );
                           })}
                         </div>
@@ -353,9 +314,9 @@ const Print = ({ orderDetail, printRef }) => {
                 }
                 if (item?.key === "pizza") {
                   return (
-                    <div className="row pe-0">
-                      <div className="col-2"></div>
-                      <div className="col-10">
+                    <div className='row pe-0'>
+                      <div className='col-2'></div>
+                      <div className='col-10'>
                         {/* {(product_type !== "custom_pizza" ||
                           product_type !== "special_pizza") && (
                           <p className="m-0 text-capitalize p-0 fw-bold">
@@ -367,7 +328,7 @@ const Print = ({ orderDetail, printRef }) => {
                           productType={product_type}
                         />
                         {order?.comments !== "" && (
-                          <p className="m-0 text-capitalize fst-italic fw-bold">
+                          <p className='m-0 text-capitalize fst-italic fw-bold'>
                             Comment : {order?.comments}
                           </p>
                         )}
@@ -380,38 +341,38 @@ const Print = ({ orderDetail, printRef }) => {
                     <>
                       {item?.value[0]?.drinksName !== undefined && (
                         <div
-                          className="row pe-0"
+                          className='row pe-0'
                           style={{ padding: "0px !important" }}
                         >
-                          <div className="col-2"> </div>
-                          <div className="col-10">
+                          <div className='col-2'> </div>
+                          <div className='col-10'>
                             {product_type === "custom_pizza" ||
                             product_type === "special_pizza" ? (
                               <>
                                 <strong
-                                  className="m-0"
+                                  className='m-0'
                                   style={{ color: "#191919" }}
                                 >
                                   Drinks :{" "}
                                 </strong>
-                                <div className="col-12 text-capitalize">
+                                <div className='col-12 text-capitalize'>
                                   {item.value?.map((drink, index) => {
                                     return (
                                       <>
                                         <div
-                                          className="p-0"
+                                          className='p-0'
                                           style={{ padding: "0px !important" }}
                                         >
-                                          <div className="row p-0">
+                                          <div className='row p-0'>
                                             <div
-                                              className="col-9 text-capitalize"
+                                              className='col-9 text-capitalize'
                                               key={index}
                                             >
                                               {drink.drinksName}
                                             </div>
                                             {product_type !==
                                               "special_pizza" && (
-                                              <div className="col-3 text-end pe-0">
+                                              <div className='col-3 text-end pe-0'>
                                                 ${drink.drinksPrice}
                                               </div>
                                             )}
@@ -434,36 +395,36 @@ const Print = ({ orderDetail, printRef }) => {
             </div>
           );
         })}
-        <div className="row">
-          <div className="col-4 m-0">
+        <div className='row'>
+          <div className='col-4 m-0'>
             <img
               src={Barcode}
               width={"100px"}
               height={"100px"}
-              className="mt-1"
-              alt=""
+              className='mt-1'
+              alt=''
             />
           </div>
-          <div className="col-8 text-end pe-1">
-            <p className="m-0 p-0">Sub Total : $ {orderDetail?.subTotal}</p>
-            <p className="m-0 p-0">Tax : $ {orderDetail?.taxAmount}</p>
+          <div className='col-8 text-end pe-1'>
+            <p className='m-0 p-0'>Sub Total : $ {orderDetail?.subTotal}</p>
+            <p className='m-0 p-0'>Tax : $ {orderDetail?.taxAmount}</p>
             {orderDetail?.deliveryType === "delivery" && (
-              <p className="m-0 p-0">
+              <p className='m-0 p-0'>
                 Delivery Charges:$ {orderDetail?.deliveryCharges}
               </p>
             )}
             {Number(orderDetail?.extraDeliveryCharges) > 0 ? (
-              <p className="m-0 p-0">
+              <p className='m-0 p-0'>
                 Extra Delivery Charges : ${" "}
                 {Number(orderDetail?.extraDeliveryCharges)}
               </p>
             ) : null}
             {orderDetail?.discountmount !== "0.00" && (
-              <p className="m-0 p-0">
+              <p className='m-0 p-0'>
                 Discount : $ {Number(orderDetail?.discountmount)}
               </p>
             )}
-            <p className="m-0 p-0 fw-bold">
+            <p className='m-0 p-0 fw-bold'>
               Grand Total : $ {orderDetail?.grandTotal}
             </p>
           </div>

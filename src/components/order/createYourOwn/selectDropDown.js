@@ -108,7 +108,7 @@ export const SelectDropDownCook = ({
       value={cookSelected?.cookCode}
       required
     >
-      <option value={""}>--- choose any one ---</option>
+      {/* <option value={""}>--- choose any one ---</option> */}
       {allIngredients?.cook?.map((cook) => {
         return (
           <>
@@ -139,7 +139,7 @@ export const SelectDropDownSause = ({
       value={sauseSelected?.sauceCode}
       required
     >
-      <option value={""}>--- choose any one ---</option>
+      {/* <option value={""}>--- choose any one ---</option> */}
       {allIngredients?.sauce?.map((sauce) => {
         return (
           <>
@@ -170,7 +170,7 @@ export const SelectDropDownSpicy = ({
       value={spicySelected?.spicyCode}
       required
     >
-      <option value={""}>--- choose any one ---</option>
+      {/* <option value={""}>--- choose any one ---</option> */}
       {allIngredients?.spices?.map((spices) => {
         return (
           <>

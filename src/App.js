@@ -20,8 +20,6 @@ import HelmetHeader from "./components/order/HelmetHeader";
 
 function App() {
   const dispatch = useDispatch();
-  const printRef = useRef();
-  dispatch(setPrintRef(printRef));
   const [hasToken, setHasToken] = useState(false);
   return (
     <>
@@ -35,15 +33,29 @@ function App() {
             path='/ongoing-orders'
             element={
               <AuthLayout>
-                <OngoingOrder printRef={printRef} />
+                <OngoingOrder />
               </AuthLayout>
             }
           />
-          <Route path='/orders' element={<Order printRef={printRef} />} />
+          <Route path='/orders' element={<Order />} />
           <Route path='/invoices' element={<Invoices />} />
           {/* <Route path='/reports' element={<Report />} /> */}
-          <Route path='/profile-update' element={<AuthLayout><Profile /></AuthLayout>} />
-          <Route path='/password-change' element={<AuthLayout><PasswordChange /></AuthLayout>} />
+          <Route
+            path='/profile-update'
+            element={
+              <AuthLayout>
+                <Profile />
+              </AuthLayout>
+            }
+          />
+          <Route
+            path='/password-change'
+            element={
+              <AuthLayout>
+                <PasswordChange />
+              </AuthLayout>
+            }
+          />
           {/* Page For Restricted condition */}
           <Route path='/restricted-page' element={<RestrictedPage />} />
         </Routes>

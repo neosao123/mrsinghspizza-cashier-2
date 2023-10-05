@@ -1,9 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import {
+  SelectDropDownCook,
+  SelectDropDownSause,
+  SelectDropDownSpicy,
+} from "./createYourOwn/selectDropDown";
 
 function SpecialPizzaSelection({
   getSpecialData,
   count,
+  handleCookChange,
+  handleSauseChange,
+  handleSpicyChange,
   toppingsData,
   handleCrustChange,
   pizzaState,
@@ -83,6 +91,34 @@ function SpecialPizzaSelection({
                 );
               })}
             </select>
+          </div>
+          <div className='col-lg-4 col-md-4'>
+            <label className='mt-2 mb-1'>Cook</label>
+            <SelectDropDownCook
+              allIngredients={getSpecialData}
+              handleCookChange={(event) => handleCookChange(event, count)}
+              cookSelected={pizzaState[count - 1]?.cook}
+            />
+          </div>
+          <div className='col-lg-4 col-md-4'>
+            <label className='mt-2 mb-1'>Sause</label>
+            <SelectDropDownSause
+              allIngredients={getSpecialData}
+              handleSauseChange={(event) => {
+                handleSauseChange(event, count);
+              }}
+              sauseSelected={pizzaState[count - 1]?.sauce}
+            />
+          </div>
+          <div className='col-lg-4 col-md-4'>
+            <label className='mt-2 mb-1'>Spicy</label>
+            <SelectDropDownSpicy
+              allIngredients={getSpecialData}
+              handleSpicyChange={(event) => {
+                handleSpicyChange(event, count);
+              }}
+              spicySelected={pizzaState[count - 1]?.spicy}
+            />
           </div>
           <div className='col-sm-12 mt-3'>
             <div class='form-check'>
@@ -195,8 +231,11 @@ function SpecialPizzaSelection({
                             style={{ width: "65%" }}
                             value={
                               pizzaState[count - 1]?.toppings
-                                ?.countAsTwoToppings[comm]?.placement
+                                ?.countAsTwoToppings[comm]?.toppingsPlacement
                             }
+                            id={`placement-${count - 1}-${
+                              countAsTwoToppings.toppingsCode
+                            }`}
                             onChange={(e) => {
                               handleCountAsTwoToppingsPlacementChange(
                                 e,
@@ -277,8 +316,11 @@ function SpecialPizzaSelection({
                             style={{ width: "65%" }}
                             value={
                               pizzaState[count - 1]?.toppings
-                                ?.countAsOneToppings[comm]?.placement
+                                ?.countAsOneToppings[comm]?.toppingsPlacement
                             }
+                            id={`placement-${count - 1}-${
+                              countAsOneToppings.toppingsCode
+                            }`}
                             onChange={(e) => {
                               handleCountAsOneToppingsPlacementChange(
                                 e,
@@ -360,8 +402,11 @@ function SpecialPizzaSelection({
                             value={
                               pizzaState[count - 1]?.toppings?.freeToppings[
                                 index
-                              ]?.placement
+                              ]?.toppingsPlacement
                             }
+                            id={`placement-${count - 1}-${
+                              freeToppings.toppingsCode
+                            }`}
                             onChange={(e) => {
                               handleFreeToppingsPlacementChange(
                                 e,
