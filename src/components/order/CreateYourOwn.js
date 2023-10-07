@@ -62,6 +62,10 @@ function CreateYourOwn({
     let specialbase_price = specialBasesSelected?.price
       ? specialBasesSelected?.price
       : 0;
+    let cook_price = cookSelected?.price ? cookSelected?.price : 0;
+    let sause_price = sauseSelected?.price ? sauseSelected?.price : 0;
+    let spicy_price = spicySelected?.price ? spicySelected?.price : 0;
+
     let totalSidesPrice = Number(0);
     let totalTwoToppings = Number(0);
     let totalOneToppings = Number(0);
@@ -79,7 +83,9 @@ function CreateYourOwn({
     sidesArr.map((side) => (totalSidesPrice += Number(side.sidePrice)));
     dips.map((dips) => (totalDips += Number(dips.dipsPrice)));
     drinks.map((drinks) => (totalDrinks += Number(drinks.drinksPrice)));
-
+    calculatePrice += Number(cook_price);
+    calculatePrice += Number(sause_price);
+    calculatePrice += Number(spicy_price);
     calculatePrice += Number(crust_price);
     calculatePrice += Number(cheese_price);
     calculatePrice += Number(specialbase_price);
@@ -139,13 +145,13 @@ function CreateYourOwn({
         discountAmount: discount,
         taxPer: taxPer,
       };
-      console.log(payloadForEdit.config, "payload conffig");
-
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
       );
       let tempPayload = [...cartdata];
-      tempPayload[updatedCart] = payloadForEdit;
+      let movedObject = tempPayload.splice(updatedCart, 1)[0];
+      // tempPayload.unshift(movedObject);
+      tempPayload[0] = payloadForEdit;
       dispatch(addToCart([...tempPayload]));
       setPayloadEdit();
       resetFields(
@@ -214,7 +220,7 @@ function CreateYourOwn({
         };
         console.log(payload.config, "payload conffig");
 
-        dispatch(addToCart([...cartdata, payload]));
+        dispatch(addToCart([payload, ...cartdata]));
         toast.success(`Custom Pizza Added Successfully...`);
         setSizesOfPizzaSelected(sizesOfPizza[0]);
         setCrustSelected({

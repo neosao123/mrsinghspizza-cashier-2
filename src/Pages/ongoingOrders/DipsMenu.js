@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { dipsApi } from "../../API/ongoingOrder";
 import { toast } from "react-toastify";
-import { addToCart } from "../../reducer/cartReducer";
+import { addToCart, setDipsArray } from "../../reducer/cartReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { addToCartAndResetQty } from "./dipsMenu/dipsMenuFunctions";
@@ -10,6 +10,7 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
   const [dipsData, setDipsData] = useState();
   const [dipsArr, setDipsArr] = useState([]);
   let cartdata = useSelector((state) => state.cart.cart);
+  let dipsArray = useSelector((state) => state.cart.dipsArray);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -19,31 +20,40 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
   // handle Quantity
   const handleQuantity = (e, dipsCode, data) => {
     const inputValue = e.target.value;
-    if (parseInt(inputValue) < 1) {
-      e.target.value = 1;
-    } else if (parseInt(inputValue) > 100) {
-      e.target.value = 100;
-    }
     let itemToUpdate = dipsArr?.findIndex((item) => item.dipsCode === dipsCode);
 
     if (itemToUpdate !== -1) {
       let arr = [...dipsArr];
       arr[itemToUpdate] = {
         ...arr[itemToUpdate],
-        qty: inputValue < 0 ? 1 : inputValue,
+        qty: inputValue <= 0 ? 1 : inputValue,
       };
-
+      updateInCart(dipsCode, { ...arr[itemToUpdate] });
       setDipsArr(arr);
     } else {
+      updateInCart(dipsCode, {
+        ...data,
+        qty: inputValue <= 0 ? 1 : inputValue,
+      });
+
       setDipsArr([
         ...dipsArr,
         {
           ...data,
-          qty: inputValue < 0 ? 1 : inputValue,
+          qty: inputValue <= 0 ? 1 : inputValue,
         },
       ]);
     }
   };
+
+  useEffect(() => {
+    // handleAddToCart();
+    dispatch(setDipsArray(dipsArr));
+  }, [dipsArr]);
+
+  useEffect(() => {
+    console.log(dipsArray, "dipsArray");
+  }, [dipsArray]);
 
   //API - Dips Data
   const dips = () => {
@@ -71,9 +81,6 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       ]);
     }
   }, [payloadEdit]);
-  useEffect(() => {
-    console.log(dipsArr, "dipsArr");
-  }, [dipsArr]);
 
   // Onclick Add To Cart - API Add To Cart
   const handleAddToCart = async (e, dipsitem) => {
@@ -84,12 +91,7 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
     const selectedDips = dipsArr?.filter(
       (dips) => dips.dipsCode === dipsitem.dipsCode
     );
-
-    // console.log(first);
     if (selectedDips.length === 0) {
-      // config: {
-      //   dips: dipsArr,
-      // },
       const payload = {
         id: uuidv4(),
         customerCode: customerCode ? customerCode : "#NA",
@@ -133,9 +135,6 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       (selectedDips[0]?.qty !== undefined ? Number(selectedDips[0]?.qty) : 1);
 
     if (payloadEdit !== undefined && payloadEdit.productType === "dips") {
-      // config: {
-      //   dips: dipsArr,
-      // },
       const payloadForEdit = {
         id: payloadEdit?.id,
         cartCode: cartCode ? cartCode : "#NA",
@@ -153,11 +152,8 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         pizzaSize: "",
         comments: selectedDips[0].comment,
       };
-      const updatedCart = cartdata.findIndex(
-        (item) => item.id === payloadEdit.id
-      );
       let tempPayload = [...cartdata];
-      tempPayload[updatedCart] = payloadForEdit;
+      tempPayload[0] = payloadForEdit;
       addToCartAndResetQty(
         dispatch,
         addToCart,
@@ -172,11 +168,14 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
 
       setPayloadEdit();
     } else {
-      // config: {
-      //   dips: dipsArr,
-      // },
+      let tempPayload = [...cartdata];
+
+      const updatedCartId = cartdata?.findIndex(
+        (item) => item?.productCode === selectedDips[0].dipsCode
+      );
+
       const payload = {
-        id: uuidv4(),
+        id: updatedCartId !== -1 ? cartdata[updatedCartId].id : uuidv4(),
         cartCode: cartCode ? cartCode : "#NA",
         customerCode: customerCode ? customerCode : "#NA",
         cashierCode: localStorage.getItem("cashierCode"),
@@ -192,11 +191,15 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         pizzaSize: "",
         comments: selectedDips[0].comment,
       };
-      console.log(selectedDips, "selected dips");
+      if (updatedCartId !== -1) {
+        tempPayload[updatedCartId] = payload;
+      } else {
+        tempPayload.unshift(payload);
+      }
       addToCartAndResetQty(
         dispatch,
         addToCart,
-        [...cartdata, payload],
+        [...tempPayload],
         toast,
         setDipsArr,
         setDipsData,
@@ -206,19 +209,82 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       );
     }
   };
+
+  const updateInCart = (dipsCode, data) => {
+    console.log(data, "data kdsjhfjk");
+    let itemToUpdate = dipsArr?.find((item) => {
+      item.dipsCode === dipsCode;
+    });
+    console.log(itemToUpdate, "itemToUpdate");
+    let cart = JSON.parse(localStorage.getItem("CartData"));
+
+    let tempPayload = [...cartdata];
+
+    const updatedCartId = cartdata?.findIndex(
+      (item) => item?.productCode === data?.dipsCode
+    );
+    console.log(updatedCartId, "updatedCartId");
+    let cartCode;
+    let customerCode;
+    if (cart !== null && cart !== undefined) {
+      cartCode = cart?.cartCode;
+      customerCode = cart?.customerCode;
+    }
+    let price = data?.price;
+    let totalAmount = 0;
+    totalAmount =
+      Number(price) * (data?.qty !== undefined ? Number(data?.qty) : 1);
+
+    const payload = {
+      id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),
+      cartCode: cartCode ? cartCode : "#NA",
+      customerCode: customerCode ? customerCode : "#NA",
+      cashierCode: localStorage.getItem("cashierCode"),
+      productCode: data?.dipsCode,
+      productName: data?.dipsName,
+      productType: "dips",
+      config: {},
+      quantity: data?.qty ? data?.qty : 1,
+      price: price,
+      amount: totalAmount.toFixed(2),
+      discountAmount: discount,
+      taxPer: taxPer,
+      pizzaSize: "",
+      comments: data?.comment,
+    };
+    if (updatedCartId !== -1) {
+      tempPayload[updatedCartId] = payload;
+    } else {
+      tempPayload.push(payload);
+    }
+    // dispatch(setDipsArray(tempPayload));
+    dispatch(addToCart([...tempPayload]));
+  };
   const handleComment = (e, data) => {
     let index = dipsArr?.findIndex((item) => item.dipsCode === data.dipsCode);
-
     let obj = dipsData.find((item) => item.dipsCode === data.dipsCode);
     if (index !== -1) {
       let arr = [...dipsArr];
 
       arr[index] = { ...arr[index], comment: e.target.value };
+      updateInCart(data.dipsCode, { ...arr[index], comment: e.target.value });
+
       setDipsArr(arr);
     } else {
+      updateInCart(data.dipsCode, { ...obj, comment: e.target.value });
       setDipsArr([{ ...obj, comment: e.target.value }]);
     }
   };
+  // const handleAddtoCartTemp = (e, dipsitem) => {
+  //   console.log(dipsitem, "dipsitem");
+
+  //   // dipsitem?.dipsCode;
+  //   let index = dipsArr?.findIndex(
+  //     (item) => item.dipsCode === dipsitem.dipsCode
+  //   );
+  //   let dipsTempArr = [...dipsArr];
+  //   dipsTempArr[index].qty = e.target.value;
+  // };
 
   return (
     <>

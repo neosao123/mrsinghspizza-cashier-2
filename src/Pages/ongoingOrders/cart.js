@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { addToCart } from "../../reducer/cartReducer";
 import { v4 as uuidv4 } from "uuid";
 
-const Cart = ({ setPayloadEdit, onProductClick }) => {
+const Cart = ({ setPayloadEdit, payloadEdit, onProductClick }) => {
   const dispatch = useDispatch();
   const [cartListData, setCartListData] = useState();
   let cartdata = useSelector((state) => state.cart.cart);
@@ -21,13 +21,35 @@ const Cart = ({ setPayloadEdit, onProductClick }) => {
   useEffect(() => {
     setCartListData(cartdata);
   }, [cartdata]);
+  const moveItemToTop = (item, index) => {
+    let tempPayload = [...cartdata];
+    let movedObject = tempPayload.splice(index, 1)[0];
+    tempPayload.unshift(movedObject);
+    dispatch(addToCart([...tempPayload]));
+  };
 
   return (
     <>
       <div>
         {cartdata?.map((data, index) => {
           return (
-            <div key={"cart-div-" + index}>
+            <div
+              key={"cart-div-" + index}
+              className='p-1'
+              style={{
+                borderRadius: "5px",
+                scrollTop:
+                  payloadEdit !== undefined && index === 0 ? "0" : null,
+                borderColor:
+                  payloadEdit !== undefined && index === 0
+                    ? "rgb(22 22 22)"
+                    : "",
+                boxShadow:
+                  payloadEdit !== undefined && index === 0
+                    ? " rgb(167 142 73) 0px 0px 10px"
+                    : "",
+              }}
+            >
               <div className='d-flex justify-content-between'>
                 <h6>{data.productName}</h6>
                 <span className='mx-0'>${data.amount}</span>
@@ -101,9 +123,10 @@ const Cart = ({ setPayloadEdit, onProductClick }) => {
                   ></i>
                 </span>
                 <span
-                  className='btn  mx-3'
+                  className='btn  ms-3'
                   onClick={() => {
                     setPayloadEdit(cartdata[index]);
+                    moveItemToTop(cartdata[index], index);
                     onProductClick(cartdata[index].productType);
                   }}
                 >
@@ -114,7 +137,7 @@ const Cart = ({ setPayloadEdit, onProductClick }) => {
                   ></i>
                 </span>
                 <span
-                  className='btn  mx-3'
+                  className='btn'
                   onClick={() => {
                     // setPayloadEdit(cartdata[index]);
                     duplicateItem(cartdata[index]);

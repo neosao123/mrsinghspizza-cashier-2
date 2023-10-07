@@ -124,7 +124,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
       });
       setSidesData(temp);
       setSidesArr([]);
-      dispatch(addToCart([...cartdata, payload]));
+      dispatch(addToCart([payload, ...cartdata]));
       toast.success(`${Obj.sideName} Added Successfully`);
       return;
     }
@@ -168,7 +168,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
         (item) => item.id === payloadEdit.id
       );
       let tempPayload = [...cartdata];
-      tempPayload[updatedCart] = payloadForEdit;
+      tempPayload[0] = payloadForEdit;
       dispatch(addToCart([...tempPayload]));
       setPayloadEdit();
       let temp = sidesData.map((item) => {
@@ -211,7 +211,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
       });
       setSidesData(temp);
       setSidesArr([]);
-      dispatch(addToCart([...cartdata, payload]));
+      dispatch(addToCart([payload, ...cartdata]));
       toast.success(
         `${selectedSideForNewItem[0]?.sideName} Added Successfully`
       );

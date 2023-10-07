@@ -56,9 +56,11 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       ]);
       setSelectedTypes([e.target.value]);
     }
+    // handleAddToCart(e, data);
   };
+
   useEffect(() => {
-    console.log(drinksArr, "drinksArr");
+    // data();
   }, [drinksArr]);
   const handleQuantity = (e, data) => {
     const inputValue = e.target.value;
@@ -69,7 +71,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       let arr = [...drinksArr];
       arr[itemToUpdate] = {
         ...arr[itemToUpdate],
-        qty: inputValue < 0 ? 1 : inputValue,
+        qty: inputValue <= 0 ? 1 : inputValue,
       };
       setDrinksArr(arr);
     } else {
@@ -77,7 +79,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         ...drinksArr,
         {
           ...data,
-          qty: inputValue < 0 ? 1 : inputValue,
+          qty: inputValue <= 0 ? 1 : inputValue,
           drinkType:
             selectedTypes.length == 0
               ? data?.softDrinksName === "Juice"
@@ -87,6 +89,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         },
       ]);
     }
+
+    handleAddToCart(e, data);
   };
   useEffect(() => {
     if (payloadEdit !== undefined && payloadEdit.productType === "drinks") {
@@ -148,7 +152,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
 
   // Onclick Add To Cart - API Add To Cart
   const handleAddToCart = async (e, drink) => {
-    e.preventDefault();
+    // e.preventDefault();
     const selectedDrinks = drinksArr?.filter(
       (drinks) => drinks.softdrinkCode === drink.softdrinkCode
     );
@@ -178,12 +182,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productType: "drinks",
         quantity: 1,
         config:
-          selectedTypes.length == 0
-            ? drink?.softDrinksName === "Juice"
-              ? [JuiceType[0]]
-              : [PopsType[0]]
-            : selectedTypes,
-        // config: selectedTypes.length == 0 ? drink?.softDrinksName === "Juice" ? [JuiceType[0]] : [PopsType[0]] : selectedTypes,
+          selectedTypes.length === 0 ? drink?.drinkType[0] : selectedTypes,
         price: drink?.price,
         amount: drink?.price,
         discountAmount: discount,
@@ -191,13 +190,12 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         pizzaSize: "",
         comments: selectedDrinks[0]?.comment,
       };
-      console.log(payload, "payload");
       setComment("");
       addToCartAndResetQty(
         // setComment,
         dispatch,
         addToCart,
-        [...cartdata, payload],
+        [payload, ...cartdata],
         toast,
         setDrinksArr,
         setSoftDrinksData,
@@ -207,7 +205,6 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       );
       return;
     }
-
     if (payloadEdit !== undefined && payloadEdit.productType === "drinks") {
       console.log(selectedDrinks, "selectedDrinks");
       const payloadForEdit = {
@@ -219,10 +216,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productName: selectedDrinks[0].softDrinksName,
         productType: "drinks",
         config:
-          selectedTypes.length == 0
-            ? drink?.softDrinksName === "Juice"
-              ? [JuiceType[0]]
-              : [PopsType[0]]
+          selectedTypes.length === 0
+            ? selectedDrinks[0].drinkType[0]
             : selectedTypes,
         quantity: selectedDrinks[0].qty ? selectedDrinks[0].qty : 1,
         price: selectedDrinks[0].price,
@@ -236,7 +231,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         (item) => item.id === payloadEdit.id
       );
       let tempPayload = [...cartdata];
-      tempPayload[updatedCart] = payloadForEdit;
+      tempPayload[0] = payloadForEdit;
       dispatch(addToCart([...tempPayload]));
       toast.success(
         `${selectedDrinks[0].softDrinksName} ` + "Updated Successfully"
@@ -263,10 +258,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productName: selectedDrinks[0]?.softDrinksName,
         productType: "drinks",
         config:
-          selectedTypes.length == 0
-            ? drink?.softDrinksName === "Juice"
-              ? [JuiceType[0]]
-              : [PopsType[0]]
+          selectedTypes.length === 0
+            ? selectedDrinks[0]?.drinkType[0]
             : selectedTypes,
         quantity: selectedDrinks[0]?.qty ? selectedDrinks[0]?.qty : 1,
         price: selectedDrinks[0]?.price,
@@ -276,17 +269,14 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         pizzaSize: "",
         comments: selectedDrinks[0]?.comment,
       };
-      console.log(payload, "payload");
       setComment("");
-
       addToCartAndResetQty(
         dispatch,
         addToCart,
-        [...cartdata, payload],
+        [payload, ...cartdata],
         toast,
         setDrinksArr,
         setSoftDrinksData,
-
         softDrinksData,
         [drink],
         "Added Successfully"
@@ -326,7 +316,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
                     <input
                       type='number'
                       defaultValue={1}
-                      min={0}
+                      min={1}
                       value={obj !== undefined ? obj.qty : data.qty}
                       className='form-control'
                       style={{ width: "20%" }}
@@ -345,9 +335,16 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
                         value={obj?.drinkType ? obj?.drinkType : ""}
                         onChange={(e) => handleDrinkType(e, data)}
                       >
-                        {data.softDrinksName === "Juice" ? (
+                        {data?.drinkType?.map((type, index) => {
+                          return (
+                            <option value={type} key={type + index}>
+                              {type}
+                            </option>
+                          );
+                        })}
+                        {/* {data.softDrinksName === "Juice" ? (
                           <>
-                            {JuiceType?.map((type, index) => {
+                            {JuiceType.map((type, index) => {
                               return (
                                 <option value={type} key={type + index}>
                                   {type}
@@ -365,7 +362,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
                               );
                             })}
                           </>
-                        )}
+                        )} */}
                       </select>
                     </div>
                     <button

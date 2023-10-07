@@ -789,7 +789,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         (item) => item.id === payloadEdit.id
       );
       let tempPayload = [...cartdata];
-      tempPayload[updatedCart] = payloadForEdit;
+      tempPayload[0] = payloadForEdit;
       dispatch(addToCart([...tempPayload]));
       setSidesArr([]);
       setDrinksArr([]);
@@ -871,7 +871,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             ? getSpecialData?.largePizzaPrice
             : getSpecialData?.extraLargePizzaPrice,
       };
-      dispatch(addToCart([...cartdata, payload]));
+      dispatch(addToCart([payload, ...cartdata]));
       setSidesArr([]);
       setDrinksArr([]);
       setDipsArr([]);
@@ -962,7 +962,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       totalPrice += item?.specialBases?.price
         ? Number(item?.specialBases?.price)
         : 0;
-
+      totalPrice += item?.cook?.price ? Number(item?.cook?.price) : 0;
+      totalPrice += item?.spicy?.price ? Number(item?.spicy?.price) : 0;
+      totalPrice += item?.sauce?.price ? Number(item?.sauce?.price) : 0;
       pizzaCartons.map((pizzaCarton) => {
         if (item?.toppings?.countAsOneToppings?.length > 0) {
           item?.toppings?.countAsOneToppings?.map((items) => {
