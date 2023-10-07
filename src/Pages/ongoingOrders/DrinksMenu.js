@@ -43,9 +43,19 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         drinkType: [e.target.value],
       };
 
-      setDrinksArr(arr);
       setSelectedTypes([e.target.value]);
+      setDrinksArr(arr);
+      updateInCart(data.softdrinkCode, {
+        ...arr[itemToUpdate],
+        drinkType: [e.target.value],
+      });
     } else {
+      setSelectedTypes([e.target.value]);
+      updateInCart(data.softdrinkCode, {
+        ...data,
+        drinkType: [e.target.value],
+        qty: 1,
+      });
       setDrinksArr([
         ...drinksArr,
         {
@@ -54,7 +64,6 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           qty: 1,
         },
       ]);
-      setSelectedTypes([e.target.value]);
     }
     // handleAddToCart(e, data);
   };
@@ -73,24 +82,81 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         ...arr[itemToUpdate],
         qty: inputValue <= 0 ? 1 : inputValue,
       };
+      updateInCart(data.softdrinkCode, {
+        ...arr[itemToUpdate],
+        qty: inputValue <= 0 ? 1 : inputValue,
+      });
+
       setDrinksArr(arr);
     } else {
+      updateInCart(data.softdrinkCode, {
+        ...data,
+        qty: inputValue <= 0 ? 1 : inputValue,
+        drinkType: selectedTypes.length === 0 ? data?.drinkType : selectedTypes,
+      });
+
       setDrinksArr([
         ...drinksArr,
         {
           ...data,
           qty: inputValue <= 0 ? 1 : inputValue,
           drinkType:
-            selectedTypes.length == 0
-              ? data?.softDrinksName === "Juice"
-                ? [JuiceType[0]]
-                : [PopsType[0]]
-              : null,
+            selectedTypes.length === 0 ? data?.drinkType : selectedTypes,
         },
       ]);
     }
 
-    handleAddToCart(e, data);
+    // handleAddToCart(e, data);
+  };
+  const updateInCart = (softdrinkCode, data) => {
+    // let itemToUpdate = drinksArr?.find((item) => {
+    //   item.softdrinkCode === softdrinkCode;
+    // });
+    console.log(data, "drink data");
+    let cart = JSON.parse(localStorage.getItem("CartData"));
+
+    let tempPayload = [...cartdata];
+
+    const updatedCartId = cartdata?.findIndex(
+      (item) => item?.productCode === data?.softdrinkCode
+    );
+    let cartCode;
+    let customerCode;
+    if (cart !== null && cart !== undefined) {
+      cartCode = cart?.cartCode;
+      customerCode = cart?.customerCode;
+    }
+    let price = data?.price;
+    let totalAmount = 0;
+    totalAmount =
+      Number(price) * (data?.qty !== undefined ? Number(data?.qty) : 1);
+    console.log(
+      selectedTypes.length === 0 ? data?.drinkType : selectedTypes,
+      "new change"
+    );
+    const payload = {
+      id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),
+      cartCode: cartCode ? cartCode : "#NA",
+      customerCode: customerCode ? customerCode : "#NA",
+      cashierCode: localStorage.getItem("cashierCode"),
+      productCode: data?.softdrinkCode,
+      productName: data?.softDrinksName,
+      productType: "drinks",
+      quantity: data?.qty,
+      config: selectedTypes.length === 0 ? data?.drinkType : data?.drinkType,
+      price: data?.price,
+      amount: totalAmount.toFixed(2),
+      discountAmount: discount,
+      taxPer: taxPer,
+      pizzaSize: "",
+      comments: data?.comment,
+    };
+    if (updatedCartId !== -1) {
+      tempPayload[updatedCartId] = payload;
+    } else {
+      tempPayload.push(payload);
+    }
+    dispatch(addToCart([...tempPayload]));
   };
   useEffect(() => {
     if (payloadEdit !== undefined && payloadEdit.productType === "drinks") {
@@ -140,11 +206,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           comment: e.target.value,
           qty: 1,
           drinkType:
-            selectedTypes.length == 0
-              ? data?.softDrinksName === "Juice"
-                ? [JuiceType[0]]
-                : [PopsType[0]]
-              : null,
+            selectedTypes.length === 0 ? data?.drinkType : selectedTypes,
         },
       ]);
     }
@@ -181,8 +243,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productName: drink?.softDrinksName,
         productType: "drinks",
         quantity: 1,
-        config:
-          selectedTypes.length === 0 ? drink?.drinkType[0] : selectedTypes,
+        config: selectedTypes.length === 0 ? drink?.drinkType : selectedTypes,
         price: drink?.price,
         amount: drink?.price,
         discountAmount: discount,
@@ -217,7 +278,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productType: "drinks",
         config:
           selectedTypes.length === 0
-            ? selectedDrinks[0].drinkType[0]
+            ? selectedDrinks[0].drinkType
             : selectedTypes,
         quantity: selectedDrinks[0].qty ? selectedDrinks[0].qty : 1,
         price: selectedDrinks[0].price,
@@ -248,9 +309,15 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       setSoftDrinksData(temp);
       setDrinksArr([]);
     } else {
-      console.log(selectedDrinks[0], "selected ");
+      let tempPayload = [...cartdata];
+
+      const updatedCartId = cartdata?.findIndex(
+        (item) => item?.productCode === selectedDrinks[0].softdrinkCode
+      );
+      console.log(updatedCartId, "updatedCartId");
+
       const payload = {
-        id: uuidv4(),
+        id: updatedCartId !== -1 ? cartdata[updatedCartId].id : uuidv4(),
         cartCode: cartCode ? cartCode : "#NA",
         customerCode: customerCode ? customerCode : "#NA",
         cashierCode: localStorage.getItem("cashierCode"),
@@ -259,7 +326,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productType: "drinks",
         config:
           selectedTypes.length === 0
-            ? selectedDrinks[0]?.drinkType[0]
+            ? selectedDrinks[0]?.drinkType
             : selectedTypes,
         quantity: selectedDrinks[0]?.qty ? selectedDrinks[0]?.qty : 1,
         price: selectedDrinks[0]?.price,
@@ -269,11 +336,16 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         pizzaSize: "",
         comments: selectedDrinks[0]?.comment,
       };
+      if (updatedCartId !== -1) {
+        tempPayload[updatedCartId] = payload;
+      } else {
+        tempPayload.unshift(payload);
+      }
       setComment("");
       addToCartAndResetQty(
         dispatch,
         addToCart,
-        [payload, ...cartdata],
+        [...tempPayload],
         toast,
         setDrinksArr,
         setSoftDrinksData,

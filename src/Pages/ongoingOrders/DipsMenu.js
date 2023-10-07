@@ -211,11 +211,9 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
   };
 
   const updateInCart = (dipsCode, data) => {
-    console.log(data, "data kdsjhfjk");
     let itemToUpdate = dipsArr?.find((item) => {
       item.dipsCode === dipsCode;
     });
-    console.log(itemToUpdate, "itemToUpdate");
     let cart = JSON.parse(localStorage.getItem("CartData"));
 
     let tempPayload = [...cartdata];
@@ -223,7 +221,6 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
     const updatedCartId = cartdata?.findIndex(
       (item) => item?.productCode === data?.dipsCode
     );
-    console.log(updatedCartId, "updatedCartId");
     let cartCode;
     let customerCode;
     if (cart !== null && cart !== undefined) {
@@ -257,7 +254,6 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
     } else {
       tempPayload.push(payload);
     }
-    // dispatch(setDipsArray(tempPayload));
     dispatch(addToCart([...tempPayload]));
   };
   const handleComment = (e, data) => {
@@ -275,17 +271,6 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       setDipsArr([{ ...obj, comment: e.target.value }]);
     }
   };
-  // const handleAddtoCartTemp = (e, dipsitem) => {
-  //   console.log(dipsitem, "dipsitem");
-
-  //   // dipsitem?.dipsCode;
-  //   let index = dipsArr?.findIndex(
-  //     (item) => item.dipsCode === dipsitem.dipsCode
-  //   );
-  //   let dipsTempArr = [...dipsArr];
-  //   dipsTempArr[index].qty = e.target.value;
-  // };
-
   return (
     <>
       <ul className='list-group'>

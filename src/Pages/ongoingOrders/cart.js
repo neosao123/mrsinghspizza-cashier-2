@@ -56,6 +56,13 @@ const Cart = ({ setPayloadEdit, payloadEdit, onProductClick }) => {
               </div>
               <div className='d-flex justify-content-between'>
                 <div className='d-flex justify-content-left'>
+                  {console.log(data, "product type")}
+                  {data?.productType?.toLowerCase() === "drinks" ? (
+                    <>
+                      <h6>Drink Type : </h6>
+                      <span className='mx-1'>{data?.config[0]}</span>
+                    </>
+                  ) : null}
                   {data?.productType?.toLowerCase() === "custom_pizza" ||
                   data?.productType?.toLowerCase() === "special_pizza" ? (
                     <>
