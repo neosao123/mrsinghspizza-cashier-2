@@ -211,9 +211,9 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
   };
 
   const updateInCart = (dipsCode, data) => {
-    let itemToUpdate = dipsArr?.find((item) => {
-      item.dipsCode === dipsCode;
-    });
+    // let itemToUpdate = dipsArr?.find((item) => {
+    //   item.dipsCode === dipsCode;
+    // });
     let cart = JSON.parse(localStorage.getItem("CartData"));
 
     let tempPayload = [...cartdata];

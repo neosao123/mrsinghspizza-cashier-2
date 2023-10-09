@@ -201,6 +201,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         },
       };
       setAllToppings([...allToppings, Number(countAsTwoToppings.countAs)]);
+      updateInCart({
+        pizzaState: arr,
+      });
       setPizzaState(arr);
     } else {
       let arr = [...pizzaState];
@@ -230,6 +233,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           },
         };
       }
+      updateInCart({
+        pizzaState: [...arr],
+      });
       setPizzaState([...arr]);
     }
   };
@@ -315,7 +321,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         };
 
         setAllToppings([...allToppings, Number(countAsOneToppings.countAs)]);
-
+        updateInCart({
+          pizzaState: newState,
+        });
         return newState;
       });
     } else {
@@ -350,6 +358,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             )
           );
         }
+        updateInCart({
+          pizzaState: newState,
+        });
 
         return newState;
       });
@@ -486,6 +497,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           };
         }
       }
+      updateInCart({
+        pizzaState: newState,
+      });
       return newState;
     });
   };
@@ -871,6 +885,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             ? getSpecialData?.largePizzaPrice
             : getSpecialData?.extraLargePizzaPrice,
       };
+      console.log(payload, "special pizza payload");
       dispatch(addToCart([payload, ...cartdata]));
       setSidesArr([]);
       setDrinksArr([]);
@@ -886,6 +901,65 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       createEmptyObjects(Number(getSpecialData?.noofPizzas));
       toast.success(` ${payload.productName} added to cart successfully...`);
     }
+  };
+  const handlePizzaSize = (e) => {
+    setPizzaSize(e.target.value);
+    updateInCart({ pizzaSize: e.target.value });
+  };
+  const updateInCart = (data) => {
+    let cart = JSON.parse(localStorage.getItem("CartData"));
+
+    let tempPayload = [...cartdata];
+
+    const updatedCartId = cartdata?.findIndex(
+      (item) => item?.productCode === getSpecialData.code
+    );
+    console.log(data?.pizzaState, "New Payload 2");
+    let cartCode;
+    let customerCode;
+    if (cart !== null && cart !== undefined) {
+      cartCode = cart?.cartCode;
+      customerCode = cart?.customerCode;
+    }
+    let price = 0;
+
+    let pizzaPrice =
+      data?.pizzaSize === "Large"
+        ? getSpecialData?.largePizzaPrice
+        : getSpecialData?.extraLargePizzaPrice;
+    price += Number(pizzaPrice);
+    let totalAmount = 0;
+    console.log(data, "special pizza payload");
+    let payload = {
+      id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),
+      productCode: getSpecialData.code,
+      productType: "special_pizza",
+      productName: getSpecialData?.name,
+      config: {
+        pizza: data?.pizzaState,
+        sides: sidesArr,
+        dips: dipsArr,
+        drinks: drinksArr,
+      },
+      quantity: "1",
+      price: "0",
+      amount: price,
+      comments: comments,
+      pizzaSize: data.pizzaSize !== undefined ? data.pizzaSize : pizzaSize,
+      pizzaPrice:
+        data.pizzaSize === "Large"
+          ? getSpecialData?.largePizzaPrice
+          : getSpecialData?.extraLargePizzaPrice,
+    };
+    if (updatedCartId !== -1) {
+      tempPayload[updatedCartId] = payload;
+      console.log("New Payload", payload);
+    } else {
+      tempPayload.unshift(payload);
+      console.log("New Payload", payload);
+    }
+    dispatch(addToCart([...tempPayload]));
+    console.log(tempPayload, "special pizza payload");
   };
 
   // Customize Details
@@ -1210,7 +1284,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   <select
                     className='form-select mx-2 my-2 w-25 d-inline'
                     value={pizzaSize}
-                    onChange={(e) => setPizzaSize(e.target.value)}
+                    onChange={handlePizzaSize}
                   >
                     {Number(getSpecialData?.largePizzaPrice) > 0 && (
                       <option value='Large'>Large</option>

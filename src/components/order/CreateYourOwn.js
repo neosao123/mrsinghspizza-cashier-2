@@ -101,9 +101,87 @@ function CreateYourOwn({
     setPrice(calculatePrice.toFixed(2));
   };
   let cartdata = useSelector((state) => state.cart.cart);
-  useEffect(() => {
-    console.log(sidesArr, "sidesArr array");
-  }, [sidesArr]);
+
+  const updateInCart = (data) => {
+    let cart = JSON.parse(localStorage.getItem("CartData"));
+
+    let tempPayload = [...cartdata];
+    let itemId =
+      payloadEdit !== undefined && payloadEdit.productType === "custom_pizza"
+        ? payloadEdit?.id
+        : "#NA";
+    let toUpdateCartIndex = null;
+    let updatedCartId = cartdata?.findIndex(
+      (item) => item?.id === payloadEdit?.id
+    );
+    if (updatedCartId === -1) {
+      const updatedCartId2 = cartdata?.findIndex(
+        (item) => item?.productCode === "#NA"
+      );
+
+      updatedCartId = updatedCartId2;
+    }
+    console.log(updatedCartId, "special pizza payload");
+    console.log(data, "tempPayload");
+    let cartCode;
+    let customerCode;
+    if (cart !== null && cart !== undefined) {
+      cartCode = cart?.cartCode;
+      customerCode = cart?.customerCode;
+    }
+    // let price = data?.price;
+    let totalAmount = 0;
+    // let data = {
+    //   pizzaSize: "Large",
+    // };
+    totalAmount =
+      Number(price) * (data?.qty !== undefined ? Number(data?.qty) : 1);
+    console.log(data?.pizzaSize, "data?.pizzaSize");
+    const payload = {
+      id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),
+      productCode: "#NA",
+      productName: "Create Your Own",
+      productType: "custom_pizza",
+      config: {
+        pizza: [
+          {
+            crust: crustSelected,
+            cheese: cheeseSelected,
+            specialBases: specialBasesSelected,
+            cook: cookSelected,
+            sauce: sauseSelected,
+            spicy: spicySelected,
+            toppings: {
+              countAsTwoToppings: data?.countAs2Arr
+                ? data?.countAs2Arr
+                : countTwoToppingsArr,
+              countAsOneToppings: data?.countAs1Arr
+                ? data?.countAs1Arr
+                : countOneToppingsArr,
+              freeToppings: freeToppingsArr,
+              isAllIndiansTps: isAllIndiansTps,
+            },
+          },
+        ],
+        sides: sidesArr,
+        dips: dips,
+        drinks: drinks,
+      },
+      quantity: "1",
+      price: data?.pizzaSize == "Extra Large" ? 16.49 : 11.49,
+      amount: data?.pizzaSize == "Extra Large" ? 16.49 : 11.49,
+      comments: comments,
+      pizzaSize: data.pizzaSize ? data.pizzaSize : sizesOfPizzaSelected,
+      discountAmount: discount,
+      taxPer: taxPer,
+    };
+    if (updatedCartId !== -1) {
+      tempPayload[updatedCartId] = payload;
+    } else {
+      tempPayload.unshift(payload);
+    }
+    dispatch(addToCart([...tempPayload]));
+  };
   // Onclick Add To Cart Button
   const handleAddToCart = async (e) => {
     e.preventDefault();
@@ -291,13 +369,22 @@ function CreateYourOwn({
           : "0",
         toppingsPlacement: placement,
       };
+      updateInCart({
+        countAs2Arr: [toppingObj, ...countTwoToppingsArr],
+      });
       setCountTwoToppingsArr([...countTwoToppingsArr, toppingObj]);
     } else {
-      setCountTwoToppingsArr((prevToppings) =>
-        prevToppings.filter(
+      setCountTwoToppingsArr((prevToppings) => {
+        updateInCart({
+          countAs1Arr: prevToppings.filter(
+            (toppingObj) => toppingObj.toppingsCode !== toppingCode
+          ),
+        });
+
+        return prevToppings.filter(
           (toppingObj) => toppingObj.toppingsCode !== toppingCode
-        )
-      );
+        );
+      });
     }
 
     setAllCheckBoxes((prevCheckboxes) =>
@@ -654,11 +741,10 @@ function CreateYourOwn({
     freeToppingsArr,
   ]);
 
-  // --------------using react only
-
   //pizza size (large or extra-large)
   const handleSizeOfPizza = (e) => {
     setSizesOfPizzaSelected(e.target.value);
+    updateInCart({ pizzaSize: e.target.value });
   };
 
   //crust

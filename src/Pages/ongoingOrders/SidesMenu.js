@@ -24,13 +24,18 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     let index = sidesArr?.findIndex((item) => item.sideCode === side.sideCode);
     if (index !== -1) {
       let arr = [...sidesArr];
-      arr[index].qty = e.target.value < 0 ? 1 : e.target.value;
+      arr[index].qty = e.target.value <= 0 ? 1 : e.target.value;
       setSidesArr(arr);
+      updateInCart({
+        ...arr[index],
+        qty: e.target.value <= 0 ? 1 : e.target.value,
+      });
     } else {
       setSidesArr([
         ...sidesArr,
-        { ...side, qty: e.target.value < 0 ? 1 : e.target.value },
+        { ...side, qty: e.target.value <= 0 ? 1 : e.target.value },
       ]);
+      updateInCart({ ...side, qty: e.target.value <= 0 ? 1 : e.target.value });
     }
   };
 
@@ -47,17 +52,77 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
         (item) => item.lineCode === e.target.value
       );
       setSidesArr(arr);
+      updateInCart({
+        ...arr[index],
+        combination: obj.combination.filter(
+          (item) => item.lineCode === e.target.value
+        ),
+      });
     } else {
       let selectedSideLine = data?.combination?.filter(
         (item) => item.lineCode === e.target.value
       );
       setSidesArr([{ ...data, combination: selectedSideLine }]);
+      updateInCart({ ...data, combination: selectedSideLine });
     }
+  };
+  const updateInCart = (data) => {
+    let cart = JSON.parse(localStorage.getItem("CartData"));
+
+    let tempPayload = [...cartdata];
+
+    const updatedCartId = cartdata?.findIndex(
+      (item) => item?.productCode === data?.sideCode
+    );
+    let cartCode;
+    let customerCode;
+    if (cart !== null && cart !== undefined) {
+      cartCode = cart?.cartCode;
+      customerCode = cart?.customerCode;
+    }
+    let price = data?.combination[0]?.price;
+
+    let totalAmount = 0;
+
+    totalAmount =
+      Number(price) * (data?.qty !== undefined ? Number(data?.qty) : 1);
+
+    const payload = {
+      id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),
+      cartCode: cartCode ? cartCode : "#NA",
+      customerCode: customerCode ? customerCode : "#NA",
+      cashierCode: localStorage.getItem("cashierCode"),
+      productCode: data?.sideCode,
+      productName: data?.sideName,
+      productType: "side",
+      config: {
+        lineCode: data?.combination[0]?.lineCode,
+        sidesSize: data?.combination[0]?.size,
+        sideType: data?.type,
+      },
+      quantity: data?.qty ? data?.qty : 1,
+      price: data?.combination[0]?.price,
+      amount: totalAmount.toFixed(2),
+      discountAmount: discount,
+      taxPer: taxPer,
+      pizzaSize: "",
+      comments: data?.comment ? data?.comment : "",
+    };
+
+    if (updatedCartId !== -1) {
+      tempPayload[updatedCartId] = payload;
+    } else {
+      tempPayload.unshift(payload);
+    }
+    dispatch(addToCart([...tempPayload]));
   };
 
   // Onclick handle Add To Cart & API - Add To Cart
   const handleAddToCart = async (e, sideCode, Obj) => {
     e.preventDefault();
+    const updatedCartId = cartdata?.findIndex(
+      (item) => item?.productCode === Obj?.sideCode
+    );
     let cart = JSON.parse(localStorage.getItem("CartData"));
     let cartCode;
     let customerCode;
@@ -181,8 +246,10 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
       setSidesArr([]);
       setQuantity(1);
     } else {
+      let tempPayload = [...cartdata];
+
       const payload = {
-        id: uuidv4(),
+        id: updatedCartId !== -1 ? cartdata[updatedCartId].id : uuidv4(),
         customerCode: customerCode ? customerCode : "#NA",
         cashierCode: localStorage.getItem("cashierCode"),
         productCode: selectedSideForNewItem[0]?.sideCode,
@@ -211,7 +278,13 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
       });
       setSidesData(temp);
       setSidesArr([]);
-      dispatch(addToCart([payload, ...cartdata]));
+      // let
+      if (updatedCartId !== -1) {
+        tempPayload[updatedCartId] = payload;
+      } else {
+        tempPayload.unshift(payload);
+      }
+      dispatch(addToCart([...tempPayload]));
       toast.success(
         `${selectedSideForNewItem[0]?.sideName} Added Successfully`
       );
@@ -220,6 +293,7 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
 
   useEffect(() => {
     if (payloadEdit !== undefined && payloadEdit.productType === "side") {
+      console.log(payloadEdit, "payloadEdit");
       setSidesArr([
         ...sidesArr,
         {
@@ -227,7 +301,13 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
           sideName: payloadEdit?.productName,
           price: payloadEdit?.price,
           qty: payloadEdit?.quantity,
-          combination: [payloadEdit?.config],
+          combination: [
+            {
+              ...payloadEdit?.config,
+              price: payloadEdit?.price,
+              size: payloadEdit?.config?.sidesSize,
+            },
+          ],
           comment: payloadEdit?.comments,
         },
       ]);
