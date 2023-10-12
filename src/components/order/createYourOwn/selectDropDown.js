@@ -16,7 +16,7 @@ export const SelectDropDownCrust = ({
         onChange={handleCrustChange}
         required
       >
-        <option value={""}>--- choose any one ---</option>
+        {/* <option value={""}>--- choose any one ---</option> */}
         {allIngredients?.crust?.map((crustData, index) => {
           return (
             <option
@@ -47,7 +47,7 @@ export const SelectDropDownCheese = ({
       onChange={handleCheeseChange}
       required
     >
-      <option value={""}>--- choose any one ---</option>
+      {/* <option value={""}>--- choose any one ---</option> */}
       {allIngredients?.cheese?.map((item, index) => {
         return (
           <option

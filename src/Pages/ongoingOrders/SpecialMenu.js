@@ -57,7 +57,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   let calcToppingsArr = [];
   // let ides = [];
   let noOfFreeToppings = Number(getSpecialData?.noofToppings);
+  let noOfFreeToppings2 = Number(getSpecialData?.noofToppings);
   let noOfAdditionalTps = Number(0);
+  let noOfAdditionalTps2 = Number(0);
   const dispatch = useDispatch();
   let cartdata = useSelector((state) => state.cart.cart);
 
@@ -77,6 +79,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       ...arr[count - 1],
       crust: crustObject,
     };
+    updateInCart({ pizzaState: arr });
     setPizzaState(arr);
   };
 
@@ -97,6 +100,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         ...newArr[i - 1],
         cheese: cheeseObject,
       };
+      updateInCart({ pizzaState: newArr });
+
       return newArr;
     });
   };
@@ -118,6 +123,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       ...arr[i - 1],
       specialBases: specialBaseObject,
     };
+    updateInCart({ pizzaState: arr });
+
     setPizzaState(arr);
   };
 
@@ -144,6 +151,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           isAllIndiansTps: true,
         },
       };
+      updateInCart({ pizzaState: arr });
 
       setPizzaState(arr);
       setIsAllIndiansTps(true);
@@ -156,6 +164,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           freeToppings: [],
         },
       };
+      updateInCart({ pizzaState: arr });
+
       setPizzaState(arr);
       setIsAllIndiansTps(false);
     }
@@ -167,21 +177,17 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     delete countAsTwoToppings?.isPaid;
     delete countAsTwoToppings?.countAs;
 
-    //console.log(" Count 2 Special Pizza Topping ", countAsTwoToppings);
-
-    let placement = "whole";
-
     if (checked) {
       let arr = [...pizzaState];
       let ct = count - 1;
       let placement = "whole";
-      const placementValue = $(
-        "#placement-" + ct + "-" + countAsTwoToppings?.toppingsCode
-      ).val();
-      if (placementValue !== "" && placementValue !== undefined) {
-        placement = placementValue;
-      }
-      console.log("Checked 2 Topping Placement ", placement);
+      // const placementValue = $(
+      //   "#placement-" + ct + "-" + countAsTwoToppings?.toppingsCode
+      // ).val();
+      // if (placementValue !== "" && placementValue !== undefined) {
+      //   placement = placementValue;
+      // }
+
       const tempCountAsTwo = [
         ...(arr[count - 1].toppings?.countAsTwoToppings || []),
         {
@@ -201,9 +207,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         },
       };
       setAllToppings([...allToppings, Number(countAsTwoToppings.countAs)]);
-      updateInCart({
-        pizzaState: arr,
-      });
+      updateInCart({ pizzaState: arr });
       setPizzaState(arr);
     } else {
       let arr = [...pizzaState];
@@ -233,12 +237,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           },
         };
       }
-      updateInCart({
-        pizzaState: [...arr],
-      });
+      updateInCart({ pizzaState: [...arr] });
+
       setPizzaState([...arr]);
     }
   };
+  useEffect(() => {
+    console.log("pizza updated :", pizzaState);
+  }, [pizzaState]);
 
   const handleCountAsTwoToppingsPlacementChange = (
     event,
@@ -277,6 +283,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           ],
         },
       };
+      updateInCart({ pizzaState: arr });
     }
     setPizzaState(arr);
   };
@@ -287,17 +294,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     delete countAsOneToppings?.isPaid;
     delete countAsOneToppings?.countAs;
 
-    console.log(" Count 1 Special Pizza Topping ", countAsOneToppings);
     if (checked) {
       let ct = count - 1;
       let placement = "whole";
-      const placementValue = $(
-        "#placement-" + ct + "-" + countAsOneToppings?.toppingsCode
-      ).val();
-      if (placementValue !== "" && placementValue !== undefined) {
-        placement = placementValue;
-      }
-      console.log("Checked 1 Topping Placement ", placement);
 
       setPizzaState((prevState) => {
         const newState = [...prevState];
@@ -321,9 +320,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         };
 
         setAllToppings([...allToppings, Number(countAsOneToppings.countAs)]);
-        updateInCart({
-          pizzaState: newState,
-        });
+        updateInCart({ pizzaState: newState });
         return newState;
       });
     } else {
@@ -358,9 +355,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             )
           );
         }
-        updateInCart({
-          pizzaState: newState,
-        });
+        updateInCart({ pizzaState: newState });
 
         return newState;
       });
@@ -399,7 +394,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           ],
         },
       };
+      updateInCart({ pizzaState: arr });
     }
+
     setPizzaState(arr);
   };
 
@@ -439,7 +436,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           ],
         },
       };
+      updateInCart({ pizzaState: arr });
     }
+
     setPizzaState(arr);
   };
 
@@ -447,7 +446,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     const { checked } = e.target;
     delete freeToppings.image;
 
-    console.log(" Free Special Pizza Topping ", freeToppings);
     setPizzaState((prevState) => {
       const newState = [...prevState];
       const pizzaIndex = count - 1;
@@ -455,13 +453,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       if (checked) {
         let ct = count - 1;
         let placement = "whole";
-        const placementValue = $(
-          "#placement-" + ct + "-" + freeToppings?.toppingsCode
-        ).val();
-        if (placementValue !== "" && placementValue !== undefined) {
-          placement = placementValue;
-        }
-        console.log("Checked 1 Topping Placement ", placement);
 
         newState[pizzaIndex] = {
           ...newState[pizzaIndex],
@@ -497,9 +488,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           };
         }
       }
-      updateInCart({
-        pizzaState: newState,
-      });
+      updateInCart({ pizzaState: newState });
+
       return newState;
     });
   };
@@ -529,7 +519,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   //Component - Special Pizza Selection
   const elements = [];
   const createEmptyObjects = (count) => {
-    console.log(getSpecialData?.spices, "getSpecialData");
     const emptyObjectsArray = Array.from({ length: count }, () => ({
       crust: {
         crustCode: getSpecialData?.crust[0].code,
@@ -578,6 +567,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       ...arr[count - 1],
       cook: selectedObject,
     };
+    updateInCart({ pizzaState: arr });
     setPizzaState(arr);
   };
   const handleSauseChange = (event, count) => {
@@ -589,6 +579,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       ...arr[count - 1],
       sauce: selectedObject,
     };
+    updateInCart({ pizzaState: arr });
     setPizzaState(arr);
   };
   const handleSpicyChange = (event, count) => {
@@ -600,6 +591,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       ...arr[count - 1],
       spicy: selectedObject,
     };
+    updateInCart({ pizzaState: arr });
     setPizzaState(arr);
   };
   const handleSides = (e, sides) => {
@@ -701,42 +693,83 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setDrinksArr(filteredDrinks);
     }
   };
-
-  for (let i = 1; i <= getSpecialData?.noofPizzas; i++) {
-    elements.push(
-      <SpecialPizzaSelection
-        pizzaState={pizzaState}
-        handleFreeToppings={handleFreeToppings}
-        handleSauseChange={handleSauseChange}
-        handleSpicyChange={handleSpicyChange}
-        handleCookChange={handleCookChange}
-        handleOneToppings={handleOneToppings}
-        handleTwoToppings={handleTwoToppings}
-        getSpecialData={getSpecialData}
-        count={i}
-        toppingsData={toppingsData}
-        handleChangeAllIndianToppings={handleChangeAllIndianToppings}
-        handleCrustChange={handleCrustChange}
-        crustSelected={crustSelected}
-        cheeseSelected={cheeseSelected}
-        setOfferedFreeToppings={setOfferedFreeToppings}
-        offeredFreeToppings={offeredFreeToppings}
-        additionalToppingsCount={additionalToppingsCount}
-        setAdditionalToppingsCount={setAdditionalToppingsCount}
-        specialBasesSelected={specialBasesSelected}
-        setCheeseSelected={setCheeseSelected}
-        handleSpecialBasesChange={handleSpecialBasesChange}
-        handleCheeseChange={handleCheeseChange}
-        handleCountAsTwoToppingsPlacementChange={
-          handleCountAsTwoToppingsPlacementChange
-        }
-        handleCountAsOneToppingsPlacementChange={
-          handleCountAsOneToppingsPlacementChange
-        }
-        handleFreeToppingsPlacementChange={handleFreeToppingsPlacementChange}
-      />
-    );
-  }
+  const newPizzaComponent = () => {
+    return Array.from(
+      Array(Number(getSpecialData?.noofPizzas || 0)).keys()
+    ).map((pizza, index) => {
+      return (
+        <SpecialPizzaSelection
+          pizzaState={pizzaState}
+          handleFreeToppings={handleFreeToppings}
+          handleSauseChange={handleSauseChange}
+          handleSpicyChange={handleSpicyChange}
+          handleCookChange={handleCookChange}
+          handleOneToppings={handleOneToppings}
+          handleTwoToppings={handleTwoToppings}
+          getSpecialData={getSpecialData}
+          count={index + 1}
+          key={index + 1}
+          toppingsData={toppingsData}
+          handleChangeAllIndianToppings={handleChangeAllIndianToppings}
+          handleCrustChange={handleCrustChange}
+          crustSelected={crustSelected}
+          cheeseSelected={cheeseSelected}
+          setOfferedFreeToppings={setOfferedFreeToppings}
+          offeredFreeToppings={offeredFreeToppings}
+          additionalToppingsCount={additionalToppingsCount}
+          setAdditionalToppingsCount={setAdditionalToppingsCount}
+          specialBasesSelected={specialBasesSelected}
+          setCheeseSelected={setCheeseSelected}
+          handleSpecialBasesChange={handleSpecialBasesChange}
+          handleCheeseChange={handleCheeseChange}
+          handleCountAsTwoToppingsPlacementChange={
+            handleCountAsTwoToppingsPlacementChange
+          }
+          handleCountAsOneToppingsPlacementChange={
+            handleCountAsOneToppingsPlacementChange
+          }
+          handleFreeToppingsPlacementChange={handleFreeToppingsPlacementChange}
+        />
+      );
+    });
+  };
+  // for (let i = 1; i <= getSpecialData?.noofPizzas; i++) {
+  //   console.log(i, "pizzaState count for loop");
+  //   elements.push(
+  //     <SpecialPizzaSelection
+  //       pizzaState={pizzaState}
+  //       handleFreeToppings={handleFreeToppings}
+  //       handleSauseChange={handleSauseChange}
+  //       handleSpicyChange={handleSpicyChange}
+  //       handleCookChange={handleCookChange}
+  //       handleOneToppings={handleOneToppings}
+  //       handleTwoToppings={handleTwoToppings}
+  //       getSpecialData={getSpecialData}
+  //       count1={i}
+  //       key={i}
+  //       toppingsData={toppingsData}
+  //       handleChangeAllIndianToppings={handleChangeAllIndianToppings}
+  //       handleCrustChange={handleCrustChange}
+  //       crustSelected={crustSelected}
+  //       cheeseSelected={cheeseSelected}
+  //       setOfferedFreeToppings={setOfferedFreeToppings}
+  //       offeredFreeToppings={offeredFreeToppings}
+  //       additionalToppingsCount={additionalToppingsCount}
+  //       setAdditionalToppingsCount={setAdditionalToppingsCount}
+  //       specialBasesSelected={specialBasesSelected}
+  //       setCheeseSelected={setCheeseSelected}
+  //       handleSpecialBasesChange={handleSpecialBasesChange}
+  //       handleCheeseChange={handleCheeseChange}
+  //       handleCountAsTwoToppingsPlacementChange={
+  //         handleCountAsTwoToppingsPlacementChange
+  //       }
+  //       handleCountAsOneToppingsPlacementChange={
+  //         handleCountAsOneToppingsPlacementChange
+  //       }
+  //       handleFreeToppingsPlacementChange={handleFreeToppingsPlacementChange}
+  //     />
+  //   );
+  // }
 
   // console.log(calcTwoTpsArr, "calcTwoTpsArr")
 
@@ -885,7 +918,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             ? getSpecialData?.largePizzaPrice
             : getSpecialData?.extraLargePizzaPrice,
       };
-      console.log(payload, "special pizza payload");
       dispatch(addToCart([payload, ...cartdata]));
       setSidesArr([]);
       setDrinksArr([]);
@@ -901,65 +933,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       createEmptyObjects(Number(getSpecialData?.noofPizzas));
       toast.success(` ${payload.productName} added to cart successfully...`);
     }
-  };
-  const handlePizzaSize = (e) => {
-    setPizzaSize(e.target.value);
-    updateInCart({ pizzaSize: e.target.value });
-  };
-  const updateInCart = (data) => {
-    let cart = JSON.parse(localStorage.getItem("CartData"));
-
-    let tempPayload = [...cartdata];
-
-    const updatedCartId = cartdata?.findIndex(
-      (item) => item?.productCode === getSpecialData.code
-    );
-    console.log(data?.pizzaState, "New Payload 2");
-    let cartCode;
-    let customerCode;
-    if (cart !== null && cart !== undefined) {
-      cartCode = cart?.cartCode;
-      customerCode = cart?.customerCode;
-    }
-    let price = 0;
-
-    let pizzaPrice =
-      data?.pizzaSize === "Large"
-        ? getSpecialData?.largePizzaPrice
-        : getSpecialData?.extraLargePizzaPrice;
-    price += Number(pizzaPrice);
-    let totalAmount = 0;
-    console.log(data, "special pizza payload");
-    let payload = {
-      id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),
-      productCode: getSpecialData.code,
-      productType: "special_pizza",
-      productName: getSpecialData?.name,
-      config: {
-        pizza: data?.pizzaState,
-        sides: sidesArr,
-        dips: dipsArr,
-        drinks: drinksArr,
-      },
-      quantity: "1",
-      price: "0",
-      amount: price,
-      comments: comments,
-      pizzaSize: data.pizzaSize !== undefined ? data.pizzaSize : pizzaSize,
-      pizzaPrice:
-        data.pizzaSize === "Large"
-          ? getSpecialData?.largePizzaPrice
-          : getSpecialData?.extraLargePizzaPrice,
-    };
-    if (updatedCartId !== -1) {
-      tempPayload[updatedCartId] = payload;
-      console.log("New Payload", payload);
-    } else {
-      tempPayload.unshift(payload);
-      console.log("New Payload", payload);
-    }
-    dispatch(addToCart([...tempPayload]));
-    console.log(tempPayload, "special pizza payload");
   };
 
   // Customize Details
@@ -1152,6 +1125,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       Number(totalPriceOfToppings) +
       Number(totalPriceOfDips)
     ).toFixed(2);
+    // updateInCart({price:formattedPrice })
     setPrice(formattedPrice);
   };
 
@@ -1218,6 +1192,170 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setFreeSides(getSpecialData?.freesides);
     }
   }, [getSpecialData]);
+  const updateInCart = (data) => {
+    let cart = JSON.parse(localStorage.getItem("CartData"));
+
+    let tempPayload = [...cartdata];
+
+    const updatedCartId = cartdata?.findIndex(
+      (item) => item?.productCode === getSpecialData.code
+    );
+    let cartCode;
+    let customerCode;
+    if (cart !== null && cart !== undefined) {
+      cartCode = cart?.cartCode;
+      customerCode = cart?.customerCode;
+    }
+    let price = 0;
+    let sizeofpizza = data?.pizzaSize ? data.pizzaSize : pizzaSize;
+
+    let pizzaPrice =
+      sizeofpizza === "Large"
+        ? getSpecialData?.largePizzaPrice
+        : getSpecialData?.extraLargePizzaPrice;
+    price += Number(pizzaPrice);
+    console.log(data, "special pizza payload");
+
+    const calculate = () => {
+      let totalPrice = Number(0);
+      let totalOneTpsPrice = Number(0);
+      let totalTwoTpsPrice = Number(0);
+      totalPrice +=
+        sizeofpizza === "Large"
+          ? Number(getSpecialData?.largePizzaPrice)
+          : Number(getSpecialData?.extraLargePizzaPrice);
+      let calcOneTpsArr2 = [];
+      let calcTwoTpsArr2 = [];
+      let pizzaCartons = [];
+      for (let i = 0; i < getSpecialData?.noofPizzas; i++) {
+        pizzaCartons.push(i);
+      }
+      // Iterate through pizzaState
+      data?.pizzaState?.forEach((item) => {
+        totalPrice += item?.cheese?.price ? Number(item?.cheese?.price) : 0;
+
+        totalPrice += item?.crust?.price ? Number(item?.crust?.price) : 0;
+
+        totalPrice += item?.specialBases?.price
+          ? Number(item?.specialBases?.price)
+          : 0;
+        totalPrice += item?.cook?.price ? Number(item?.cook?.price) : 0;
+        totalPrice += item?.spicy?.price ? Number(item?.spicy?.price) : 0;
+        totalPrice += item?.sauce?.price ? Number(item?.sauce?.price) : 0;
+        console.log(noOfFreeToppings2, "calcOneTpsArr2");
+        pizzaCartons.map((pizzaCarton) => {
+          if (item?.toppings?.countAsOneToppings?.length > 0) {
+            item?.toppings?.countAsOneToppings?.map((items) => {
+              if (items.pizzaIndex === pizzaCarton) {
+                if (noOfFreeToppings2 > 0) {
+                  let tpsObj = {
+                    ...items,
+                    amount: 0,
+                  };
+                  calcOneTpsArr2.push(tpsObj);
+                  noOfFreeToppings2 -= 1;
+                  // setOfferedFreeToppings((prev) => prev - 1);
+                } else {
+                  calcOneTpsArr2.push({
+                    ...items,
+                    amount: Number(items?.toppingsPrice).toFixed(2),
+                  });
+                  noOfAdditionalTps2 += 1;
+                  // setAdditionalToppingsCount((prev) => prev + 1);
+                }
+              }
+            });
+          }
+          // if (item?.toppings?.countAsTwoToppings?.length > 0) {
+          //   item?.toppings?.countAsTwoToppings?.map((items) => {
+          //     if (items.pizzaIndex === pizzaCarton) {
+          //       if (noOfFreeToppings2 > 1) {
+          //         let tpsObj = {
+          //           ...items,
+          //           amount: 0,
+          //         };
+          //         calcTwoTpsArr2.push(tpsObj);
+          //         // setOfferedFreeToppings((prev) => prev - 2);
+          //         noOfFreeToppings2 -= Number(2);
+          //       } else if (noOfFreeToppings2 === 1) {
+          //         calcTwoTpsArr2.push({
+          //           ...items,
+          //           amount: Number(items?.toppingsPrice).toFixed(2),
+          //         });
+          //         // setOfferedFreeToppings((prev) => prev - 1);
+          //         noOfFreeToppings2 -= Number(1);
+          //         noOfAdditionalTps2++;
+          //         // setAdditionalToppingsCount((prev) => prev + 1);
+          //       } else {
+          //         calcTwoTpsArr2.push({
+          //           ...items,
+          //           amount: Number(items?.toppingsPrice).toFixed(2),
+          //         });
+          //         noOfAdditionalTps2 += Number(2);
+          //         // setAdditionalToppingsCount((prev) => prev + 2);
+          //       }
+          //     }
+          //   });
+          // }
+        });
+      });
+
+      calcOneTpsArr2?.map((tps) => {
+        totalOneTpsPrice += Number(tps?.amount);
+      });
+
+      calcTwoTpsArr2?.map((tps) => {
+        totalTwoTpsPrice += Number(tps?.amount);
+      });
+      console.log(calcOneTpsArr2, "calcOneTpsArr2");
+
+      totalPrice += totalOneTpsPrice;
+      totalPrice += totalTwoTpsPrice;
+      const formattedPrice = (
+        Number(totalPrice) +
+        Number(totalPriceOfToppings) +
+        Number(totalPriceOfDips)
+      ).toFixed(2);
+      console.log(formattedPrice, "pricedj new");
+      return formattedPrice;
+    };
+
+    console.log(calculate(), "pricdj");
+    let totalAmount = calculate();
+
+    let payload = {
+      id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),
+      productCode: getSpecialData.code,
+      productType: "special_pizza",
+      productName: getSpecialData?.name,
+      config: {
+        pizza: data?.pizzaState ? data?.pizzaState : pizzaState,
+        sides: sidesArr,
+        dips: dipsArr,
+        drinks: drinksArr,
+      },
+      quantity: "1",
+      price: "0",
+      amount: calculate(),
+      comments: data?.comment ? data?.comment : comments,
+      pizzaSize: data?.pizzaSize ? data.pizzaSize : pizzaSize,
+      pizzaPrice: pizzaPrice,
+    };
+    console.log(totalAmount, "pricdj");
+    if (updatedCartId !== -1) {
+      tempPayload[updatedCartId] = payload;
+      console.log("New Payload", payload);
+    } else {
+      tempPayload.unshift(payload);
+      console.log("New Payload", payload);
+    }
+    dispatch(addToCart([...tempPayload]));
+    console.log(tempPayload, "special pizza payload");
+  };
+  const handleSizeOfPizza = (e) => {
+    setPizzaSize(e.target.value);
+    updateInCart({ pizzaSize: e.target.value });
+  };
 
   return (
     <>
@@ -1284,7 +1422,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   <select
                     className='form-select mx-2 my-2 w-25 d-inline'
                     value={pizzaSize}
-                    onChange={handlePizzaSize}
+                    onChange={(e) => handleSizeOfPizza(e)}
                   >
                     {Number(getSpecialData?.largePizzaPrice) > 0 && (
                       <option value='Large'>Large</option>
@@ -1295,7 +1433,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   </select>
                 </div>
 
-                {elements}
+                {newPizzaComponent()}
 
                 {/* Sides */}
                 {getSpecialData?.freesides.length === 0 ? null : (
@@ -1509,18 +1647,22 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                 </div>
 
                 {/* Add to Cart Button */}
-                <div className='d-flex flex-row justify-content-center align-items-center addToCartDiv mt-3 mb-3'>
-                  <button
-                    type='button'
-                    className='btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn'
-                    onClick={handleAddToCart}
-                  >
-                    {payloadEdit !== undefined &&
+                {payloadEdit !== undefined &&
+                payloadEdit?.productType.toLowerCase() === "special_pizza" ? (
+                  <div className='d-flex flex-row justify-content-center align-items-center addToCartDiv mt-3 mb-3'>
+                    <button
+                      type='button'
+                      className='btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn'
+                      onClick={handleAddToCart}
+                    >
+                      Edit
+                      {/* {payloadEdit !== undefined &&
                     payloadEdit?.productType.toLowerCase() === "special_pizza"
                       ? "Edit"
-                      : " Add to Cart"}
-                  </button>
-                </div>
+                      : " Add to Cart"} */}
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </>
           ) : (

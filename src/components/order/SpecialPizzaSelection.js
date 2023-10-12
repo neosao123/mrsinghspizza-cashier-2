@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   SelectDropDownCook,
@@ -42,7 +42,7 @@ function SpecialPizzaSelection({
               {getSpecialData?.crust?.map((data) => {
                 return (
                   <>
-                    <option key={data?.code} value={data?.code}>
+                    <option key={data?.code + count} value={data?.code}>
                       {data?.crustName}- $ {data?.price}
                     </option>
                   </>
@@ -62,7 +62,7 @@ function SpecialPizzaSelection({
               {getSpecialData?.cheese?.map((data) => {
                 return (
                   <>
-                    <option key={data?.code} value={data?.code}>
+                    <option key={data?.code + count} value={data?.code}>
                       {data.cheeseName}- $ {data.price}
                     </option>
                   </>
@@ -84,7 +84,7 @@ function SpecialPizzaSelection({
               {getSpecialData?.specialbases?.map((data) => {
                 return (
                   <>
-                    <option key={data.code} value={data.code}>
+                    <option key={data.code + count} value={data.code}>
                       {data.specialbaseName} - $ {data.price}
                     </option>
                   </>
@@ -196,18 +196,19 @@ function SpecialPizzaSelection({
                     return (
                       <li
                         className='list-group-item d-flex justify-content-between align-items-center'
-                        key={countAsTwoToppings.toppingsCode}
+                        key={countAsTwoToppings.toppingsCode + count}
                       >
                         <div class='form-check'>
                           <input
                             class='form-check-input'
                             type='checkbox'
-                            value=''
-                            id={`${countAsTwoToppings.toppingsCode}-${index}`}
+                            value={countAsTwoToppings.toppingsCode}
+                            // id={`${countAsTwoToppings.toppingsCode}-${index}`}
                             checked={comm !== -1 ? true : false}
-                            onChange={(e) =>
-                              handleTwoToppings(e, count, countAsTwoToppings)
-                            }
+                            // onClick={() => alert(sample)}
+                            onChange={(e) => {
+                              handleTwoToppings(e, count, countAsTwoToppings);
+                            }}
                           />
                           <label
                             class='form-check-label'
@@ -281,14 +282,14 @@ function SpecialPizzaSelection({
                     return (
                       <li
                         className='list-group-item d-flex justify-content-between align-items-center'
-                        key={countAsOneToppings.toppingsCode}
+                        key={countAsOneToppings.toppingsCode + count}
                       >
                         <div class='form-check'>
                           <input
                             class='form-check-input'
                             type='checkbox'
                             value=''
-                            id={`${countAsOneToppings.toppingsCode}-${index}`}
+                            // id={`${countAsOneToppings.toppingsCode}-${index}`}
                             checked={comm !== -1 ? true : false}
                             onChange={(e) =>
                               handleOneToppings(e, count, countAsOneToppings)
@@ -318,9 +319,9 @@ function SpecialPizzaSelection({
                               pizzaState[count - 1]?.toppings
                                 ?.countAsOneToppings[comm]?.toppingsPlacement
                             }
-                            id={`placement-${count - 1}-${
-                              countAsOneToppings.toppingsCode
-                            }`}
+                            // id={`placement-${count - 1}-${
+                            //   countAsOneToppings.toppingsCode
+                            // }`}
                             onChange={(e) => {
                               handleCountAsOneToppingsPlacementChange(
                                 e,
@@ -365,21 +366,21 @@ function SpecialPizzaSelection({
                     return (
                       <li
                         className='list-group-item d-flex justify-content-between align-items-center'
-                        key={freeToppings.toppingsCode}
+                        key={freeToppings.toppingsCode + count}
                       >
                         <div class='form-check'>
                           <input
                             class='form-check-input'
                             type='checkbox'
                             value=''
-                            id={`${freeToppings.toppingsCode}-${index}`}
+                            // id={`${freeToppings.toppingsCode}-${index}`}
                             checked={comm !== -1 ? true : false}
                             onChange={(e) =>
                               handleFreeToppings(e, count, freeToppings)
                             }
                           />
                           <label
-                            class='form-check-label'
+                            className='form-check-label'
                             for={`${freeToppings.toppingsCode}-${index}`}
                           >
                             {freeToppings.toppingsName}
@@ -401,12 +402,12 @@ function SpecialPizzaSelection({
                             style={{ width: "65%" }}
                             value={
                               pizzaState[count - 1]?.toppings?.freeToppings[
-                                index
+                                comm
                               ]?.toppingsPlacement
                             }
-                            id={`placement-${count - 1}-${
-                              freeToppings.toppingsCode
-                            }`}
+                            // id={`placement-${count - 1}-${
+                            //   freeToppings.toppingsCode
+                            // }`}
                             onChange={(e) => {
                               handleFreeToppingsPlacementChange(
                                 e,

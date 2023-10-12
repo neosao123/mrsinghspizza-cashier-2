@@ -104,6 +104,17 @@ function CreateYourOwn({
 
   const updateInCart = (data) => {
     let cart = JSON.parse(localStorage.getItem("CartData"));
+    let OneTopping = data?.countAs1Arr
+      ? data?.countAs1Arr
+      : countOneToppingsArr;
+
+    let TwoTopping = data?.countAs2Arr
+      ? data?.countAs2Arr
+      : countTwoToppingsArr;
+    let freeTopping = data?.freeTpsArr ? data?.freeTpsArr : freeToppingsArr;
+    let dipsArray = data?.dipsArr ? data?.dipsArr : dips;
+    let sidesArray = data?.sidesArr ? data?.sidesArr : sidesArr;
+    let drinksArray = data?.drinksArr ? data?.drinksArr : drinks;
 
     let tempPayload = [...cartdata];
     let itemId =
@@ -122,21 +133,72 @@ function CreateYourOwn({
       updatedCartId = updatedCartId2;
     }
     console.log(updatedCartId, "special pizza payload");
-    console.log(data, "tempPayload");
     let cartCode;
     let customerCode;
     if (cart !== null && cart !== undefined) {
       cartCode = cart?.cartCode;
       customerCode = cart?.customerCode;
     }
-    // let price = data?.price;
     let totalAmount = 0;
-    // let data = {
-    //   pizzaSize: "Large",
-    // };
-    totalAmount =
-      Number(price) * (data?.qty !== undefined ? Number(data?.qty) : 1);
-    console.log(data?.pizzaSize, "data?.pizzaSize");
+    let sizeofpizza = data?.pizzaSize ? data.pizzaSize : sizesOfPizzaSelected;
+
+    // let pizzaPrice = sizeofpizza === "Large" ? 11.49 : 16.49;
+
+    const calculate = () => {
+      let calculatePrice = 0;
+
+      console.log(data, "create your own data");
+      let crust_price = data?.crust
+        ? Number(data?.crust?.price)
+        : Number(crustSelected?.price);
+      let cheese_price = data?.cheese
+        ? data?.cheese?.price
+        : cheeseSelected?.price;
+      let specialbase_price = data?.specialBase
+        ? data?.specialBase?.price
+        : specialBasesSelected?.price !== undefined
+        ? specialBasesSelected?.price
+        : 0;
+      let cook_price = data?.cook ? data?.cook?.price : cookSelected?.price;
+      let sause_price = data?.sause ? data?.sause?.price : sauseSelected?.price;
+      let spicy_price = data?.spicy ? data?.spicy?.price : spicySelected?.price;
+
+      let totalSidesPrice = Number(0);
+      let totalTwoToppings = Number(0);
+      let totalOneToppings = Number(0);
+      let totalFreeToppings = Number(0);
+      let totalDips = Number(0);
+      let totalDrinks = Number(0);
+
+      TwoTopping?.map((two) => (totalTwoToppings += Number(two.toppingsPrice)));
+      console.log(data?.countAs1Arr, "countAs1Arr");
+      OneTopping?.map((one) => (totalOneToppings += Number(one.toppingsPrice)));
+      freeTopping?.map(
+        (free) => (totalFreeToppings += Number(free.toppingsPrice))
+      );
+      sidesArray?.map((side) => (totalSidesPrice += Number(side.sidePrice)));
+      dipsArray?.map((dips) => (totalDips += Number(dips.dipsPrice)));
+      drinksArray?.map((drinks) => (totalDrinks += Number(drinks.drinksPrice)));
+      calculatePrice += Number(cook_price);
+      calculatePrice += Number(sause_price);
+      calculatePrice += Number(spicy_price);
+      calculatePrice += Number(crust_price);
+      calculatePrice += Number(cheese_price);
+      calculatePrice += Number(specialbase_price);
+      calculatePrice += totalSidesPrice;
+      calculatePrice += totalTwoToppings;
+      calculatePrice += totalOneToppings;
+      calculatePrice += totalFreeToppings;
+      calculatePrice += totalDips;
+      calculatePrice += totalDrinks;
+      let priceBySize = sizeofpizza === "Large" ? 11.49 : 16.49;
+      calculatePrice += priceBySize;
+      totalAmount = calculatePrice;
+      return calculatePrice.toFixed(2);
+    };
+    calculate();
+    console.log(totalAmount, "create your own price");
+    // totalAmount += Number(pizzaPrice);
     const payload = {
       id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),
       productCode: "#NA",
@@ -145,12 +207,14 @@ function CreateYourOwn({
       config: {
         pizza: [
           {
-            crust: crustSelected,
-            cheese: cheeseSelected,
-            specialBases: specialBasesSelected,
-            cook: cookSelected,
-            sauce: sauseSelected,
-            spicy: spicySelected,
+            crust: data?.crust ? data?.crust : crustSelected,
+            cheese: data?.cheese ? data?.cheese : cheeseSelected,
+            specialBases: data?.specialBase
+              ? data?.specialBase
+              : specialBasesSelected,
+            cook: data?.cook ? data?.cook : cookSelected,
+            sauce: data?.sause ? data?.sause : sauseSelected,
+            spicy: data?.spicy ? data?.spicy : spicySelected,
             toppings: {
               countAsTwoToppings: data?.countAs2Arr
                 ? data?.countAs2Arr
@@ -158,19 +222,21 @@ function CreateYourOwn({
               countAsOneToppings: data?.countAs1Arr
                 ? data?.countAs1Arr
                 : countOneToppingsArr,
-              freeToppings: freeToppingsArr,
+              freeToppings: data?.freeTpsArr
+                ? data?.freeTpsArr
+                : freeToppingsArr,
               isAllIndiansTps: isAllIndiansTps,
             },
           },
         ],
-        sides: sidesArr,
-        dips: dips,
-        drinks: drinks,
+        sides: data?.sidesArr ? data?.sidesArr : sidesArr,
+        dips: data?.dipsArr ? data?.dipsArr : dips,
+        drinks: data?.drinksArr ? data?.drinksArr : drinks,
       },
       quantity: "1",
       price: data?.pizzaSize == "Extra Large" ? 16.49 : 11.49,
-      amount: data?.pizzaSize == "Extra Large" ? 16.49 : 11.49,
-      comments: comments,
+      amount: totalAmount?.toFixed(2),
+      comments: data?.comment ? data.comment : comments,
       pizzaSize: data.pizzaSize ? data.pizzaSize : sizesOfPizzaSelected,
       discountAmount: discount,
       taxPer: taxPer,
@@ -369,14 +435,17 @@ function CreateYourOwn({
           : "0",
         toppingsPlacement: placement,
       };
-      updateInCart({
-        countAs2Arr: [toppingObj, ...countTwoToppingsArr],
+
+      setCountTwoToppingsArr((prevTps) => {
+        updateInCart({
+          countAs2Arr: [toppingObj, ...prevTps],
+        });
+        return [...prevTps, toppingObj];
       });
-      setCountTwoToppingsArr([...countTwoToppingsArr, toppingObj]);
     } else {
       setCountTwoToppingsArr((prevToppings) => {
         updateInCart({
-          countAs1Arr: prevToppings.filter(
+          countAs2Arr: prevToppings.filter(
             (toppingObj) => toppingObj.toppingsCode !== toppingCode
           ),
         });
@@ -412,6 +481,9 @@ function CreateYourOwn({
     if (indexOfSelectedObject !== -1) {
       arr[indexOfSelectedObject] = selectedObject;
     }
+    updateInCart({
+      countAs2Arr: arr,
+    });
     setCountTwoToppingsArr(arr);
   };
 
@@ -437,13 +509,23 @@ function CreateYourOwn({
         toppingsPlacement: placement,
       };
 
-      setCountOneToppingsArr((prevToppings) => [...prevToppings, toppingObj]);
+      setCountOneToppingsArr((prevToppings) => {
+        updateInCart({
+          countAs1Arr: [...prevToppings, toppingObj],
+        });
+        return [...prevToppings, toppingObj];
+      });
     } else {
-      setCountOneToppingsArr((prevToppings) =>
-        prevToppings.filter(
+      setCountOneToppingsArr((prevToppings) => {
+        updateInCart({
+          countAs1Arr: prevToppings.filter(
+            (toppingObj) => toppingObj.toppingsCode !== toppingCode
+          ),
+        });
+        return prevToppings.filter(
           (toppingObj) => toppingObj.toppingsCode !== toppingCode
-        )
-      );
+        );
+      });
     }
     setAllCheckBoxes((prevCheckboxes) =>
       prevCheckboxes.map((checkbox) =>
@@ -470,6 +552,9 @@ function CreateYourOwn({
     if (indexOfSelectedObject !== -1) {
       arr[indexOfSelectedObject] = selectedObject;
     }
+    updateInCart({
+      countAs1Arr: arr,
+    });
     setCountOneToppingsArr(arr);
   };
 
@@ -495,13 +580,23 @@ function CreateYourOwn({
         toppingsPlacement: placement,
       };
 
-      setFreeToppingsArr((prevToppings) => [...prevToppings, toppingObj]);
+      setFreeToppingsArr((prevToppings) => {
+        updateInCart({
+          freeTpsArr: [...prevToppings, toppingObj],
+        });
+        return [...prevToppings, toppingObj];
+      });
     } else {
-      setFreeToppingsArr((prevToppings) =>
-        prevToppings.filter(
+      setFreeToppingsArr((prevToppings) => {
+        updateInCart({
+          freeTpsArr: prevToppings.filter(
+            (toppingObj) => toppingObj.toppingsCode !== toppingCode
+          ),
+        });
+        return prevToppings.filter(
           (toppingObj) => toppingObj.toppingsCode !== toppingCode
-        )
-      );
+        );
+      });
     }
     setAllCheckBoxes((prevCheckboxes) =>
       prevCheckboxes.map((checkbox) =>
@@ -526,6 +621,9 @@ function CreateYourOwn({
       const selectedObject = allIngredients?.sauce?.find(
         (option) => option.sauceCode === event.target.value
       );
+      updateInCart({
+        sause: selectedObject,
+      });
       setSauseSelected(selectedObject);
     }
   };
@@ -534,6 +632,9 @@ function CreateYourOwn({
       const selectedObject = allIngredients?.spices?.find(
         (option) => option.spicyCode === event.target.value
       );
+      updateInCart({
+        spicy: selectedObject,
+      });
       setSpicySelected(selectedObject);
     }
   };
@@ -543,6 +644,9 @@ function CreateYourOwn({
       const selectedObject = allIngredients?.cook?.find(
         (option) => option.cookCode === selectedValue
       );
+      updateInCart({
+        cook: selectedObject,
+      });
       setCookSelected(selectedObject);
     }
   };
@@ -575,11 +679,22 @@ function CreateYourOwn({
         totalPrice: price * 1,
       };
       console.log(sidesObj, "sidesArr array obj");
-      setSideArr((prevSides) => [...prevSides, sidesObj]);
+
+      setSideArr((prevSides) => {
+        updateInCart({
+          sidesArr: [...prevSides, sidesObj],
+        });
+        return [...prevSides, sidesObj];
+      });
     } else {
-      setSideArr((prevSides) =>
-        prevSides.filter((sidesObj) => sidesObj.sideCode !== sideCode)
-      );
+      setSideArr((prevSides) => {
+        updateInCart({
+          sidesArr: prevSides.filter(
+            (sidesObj) => sidesObj.sideCode !== sideCode
+          ),
+        });
+        return prevSides.filter((sidesObj) => sidesObj.sideCode !== sideCode);
+      });
     }
     setAllCheckBoxes((prevCheckboxes) =>
       prevCheckboxes.map((checkbox) =>
@@ -617,6 +732,9 @@ function CreateYourOwn({
       console.log(sidesObj, "selected side ");
       tempSideArr[sideIndex] = sidesObj;
       setSideArr(tempSideArr);
+      updateInCart({
+        sidesArr: tempSideArr,
+      });
     }
     setCount((prevCount) => prevCount + 1);
   };
@@ -636,10 +754,16 @@ function CreateYourOwn({
           quantity: 1,
           totalPrice: selectedDips[0].price ? selectedDips[0].price : "0",
         };
+        updateInCart({
+          dipsArr: [...dips, dipsObj],
+        });
         setDips([...dips, dipsObj]);
       }
     } else {
       const newDips = dips.filter((newDips) => newDips.dipsCode !== code);
+      updateInCart({
+        dipsArr: newDips,
+      });
       setDips(newDips);
     }
     setAllCheckBoxes((prevCheckboxes) =>
@@ -664,11 +788,19 @@ function CreateYourOwn({
         totalPrice: selectedDrinks[0].price ? selectedDrinks[0].price : "0",
       };
       if (checked) {
-        setDrinks([...drinks, drinksObj]);
+        setDrinks((prevDrinks) => {
+          updateInCart({
+            drinksArr: [...prevDrinks, drinksObj],
+          });
+          return [...prevDrinks, drinksObj];
+        });
       } else {
         const newDrinks = drinks.filter(
           (updatedDrinks) => updatedDrinks.drinksCode !== code
         );
+        updateInCart({
+          drinksArr: newDrinks,
+        });
         setDrinks(newDrinks);
       }
     }
@@ -753,6 +885,13 @@ function CreateYourOwn({
     const selectedObject = allIngredients?.crust?.find(
       (option) => option.crustCode === selectedValue
     );
+    updateInCart({
+      crust: {
+        crustCode: selectedObject?.crustCode,
+        crustName: selectedObject?.crustName,
+        price: selectedObject?.price,
+      },
+    });
 
     setCrustSelected({
       crustCode: selectedObject?.crustCode,
@@ -767,6 +906,9 @@ function CreateYourOwn({
     const selectedObject = allIngredients?.cheese?.find(
       (option) => option.cheeseCode === selectedValue
     );
+    updateInCart({
+      cheese: selectedObject,
+    });
     setCheeseSelected(selectedObject);
   };
 
@@ -777,6 +919,9 @@ function CreateYourOwn({
       const selectedObject = allIngredients?.specialbases?.find(
         (option) => option.specialbaseCode === selectedValue
       );
+      updateInCart({
+        specialBase: selectedObject,
+      });
       setSpecialBasesSelected(selectedObject);
     }
   };
@@ -799,12 +944,24 @@ function CreateYourOwn({
           };
         }
       );
+      updateInCart({
+        freeTpsArr: tempAllBoxes,
+      });
       setFreeToppingsArr(tempAllBoxes);
       setIsAllIndiansTps(true);
     } else {
+      updateInCart({
+        freeTpsArr: [],
+      });
       setFreeToppingsArr([]);
       setIsAllIndiansTps(false);
     }
+  };
+  const handleComment = (e) => {
+    updateInCart({
+      comment: e.target.value,
+    });
+    setComments(e.target.value);
   };
 
   const handleFreeToppingsPlacementChange = (event, toppingsCode) => {
@@ -823,6 +980,9 @@ function CreateYourOwn({
     if (indexOfSelectedObject !== -1) {
       arr[indexOfSelectedObject] = selectedObject;
     }
+    updateInCart({
+      freeTpsArr: arr,
+    });
     setFreeToppingsArr(arr);
   };
 
@@ -1305,6 +1465,7 @@ function CreateYourOwn({
                             <select
                               className='form-select w-100 d-inline-block'
                               id={"placement-" + sideCode}
+                              value={sidesArr[comm]?.lineCode}
                               onChange={(e) => {
                                 if (comm !== -1) {
                                   handleSidePlacementChange(e, sideCode);
@@ -1403,23 +1564,27 @@ function CreateYourOwn({
                 rows='2'
                 cols='50'
                 value={comments}
-                onChange={(e) => setComments(e.target.value)}
+                onChange={(e) => handleComment(e)}
               />
             </div>
           </div>
           {/* Add to Cart Button */}
-          <div className='d-flex flex-row justify-content-center align-items-center addToCartDiv position-sticky bottom-0 mb-3 '>
-            <button
-              type='button'
-              className='btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn'
-              onClick={handleAddToCart}
-            >
-              {payloadEdit !== undefined &&
-              payloadEdit.productType === "custom_pizza"
-                ? "Edit order"
-                : "Add to Cart"}
-            </button>
-          </div>
+          {payloadEdit !== undefined &&
+          payloadEdit.productType === "custom_pizza" ? (
+            <div className='d-flex flex-row justify-content-center align-items-center addToCartDiv position-sticky bottom-0 mb-3 '>
+              <button
+                type='button'
+                className='btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn'
+                onClick={handleAddToCart}
+              >
+                Edit order
+                {/* {payloadEdit !== undefined &&
+                payloadEdit.productType === "custom_pizza"
+                  ? "Edit order"
+                  : "Add to Cart"} */}
+              </button>
+            </div>
+          ) : null}
         </>
       )}
     </>
