@@ -112,7 +112,7 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       addToCartAndResetQty(
         dispatch,
         addToCart,
-        [...cartdata, payload],
+        [payload, ...cartdata],
         toast,
         setDipsArr,
         setDipsData,
@@ -252,7 +252,8 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
     if (updatedCartId !== -1) {
       tempPayload[updatedCartId] = payload;
     } else {
-      tempPayload.push(payload);
+      tempPayload.unshift(payload);
+      console.log(tempPayload, "tempPayload");
     }
     dispatch(addToCart([...tempPayload]));
   };

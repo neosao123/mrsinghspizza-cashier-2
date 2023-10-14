@@ -1416,7 +1416,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                       </span>
                     )}
                   </h6>
-                  <h6 className='mx-2'>$ {price}</h6>
+                  <h6 className='mx-2 text-nowrap'>$ {price}</h6>
                 </div>
                 <div className='mb-1'>
                   <p className='mb-1'>
@@ -1716,7 +1716,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                               ${Number(speicalPizza.largePizzaPrice)}
                             </span>
                           </p>
-                          <p className='m-0 p-0'>
+                          <p className='m-0 p-0 text-end text-nowrap'>
                             Extra Large{" "}
                             <span className='text-xlarge-pizza-price'>
                               ${Number(speicalPizza.extraLargePizzaPrice)}

@@ -267,6 +267,7 @@ function NewOrder() {
           dispatch(addToCart([]));
           setDiscount(0);
           setPrevOrders([]);
+
           setExtraDeliveryCharges(0);
           orderDetails({ orderCode: response.data.orderCode }).then((data) => {
             setOrderDetail(data.data.data);

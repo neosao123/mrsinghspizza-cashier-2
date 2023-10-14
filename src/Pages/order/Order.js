@@ -395,7 +395,9 @@ function Order() {
                     <h6 className='mb-2'>
                       Phone No : {orderDetail?.mobileNumber}
                     </h6>
-                    <h6 className='mb-2'>Address : {orderDetail?.address}</h6>
+                    <h6 className='mb-2 pe-3'>
+                      Address : {orderDetail?.address}
+                    </h6>
                     <h6 className='mb-2'>
                       Postal Code : {orderDetail?.zipCode}{" "}
                     </h6>

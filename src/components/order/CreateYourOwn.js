@@ -1078,7 +1078,7 @@ function CreateYourOwn({
               />
             </div>
             <div className='col-lg-4 col-md-4'>
-              <label className='mt-2 mb-1'>Sause</label>
+              <label className='mt-2 mb-1'>Sauce</label>
               <SelectDropDownSause
                 allIngredients={allIngredients}
                 handleSauseChange={handleSauseChange}
