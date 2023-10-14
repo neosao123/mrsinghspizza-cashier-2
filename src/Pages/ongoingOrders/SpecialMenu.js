@@ -15,7 +15,6 @@ import { toast } from "react-toastify";
 import { getSpecialDetails } from "./specialMenu/specialMenuCustomApiHandler";
 import { handlePops } from "./specialMenuFunctions";
 import { specialMenuParamsFn } from "./specialMenuParameters";
-import $ from "jquery";
 
 function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   sessionStorage.setItem("welcome", "Test");
@@ -530,7 +529,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         cheeseName: getSpecialData?.cheese[0].cheeseName,
         price: getSpecialData?.cheese[0].price ?? 0,
       },
-      specialBases: { specialbaseCode: "" },
+      specialBases: {},
       cook: {
         cookCode: getSpecialData?.cook[0]?.cookCode,
         cook: getSpecialData?.cook[0]?.cook,
@@ -610,11 +609,15 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         quantity: 1,
         totalPrice: Number(0).toFixed(2),
       };
+      updateInCart({ sidesArray: [obj] });
+
       setSidesArr([obj]);
     } else {
       let filteredSides = sidesArr?.filter(
         (item) => item.sideCode !== sides.code
       );
+      updateInCart({ sidesArray: filteredSides });
+
       setSidesArr(filteredSides);
     }
   };
@@ -631,6 +634,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       };
       let temp = [...sidesArr];
       temp[ind] = updatedSide;
+      updateInCart({ sidesArray: temp });
+
       setSidesArr(temp);
     }
   };
@@ -646,13 +651,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         quantity: Number(getSpecialData?.noofDips),
         totalPrice: Number(0.0).toFixed(2),
       };
-      //console.log("SPECIAL PIZZA DIPS ********************************", obj);
+      updateInCart({ dipsArray: [obj] });
       setDipsArr([obj]);
     } else {
       let filteredDips = dipsArr?.filter(
         (item) => item.dipsCode !== dips.dipsCode
       );
-      let tempDips = dipsArr?.filter((item) => item.dipsCode === dips.dipsCode);
+      updateInCart({ dipsArray: filteredDips });
+
       setDipsArr(filteredDips);
     }
   };
@@ -685,11 +691,15 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       totalPrice: Number(0).toFixed(2),
     };
     if (checked) {
+      updateInCart({ drinksArray: [drinksObj] });
+
       setDrinksArr([drinksObj]);
     } else {
       let filteredDrinks = drinksArr?.filter(
         (item) => item.drinksCode !== drink.code
       );
+      updateInCart({ drinksArray: filteredDrinks });
+
       setDrinksArr(filteredDrinks);
     }
   };
@@ -1129,18 +1139,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     setPrice(formattedPrice);
   };
 
-  let specialMenuParamsObj = specialMenuParamsFn(
-    handlePops,
-    {},
-    {},
-    setDrinksArr,
-    drinksArr
-  );
-
-  useEffect(() => {
-    console.log(calcDipsArr, "calcDipsArr");
-  }, []);
-
   useEffect(() => {
     // calculateDipsPrice();
     setOfferedFreeToppings(noOfFreeToppings);
@@ -1194,6 +1192,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   }, [getSpecialData]);
   const updateInCart = (data) => {
     let cart = JSON.parse(localStorage.getItem("CartData"));
+    let dipsArray = data?.dipsArray ? data?.dipsArray : dipsArr;
+    let sidesArray = data?.sidesArray ? data?.sidesArray : sidesArr;
+    let drinksArray = data?.drinksArray ? data?.drinksArray : drinksArr;
+    let pizzas = data?.pizzaState ? data?.pizzaState : pizzaState;
 
     let tempPayload = [...cartdata];
 
@@ -1231,19 +1233,20 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         pizzaCartons.push(i);
       }
       // Iterate through pizzaState
-      data?.pizzaState?.forEach((item) => {
+      pizzas?.forEach((item) => {
         totalPrice += item?.cheese?.price ? Number(item?.cheese?.price) : 0;
-
         totalPrice += item?.crust?.price ? Number(item?.crust?.price) : 0;
-
         totalPrice += item?.specialBases?.price
           ? Number(item?.specialBases?.price)
           : 0;
         totalPrice += item?.cook?.price ? Number(item?.cook?.price) : 0;
         totalPrice += item?.spicy?.price ? Number(item?.spicy?.price) : 0;
         totalPrice += item?.sauce?.price ? Number(item?.sauce?.price) : 0;
-        console.log(noOfFreeToppings2, "calcOneTpsArr2");
         pizzaCartons.map((pizzaCarton) => {
+          // console.log(
+          //   item?.toppings?.countAsOneToppings?.length > 0,
+          //   "trueorfalse"
+          // );
           if (item?.toppings?.countAsOneToppings?.length > 0) {
             item?.toppings?.countAsOneToppings?.map((items) => {
               if (items.pizzaIndex === pizzaCarton) {
@@ -1253,9 +1256,16 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                     amount: 0,
                   };
                   calcOneTpsArr2.push(tpsObj);
-                  noOfFreeToppings2 -= 1;
+                  noOfFreeToppings2 -= Number(1);
                   // setOfferedFreeToppings((prev) => prev - 1);
                 } else {
+                  console.log(
+                    {
+                      ...items,
+                      amount: Number(items?.toppingsPrice).toFixed(2),
+                    },
+                    "onetpsarray"
+                  );
                   calcOneTpsArr2.push({
                     ...items,
                     amount: Number(items?.toppingsPrice).toFixed(2),
@@ -1263,40 +1273,41 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   noOfAdditionalTps2 += 1;
                   // setAdditionalToppingsCount((prev) => prev + 1);
                 }
+                console.log(noOfFreeToppings2, "noOfFreeToppings2");
               }
             });
           }
-          // if (item?.toppings?.countAsTwoToppings?.length > 0) {
-          //   item?.toppings?.countAsTwoToppings?.map((items) => {
-          //     if (items.pizzaIndex === pizzaCarton) {
-          //       if (noOfFreeToppings2 > 1) {
-          //         let tpsObj = {
-          //           ...items,
-          //           amount: 0,
-          //         };
-          //         calcTwoTpsArr2.push(tpsObj);
-          //         // setOfferedFreeToppings((prev) => prev - 2);
-          //         noOfFreeToppings2 -= Number(2);
-          //       } else if (noOfFreeToppings2 === 1) {
-          //         calcTwoTpsArr2.push({
-          //           ...items,
-          //           amount: Number(items?.toppingsPrice).toFixed(2),
-          //         });
-          //         // setOfferedFreeToppings((prev) => prev - 1);
-          //         noOfFreeToppings2 -= Number(1);
-          //         noOfAdditionalTps2++;
-          //         // setAdditionalToppingsCount((prev) => prev + 1);
-          //       } else {
-          //         calcTwoTpsArr2.push({
-          //           ...items,
-          //           amount: Number(items?.toppingsPrice).toFixed(2),
-          //         });
-          //         noOfAdditionalTps2 += Number(2);
-          //         // setAdditionalToppingsCount((prev) => prev + 2);
-          //       }
-          //     }
-          //   });
-          // }
+          if (item?.toppings?.countAsTwoToppings?.length > 0) {
+            item?.toppings?.countAsTwoToppings?.map((items) => {
+              if (items.pizzaIndex === pizzaCarton) {
+                if (noOfFreeToppings2 > 1) {
+                  let tpsObj = {
+                    ...items,
+                    amount: 0,
+                  };
+                  calcTwoTpsArr2.push(tpsObj);
+                  // setOfferedFreeToppings((prev) => prev - 2);
+                  noOfFreeToppings2 -= Number(2);
+                } else if (noOfFreeToppings2 === 1) {
+                  calcTwoTpsArr2.push({
+                    ...items,
+                    amount: Number(items?.toppingsPrice).toFixed(2),
+                  });
+                  // setOfferedFreeToppings((prev) => prev - 1);
+                  noOfFreeToppings2 -= Number(1);
+                  noOfAdditionalTps2++;
+                  // setAdditionalToppingsCount((prev) => prev + 1);
+                } else {
+                  calcTwoTpsArr2.push({
+                    ...items,
+                    amount: Number(items?.toppingsPrice).toFixed(2),
+                  });
+                  noOfAdditionalTps2 += Number(2);
+                  // setAdditionalToppingsCount((prev) => prev + 2);
+                }
+              }
+            });
+          }
         });
       });
 
@@ -1307,7 +1318,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       calcTwoTpsArr2?.map((tps) => {
         totalTwoTpsPrice += Number(tps?.amount);
       });
-      console.log(calcOneTpsArr2, "calcOneTpsArr2");
 
       totalPrice += totalOneTpsPrice;
       totalPrice += totalTwoTpsPrice;
@@ -1316,12 +1326,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         Number(totalPriceOfToppings) +
         Number(totalPriceOfDips)
       ).toFixed(2);
-      console.log(formattedPrice, "pricedj new");
       return formattedPrice;
     };
-
-    console.log(calculate(), "pricdj");
-    let totalAmount = calculate();
+    // let totalAmount = calculate();
 
     let payload = {
       id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),
@@ -1329,10 +1336,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       productType: "special_pizza",
       productName: getSpecialData?.name,
       config: {
-        pizza: data?.pizzaState ? data?.pizzaState : pizzaState,
-        sides: sidesArr,
-        dips: dipsArr,
-        drinks: drinksArr,
+        pizza: pizzas ? pizzas : pizzaState,
+        sides: sidesArray,
+        dips: dipsArray,
+        drinks: drinksArray,
       },
       quantity: "1",
       price: "0",
@@ -1341,7 +1348,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       pizzaSize: data?.pizzaSize ? data.pizzaSize : pizzaSize,
       pizzaPrice: pizzaPrice,
     };
-    console.log(totalAmount, "pricdj");
+    console.log(payload, "pricdj");
     if (updatedCartId !== -1) {
       tempPayload[updatedCartId] = payload;
       console.log("New Payload", payload);
@@ -1356,6 +1363,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     setPizzaSize(e.target.value);
     updateInCart({ pizzaSize: e.target.value });
   };
+  let specialMenuParamsObj = specialMenuParamsFn(
+    handlePops,
+    {},
+    {},
+    updateInCart,
+    setDrinksArr,
+    drinksArr
+  );
 
   return (
     <>

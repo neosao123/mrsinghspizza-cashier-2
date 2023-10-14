@@ -2,6 +2,7 @@ export const specialMenuParamsFn = (
   handlePops,
   e,
   pop,
+  updateInCart,
   setDrinksArr,
   drinksArr
 ) => {
@@ -11,6 +12,7 @@ export const specialMenuParamsFn = (
       parameters: {
         e: e,
         pop: pop,
+        updateInCart: updateInCart,
         setDrinksArr: setDrinksArr,
         drinksArr: drinksArr,
       },
