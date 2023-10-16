@@ -295,7 +295,6 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
     if (payloadEdit !== undefined && payloadEdit.productType === "side") {
       console.log(payloadEdit, "payloadEdit");
       setSidesArr([
-        ...sidesArr,
         {
           sideCode: payloadEdit?.productCode,
           sideName: payloadEdit?.productName,

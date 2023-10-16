@@ -75,7 +75,6 @@ export const SelectDropDownSpecialBases = ({
       onChange={handleSpecialBasesChange}
       defaultValue={""}
       value={specialBasesSelected?.specialbaseCode}
-      required
     >
       <option value={""}>--- choose any one ---</option>
       {allIngredients?.specialbases?.map((specialbasesData) => {

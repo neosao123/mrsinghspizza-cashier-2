@@ -147,18 +147,13 @@ function CreateYourOwn({
     const calculate = () => {
       let calculatePrice = 0;
 
-      console.log(data, "create your own data");
       let crust_price = data?.crust
         ? Number(data?.crust?.price)
         : Number(crustSelected?.price);
       let cheese_price = data?.cheese
         ? data?.cheese?.price
         : cheeseSelected?.price;
-      let specialbase_price = data?.specialBase
-        ? data?.specialBase?.price
-        : specialBasesSelected?.price !== undefined
-        ? specialBasesSelected?.price
-        : 0;
+      let specialbase_price = data?.specialBase ? data?.specialBase?.price : 0;
       let cook_price = data?.cook ? data?.cook?.price : cookSelected?.price;
       let sause_price = data?.sause ? data?.sause?.price : sauseSelected?.price;
       let spicy_price = data?.spicy ? data?.spicy?.price : spicySelected?.price;
@@ -281,7 +276,7 @@ function CreateYourOwn({
           dips: dips,
           drinks: drinks,
         },
-        quantity: "1",
+        quantity: 1,
         price: price,
         amount: price,
         comments: comments,
@@ -293,9 +288,7 @@ function CreateYourOwn({
         (item) => item.id === payloadEdit.id
       );
       let tempPayload = [...cartdata];
-      let movedObject = tempPayload.splice(updatedCart, 1)[0];
-      // tempPayload.unshift(movedObject);
-      tempPayload[0] = payloadForEdit;
+      tempPayload[updatedCart] = payloadForEdit;
       dispatch(addToCart([...tempPayload]));
       setPayloadEdit();
       resetFields(
@@ -313,7 +306,7 @@ function CreateYourOwn({
       //   price: allIngredients?.crust[0]?.price,
       // });
       setSizesOfPizzaSelected(sizesOfPizza[0]);
-      setSpecialBasesSelected({ specialbaseCode: "" });
+      setSpecialBasesSelected({});
       setDips([]);
       setDrinks([]);
       setSideArr([]);
@@ -915,15 +908,16 @@ function CreateYourOwn({
   //special base
   const handleSpecialBasesChange = (event) => {
     const selectedValue = event.target.value;
-    if (selectedValue !== undefined) {
-      const selectedObject = allIngredients?.specialbases?.find(
-        (option) => option.specialbaseCode === selectedValue
-      );
-      updateInCart({
-        specialBase: selectedObject,
-      });
-      setSpecialBasesSelected(selectedObject);
-    }
+    // if (selectedValue !== undefined) {
+    const selectedObject = allIngredients?.specialbases?.find(
+      (option) => option.specialbaseCode === selectedValue
+    );
+    console.log(selectedObject, "selectedObject");
+    updateInCart({
+      specialBase: selectedObject,
+    });
+    setSpecialBasesSelected(selectedObject);
+    // }
   };
 
   // all indian toppings

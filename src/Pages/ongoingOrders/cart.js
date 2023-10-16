@@ -56,7 +56,6 @@ const Cart = ({ setPayloadEdit, payloadEdit, onProductClick }) => {
               </div>
               <div className='d-flex justify-content-between'>
                 <div className='d-flex justify-content-left'>
-                  {console.log(data, "product type")}
                   {data?.productType?.toLowerCase() === "drinks" ? (
                     <>
                       <h6>Drink Type : </h6>
@@ -132,9 +131,15 @@ const Cart = ({ setPayloadEdit, payloadEdit, onProductClick }) => {
                 <span
                   className='btn  ms-3'
                   onClick={() => {
-                    setPayloadEdit(cartdata[index]);
-                    moveItemToTop(cartdata[index], index);
-                    onProductClick(cartdata[index].productType);
+                    if (payloadEdit !== undefined) {
+                      toast.error(
+                        `please complete your ${payloadEdit?.productType} edit first`
+                      );
+                    } else {
+                      setPayloadEdit(cartdata[index]);
+                      moveItemToTop(cartdata[index], index);
+                      onProductClick(cartdata[index].productType);
+                    }
                   }}
                 >
                   <i
