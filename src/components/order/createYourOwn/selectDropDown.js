@@ -9,8 +9,8 @@ export const SelectDropDownCrust = ({
   return (
     <>
       <select
-        className='form-select'
-        id='crust'
+        className="form-select"
+        id="crust"
         defaultValue={""}
         value={crustSelected?.crustCode}
         onChange={handleCrustChange}
@@ -33,6 +33,37 @@ export const SelectDropDownCrust = ({
   );
 };
 
+export const SelectDropDownCrustType = ({
+  crustType,
+  handleCrustTypeChange,
+  allIngredients,
+}) => {
+  useEffect(() => {}, [crustType]);
+  return (
+    <>
+      <select
+        className="form-select"
+        id="crust"
+        defaultValue={""}
+        value={crustType?.crustTypeCode}
+        onChange={handleCrustTypeChange}
+        required
+      >
+        {allIngredients?.crustType?.map((crustTypeData, index) => {
+          return (
+            <option
+              key={"crustDropDown" + index}
+              value={crustTypeData?.crustTypeCode}
+            >
+              {crustTypeData.crustType} - $ {crustTypeData.price}
+            </option>
+          );
+        })}
+      </select>
+    </>
+  );
+};
+
 export const SelectDropDownCheese = ({
   cheeseSelected,
   handleCheeseChange,
@@ -40,8 +71,8 @@ export const SelectDropDownCheese = ({
 }) => {
   return (
     <select
-      className='form-select'
-      id='crust'
+      className="form-select"
+      id="crust"
       defaultValue={""}
       value={cheeseSelected?.cheeseCode}
       onChange={handleCheeseChange}
@@ -70,8 +101,8 @@ export const SelectDropDownSpecialBases = ({
 }) => {
   return (
     <select
-      className='form-select'
-      id='specialbase'
+      className="form-select"
+      id="specialbase"
       onChange={handleSpecialBasesChange}
       defaultValue={""}
       value={specialBasesSelected?.specialbaseCode}
@@ -100,8 +131,8 @@ export const SelectDropDownCook = ({
 }) => {
   return (
     <select
-      className='form-select'
-      id='cook'
+      className="form-select"
+      id="cook"
       onChange={handleCookChange}
       defaultValue={""}
       value={cookSelected?.cookCode}
@@ -129,8 +160,8 @@ export const SelectDropDownSause = ({
 }) => {
   return (
     <select
-      className='form-select'
-      id='sause'
+      className="form-select"
+      id="sause"
       onChange={handleSauseChange}
       defaultValue={""}
       value={sauseSelected?.sauceCode}
@@ -160,8 +191,8 @@ export const SelectDropDownSpicy = ({
 }) => {
   return (
     <select
-      className='form-select'
-      id='Spicy'
+      className="form-select"
+      id="Spicy"
       onChange={handleSpicyChange}
       defaultValue={""}
       value={spicySelected?.spicyCode}

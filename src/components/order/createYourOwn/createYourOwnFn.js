@@ -5,7 +5,7 @@ export const resetFields = (
   setSauseSelected,
   setSpicySelected,
   setCheeseSelected,
-  setCrustSelected
+  setCrustSelected,
 ) => {
   setCrustSelected({
     crustCode: allIngredients?.crust[0]?.crustCode,
