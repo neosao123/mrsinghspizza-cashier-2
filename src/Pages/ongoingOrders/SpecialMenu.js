@@ -1641,7 +1641,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                     rows='4'
                     cols='50'
                     value={comments}
-                    onChange={(e) => setComments(e.target.value)}
+                    onChange={(e) => {
+                      updateInCart({ comment: e.target.value });
+                      setComments(e.target.value);
+                    }}
                   />
                 </div>
 

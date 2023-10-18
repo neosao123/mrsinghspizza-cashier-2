@@ -1102,7 +1102,7 @@ function CreateYourOwn({
                   id='allIndianTps'
                   onChange={handleChangeAllIndianToppins}
                 />
-                <label class='form-check-label' for='allIndianTps'>
+                <label class='form-check-label' htmlFor='allIndianTps'>
                   All Indian Style
                 </label>
               </div>
@@ -1199,7 +1199,7 @@ function CreateYourOwn({
                               />
                               <label
                                 class='form-check-label'
-                                for={countAsTwoToppings.toppingsCode}
+                                htmlFor={countAsTwoToppings.toppingsCode}
                               >
                                 {countAsTwoToppings.toppingsName}
                               </label>
@@ -1215,6 +1215,7 @@ function CreateYourOwn({
                                 $ {countAsTwoToppings.price}
                               </p>
                               <select
+                                disabled={comm !== -1 ? false : true}
                                 className='form-select d-inline-block'
                                 style={{ width: "65%" }}
                                 id={"placement-" + toppingCode}
@@ -1280,7 +1281,7 @@ function CreateYourOwn({
                               />
                               <label
                                 class='form-check-label'
-                                for={countAsOneToppings.toppingsCode}
+                                htmlFor={countAsOneToppings.toppingsCode}
                               >
                                 {countAsOneToppings.toppingsName}
                               </label>
@@ -1297,6 +1298,7 @@ function CreateYourOwn({
                               </p>
                               <select
                                 className='form-select d-inline-block'
+                                disabled={comm !== -1 ? false : true}
                                 style={{ width: "65%" }}
                                 id={"placement-" + toppingCode}
                                 value={
@@ -1363,7 +1365,7 @@ function CreateYourOwn({
                               />
                               <label
                                 class='form-check-label'
-                                for={freeToppings.toppingsCode}
+                                htmlFor={freeToppings.toppingsCode}
                               >
                                 {freeToppings.toppingsName}
                               </label>
@@ -1380,6 +1382,7 @@ function CreateYourOwn({
                               </p>
                               <select
                                 data-topping-area={toppingCode}
+                                disabled={comm !== -1 ? false : true}
                                 className='form-select d-inline-block'
                                 style={{ width: "65%" }}
                                 value={freeToppingsArr[comm]?.toppingsPlacement}

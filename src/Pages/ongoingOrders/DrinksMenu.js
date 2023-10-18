@@ -143,7 +143,9 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       productName: data?.softDrinksName,
       productType: "drinks",
       quantity: data?.qty,
-      config: selectedTypes.length === 0 ? data?.drinkType : data?.drinkType,
+      config: {
+        type: data?.drinkType,
+      },
       price: data?.price,
       amount: totalAmount.toFixed(2),
       discountAmount: discount,
@@ -152,9 +154,11 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       comments: data?.comment,
     };
     if (updatedCartId !== -1) {
+      console.log(payload, "drinks payload");
       tempPayload[updatedCartId] = payload;
     } else {
-      tempPayload.push(payload);
+      console.log(payload, "drinks payload");
+      tempPayload.unshift(payload);
     }
     dispatch(addToCart([...tempPayload]));
   };
@@ -243,7 +247,10 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productName: drink?.softDrinksName,
         productType: "drinks",
         quantity: 1,
-        config: selectedTypes.length === 0 ? drink?.drinkType : selectedTypes,
+        config: {
+          type:
+            selectedTypes.length === 0 ? drink?.drinkType[0] : selectedTypes,
+        },
         price: drink?.price,
         amount: drink?.price,
         discountAmount: discount,
@@ -324,10 +331,12 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productCode: selectedDrinks[0]?.softdrinkCode,
         productName: selectedDrinks[0]?.softDrinksName,
         productType: "drinks",
-        config:
-          selectedTypes.length === 0
-            ? selectedDrinks[0]?.drinkType
-            : selectedTypes,
+        config: {
+          type:
+            selectedTypes.length === 0
+              ? selectedDrinks[0]?.drinkType
+              : selectedTypes,
+        },
         quantity: selectedDrinks[0]?.qty ? selectedDrinks[0]?.qty : 1,
         price: selectedDrinks[0]?.price,
         amount: totalAmount.toFixed(2),
@@ -366,7 +375,6 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           let obj = drinksArr?.find(
             (item) => item.softdrinkCode === data.softdrinkCode
           );
-          console.log(obj, "existed obj");
           return (
             <li className='list-group-item' key={data.softdrinkCode}>
               <div className='d-flex justify-content-between align-items-end py-2 px-1'>

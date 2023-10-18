@@ -47,13 +47,8 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
   };
 
   useEffect(() => {
-    // handleAddToCart();
     dispatch(setDipsArray(dipsArr));
   }, [dipsArr]);
-
-  useEffect(() => {
-    console.log(dipsArray, "dipsArray");
-  }, [dipsArray]);
 
   //API - Dips Data
   const dips = () => {
@@ -68,7 +63,6 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
 
   useEffect(() => {
     if (payloadEdit !== undefined && payloadEdit.productType === "dips") {
-      console.log(payloadEdit, "payloadEdit");
       setDipsArr([
         ...dipsArr,
         {
@@ -253,7 +247,6 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       tempPayload[updatedCartId] = payload;
     } else {
       tempPayload.unshift(payload);
-      console.log(tempPayload, "tempPayload");
     }
     dispatch(addToCart([...tempPayload]));
   };

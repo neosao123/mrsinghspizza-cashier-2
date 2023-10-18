@@ -52,7 +52,7 @@ export const SelectDropDownCheese = ({
         return (
           <option
             selected={item.cheeseName === "Mozzarella"}
-            key={"crustDropDown" + index}
+            key={"cheese" + index}
             value={item?.cheeseCode}
           >
             {item.cheeseName} - $ {item.price}
@@ -77,11 +77,11 @@ export const SelectDropDownSpecialBases = ({
       value={specialBasesSelected?.specialbaseCode}
     >
       <option value={""}>--- choose any one ---</option>
-      {allIngredients?.specialbases?.map((specialbasesData) => {
+      {allIngredients?.specialbases?.map((specialbasesData, index) => {
         return (
           <>
             <option
-              key={specialbasesData.specialbaseCode}
+              key={specialbasesData.specialbaseCode + "specialbase" + index}
               data-price={specialbasesData.price}
               value={specialbasesData?.specialbaseCode}
             >
@@ -108,17 +108,15 @@ export const SelectDropDownCook = ({
       required
     >
       {/* <option value={""}>--- choose any one ---</option> */}
-      {allIngredients?.cook?.map((cook) => {
+      {allIngredients?.cook?.map((cook, index) => {
         return (
-          <>
-            <option
-              key={cook.cookCode}
-              data-price={cook.price}
-              value={cook?.cookCode}
-            >
-              {cook.cook} - ${cook.price}
-            </option>
-          </>
+          <option
+            key={cook.cook + "createyourown" + index}
+            data-price={cook.price}
+            value={cook?.cookCode}
+          >
+            {cook.cook} - ${cook.price}
+          </option>
         );
       })}
     </select>
@@ -139,11 +137,11 @@ export const SelectDropDownSause = ({
       required
     >
       {/* <option value={""}>--- choose any one ---</option> */}
-      {allIngredients?.sauce?.map((sauce) => {
+      {allIngredients?.sauce?.map((sauce, index) => {
         return (
           <>
             <option
-              key={sauce.sauceCode}
+              key={sauce.sauce + "createyourown" + index}
               data-price={sauce.price}
               value={sauce?.sauceCode}
             >
@@ -170,11 +168,11 @@ export const SelectDropDownSpicy = ({
       required
     >
       {/* <option value={""}>--- choose any one ---</option> */}
-      {allIngredients?.spices?.map((spices) => {
+      {allIngredients?.spices?.map((spices, index) => {
         return (
           <>
             <option
-              key={spices.spicyCode}
+              key={spices.spicy + "createyourown" + index}
               data-price={spices.price}
               value={spices?.spicyCode}
             >

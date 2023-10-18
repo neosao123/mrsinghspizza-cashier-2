@@ -335,6 +335,9 @@ function NewOrder() {
         .settingValue
     );
   }, [settingsData]);
+  const refreshPage = () => {
+    window.location.reload();
+  };
 
   const handleRadiobtn = (e) => {
     setDeliveryType(e.target.value);
@@ -1001,7 +1004,10 @@ function NewOrder() {
                             </button>
                           )}
                           content={() => printRef2?.current}
-                          onBeforePrint={() => {}}
+                          // onBeforePrint={() => {}}
+                          onAfterPrint={() => {
+                            refreshPage();
+                          }}
                         ></ReactToPrint>
                       </div>
                     </div>

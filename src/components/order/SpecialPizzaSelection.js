@@ -228,6 +228,7 @@ function SpecialPizzaSelection({
                             $ {countAsTwoToppings.price}
                           </p>
                           <select
+                            disabled={comm !== -1 ? false : true}
                             className='form-select d-inline-block'
                             style={{ width: "65%" }}
                             value={
@@ -315,6 +316,7 @@ function SpecialPizzaSelection({
                           <select
                             className='form-select d-inline-block'
                             style={{ width: "65%" }}
+                            disabled={comm !== -1 ? false : true}
                             value={
                               pizzaState[count - 1]?.toppings
                                 ?.countAsOneToppings[comm]?.toppingsPlacement
@@ -405,6 +407,7 @@ function SpecialPizzaSelection({
                                 comm
                               ]?.toppingsPlacement
                             }
+                            disabled={comm !== -1 ? false : true}
                             // id={`placement-${count - 1}-${
                             //   freeToppings.toppingsCode
                             // }`}

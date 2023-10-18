@@ -361,7 +361,10 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
           );
           let obj = sidesArr?.find((item) => item.sideCode === data.sideCode);
           return (
-            <li className='list-group-item' key={data.sideCode}>
+            <li
+              className='list-group-item'
+              key={data.sideCode + "sidesData" + index}
+            >
               <div className='d-flex justify-content-between align-items-end py-2 px-1'>
                 <div className='d-flex justify-content-center w-auto'>
                   {/* 
