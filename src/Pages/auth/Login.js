@@ -14,12 +14,15 @@ const getCharacterValidationError = (str) => {
   return `Your password must have at least 1 ${str} character`;
 };
 
-
 const ValidateSchema = Yup.object({
-  userName: Yup.string().required("Username is required").matches(/^[a-zA-Z0-9\s]+$/, "Invalid characters in user-name").min(4, "Username should be 4 characters minimum").max(20, "Maximum characters reached"),
+  userName: Yup.string()
+    .required("Username is required")
+    .matches(/^[a-zA-Z0-9\s]+$/, "Invalid characters in user-name")
+    .min(4, "Username should be 4 characters minimum")
+    .max(20, "Maximum characters reached"),
   password: Yup.string()
     .required("Password is required")
-    .min(6, "Password must have at least 6 characters")
+    .min(6, "Password must have at least 6 characters"),
 });
 
 function Login() {
@@ -31,7 +34,6 @@ function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-
   const userData = useSelector((state) => state.user.userData);
 
   const onSubmit = async (values) => {
@@ -39,7 +41,7 @@ function Login() {
       setLoading(true);
       await loginApi(values)
         .then(async (res) => {
-          // Store res in LocalStorage 
+          // Store res in LocalStorage
           let data = res.data;
           if (data.token && data.data) {
             let parseToken = res.data.token;
@@ -55,7 +57,9 @@ function Login() {
               isActive: data.data.isActive,
               firebaseId: data.data.firebaseId,
               profilePhoto: data.data.profilePhoto,
-            }
+              storeLocation: data.data.storeLocation,
+              role: data.data.role,
+            };
             dispatch(setUser(payload));
             dispatch(setToken(res.data.token));
             setTimeout(() => {
@@ -164,7 +168,7 @@ function Login() {
           </form>
         </div>
       </div>
-      <ToastContainer hideProgressBar={true} position="top-center"/>
+      <ToastContainer hideProgressBar={true} position="top-center" />
     </>
   );
 }
