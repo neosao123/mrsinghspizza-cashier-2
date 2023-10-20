@@ -92,7 +92,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       updateInCart(data.softdrinkCode, {
         ...data,
         qty: inputValue <= 0 ? 1 : inputValue,
-        drinkType: selectedTypes.length === 0 ? data?.drinkType : selectedTypes,
+        drinkType:
+          selectedTypes.length === 0 ? data?.drinkType[0] : selectedTypes,
       });
 
       setDrinksArr([
@@ -101,7 +102,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           ...data,
           qty: inputValue <= 0 ? 1 : inputValue,
           drinkType:
-            selectedTypes.length === 0 ? data?.drinkType : selectedTypes,
+            selectedTypes.length === 0 ? data?.drinkType[0] : selectedTypes,
         },
       ]);
     }
@@ -210,7 +211,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           comment: e.target.value,
           qty: 1,
           drinkType:
-            selectedTypes.length === 0 ? data?.drinkType : selectedTypes,
+            selectedTypes.length === 0 ? data?.drinkType[0] : selectedTypes,
         },
       ]);
     }
@@ -258,6 +259,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         pizzaSize: "",
         comments: selectedDrinks[0]?.comment,
       };
+      console.log(payload, "drinks payload");
       setComment("");
       addToCartAndResetQty(
         // setComment,
