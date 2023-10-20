@@ -8,6 +8,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { user, setUser, setToken } from "../../reducer/userReducer";
 import logo from "../../assets/logo.png";
 import { ToastContainer, toast } from "react-toastify";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+} from "firebase/auth";
+import authh from "../../firebase";
 
 // Validation Functions
 const getCharacterValidationError = (str) => {
@@ -31,6 +36,7 @@ function Login() {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [firebaseId, setFirebaseId] = useState();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -55,7 +61,7 @@ function Login() {
               mobileNumber: data.data.mobileNumber,
               email: data.data.email,
               isActive: data.data.isActive,
-              firebaseId: data.data.firebaseId,
+              firebaseId: firebaseId,
               profilePhoto: data.data.profilePhoto,
               storeLocation: data.data.storeLocation,
               role: data.data.role,
