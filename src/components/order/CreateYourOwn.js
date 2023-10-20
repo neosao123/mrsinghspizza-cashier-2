@@ -102,7 +102,6 @@ function CreateYourOwn({
     calculatePrice += totalDrinks;
     let priceBySize = sizesOfPizzaSelected === "Large" ? 11.49 : 16.49;
     calculatePrice += priceBySize;
-
     setPrice(calculatePrice.toFixed(2));
   };
   let cartdata = useSelector((state) => state.cart.cart);
@@ -163,6 +162,7 @@ function CreateYourOwn({
         : cheeseSelected?.price;
       let specialbase_price = data?.specialBase ? data?.specialBase?.price : 0;
       let cook_price = data?.cook ? data?.cook?.price : cookSelected?.price;
+      console.log(cook_price, "cook_price");
       let sause_price = data?.sause ? data?.sause?.price : sauseSelected?.price;
       let spicy_price = data?.spicy ? data?.spicy?.price : spicySelected?.price;
 
@@ -174,7 +174,6 @@ function CreateYourOwn({
       let totalDrinks = Number(0);
 
       TwoTopping?.map((two) => (totalTwoToppings += Number(two.toppingsPrice)));
-      console.log(data?.countAs1Arr, "countAs1Arr");
       OneTopping?.map((one) => (totalOneToppings += Number(one.toppingsPrice)));
       freeTopping?.map(
         (free) => (totalFreeToppings += Number(free.toppingsPrice))

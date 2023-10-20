@@ -8,6 +8,8 @@ const initialState = {
   orderDetail: null,
   editRef: null,
   dipsArray: [],
+  updateOrder: false,
+  updateOrderData: {},
 };
 
 const cartSlice = createSlice({
@@ -32,6 +34,12 @@ const cartSlice = createSlice({
     setDipsArray: (state, action) => {
       state.dipsArray = action.payload;
     },
+    setUpdateOrderData: (state, action) => {
+      state.updateOrderData = action.payload;
+    },
+    setUpdateOrder: (state, action) => {
+      state.updateOrder = action.payload;
+    },
   },
 });
 
@@ -42,6 +50,8 @@ export const {
   setDipsArray,
   setPrintRef,
   setDisplaySpecialForm,
+  setUpdateOrderData,
+  setUpdateOrder,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

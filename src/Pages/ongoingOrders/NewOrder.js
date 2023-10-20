@@ -10,6 +10,7 @@ import {
   storeLocationApi,
   deliveryExecutiveApi,
   settingsApi,
+  orderEditApi,
 } from "../../API/ongoingOrder";
 import SidesMenu from "./SidesMenu";
 import DipsMenu from "./DipsMenu";
@@ -34,7 +35,12 @@ import {
 } from "./newOrder/newOrderCustomApiHandler";
 import Cart from "./cart";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, setDisplaySpecialForm } from "../../reducer/cartReducer";
+import {
+  addToCart,
+  setDisplaySpecialForm,
+  setUpdateOrder,
+  setUpdateOrderData,
+} from "../../reducer/cartReducer";
 import { useDebounce } from "./newOrder/newOrderFunctions";
 import NotDeliverableModel from "./newOrder/model";
 import { orderDetails } from "../../API/order";
@@ -102,6 +108,10 @@ function NewOrder() {
   };
   let user = useSelector((state) => state.user.userData);
   let cartdata = useSelector((state) => state.cart.cart);
+  let updateOrder = useSelector((state) => state.cart.updateOrder);
+  let updateOrderData = useSelector((state) => state.cart.updateOrderData);
+  console.log(updateOrderData, "updateOrderData");
+
   let totalPrice = 0;
   cartdata.forEach((item) => {
     totalPrice += Number(item.amount);
@@ -130,6 +140,7 @@ function NewOrder() {
     stores: user?.role !== "R_4" ? user?.storeLocation : "",
     postalcode: "",
     deliveryExecutive: "",
+    orderTakenBy: "",
   };
 
   //API - Store Location
@@ -230,6 +241,28 @@ function NewOrder() {
 
     stores: Yup.string().required("Store Location is Required."),
   });
+  useEffect(() => {
+    //  phoneno: "",
+    // category: "pickup",
+    // customername: "",
+    // address: "",
+    // stores: user?.role !== "R_4" ? user?.storeLocation : "",
+    // postalcode: "",
+    // deliveryExecutive: "",
+    // orderTakenBy: "",
+    if (updateOrder) {
+      setDeliveryType(updateOrderData?.deliveryType);
+      formik.values.phoneno = updateOrderData?.mobileNumber;
+      formik.values.orderTakenBy = updateOrderData?.orderTakenBy;
+      formik.values.address = updateOrderData?.address;
+      formik.values.customername = updateOrderData?.customerName;
+      formik.values.stores = updateOrderData?.storeLocationCode;
+      formik.values.postalcode = updateOrderData?.zipCode;
+      formik.values.deliveryExecutive = updateOrderData?.deliveryExecutiveCode;
+    } else {
+    }
+  }, [updateOrderData]);
+
   const formik = useFormik({
     initialValues: initialValues,
     validateOnBlur: true,
@@ -241,7 +274,7 @@ function NewOrder() {
 
         // Call the order placing API here
         const payload = {
-          cashierCode: cashierCode,
+          cashierCode: updateOrder ? updateOrderData?.cashierCode : cashierCode,
           customerName: values.customername,
           mobileNumber: values.phoneno,
           address: values.address,
@@ -264,14 +297,27 @@ function NewOrder() {
           extraDeliveryCharges: extraDeliveryCharges ? extraDeliveryCharges : 0,
           grandTotal: grandTotal,
         };
-        console.log(values, "values");
-        const response = await orderPlaceApi(payload);
+        console.log(
+          {
+            orderCode: updateOrderData?.code,
+            ...payload,
+          },
+          "api res for place order"
+        );
+
+        const response = updateOrder
+          ? await orderEditApi({
+              orderCode: updateOrderData?.code,
+              ...payload,
+            })
+          : await orderPlaceApi(payload);
+
+        console.log(response, "api res for place order");
         if (response.status === 200) {
           resetForm();
           dispatch(addToCart([]));
           setDiscount(0);
           setPrevOrders([]);
-
           setExtraDeliveryCharges(0);
           orderDetails({ orderCode: response.data.orderCode }).then((data) => {
             setOrderDetail(data.data.data);
@@ -288,6 +334,7 @@ function NewOrder() {
           toast.error("Error placing the order:" + error);
         }
       }
+      // }
     },
   });
   const debouncedInputValue = useDebounce(formik.values.postalcode, 2000);
@@ -323,12 +370,12 @@ function NewOrder() {
   };
 
   useEffect(() => {
-    if (formik.values.postalcode.length > 0) {
+    if (formik?.values?.postalcode?.length > 0) {
       fetchpostalcodeIsDeliverable(formik.values.postalcode);
     }
   }, [debouncedInputValue]);
   useEffect(() => {
-    if (formik.values.phoneno.length > 9) {
+    if (formik.values?.phoneno?.length > 9) {
       fetchPrevOrder(formik.values.phoneno);
     }
   }, [debouncedInputValueForphoneNumber]);
@@ -340,6 +387,8 @@ function NewOrder() {
     );
   }, [settingsData]);
   const refreshPage = () => {
+    dispatch(setUpdateOrderData({}));
+    dispatch(setUpdateOrder(false));
     window.location.reload();
   };
 
@@ -362,24 +411,24 @@ function NewOrder() {
   return (
     <>
       <Nav />
-      <div className="container-fluid orderContainer">
+      <div className='container-fluid orderContainer'>
         <form onSubmit={formik.handleSubmit}>
-          <div className="row gx-4 orderContainer ">
+          <div className='row gx-4 orderContainer '>
             {/* Section 1 */}
-            <div className="col-lg-2 sectionOne">
-              <label className="form-label mt-2 mb-1">
-                Phone <small className="text-danger">*</small>{" "}
+            <div className='col-lg-2 sectionOne'>
+              <label className='form-label mt-2 mb-1'>
+                Phone <small className='text-danger'>*</small>{" "}
               </label>
               <IntlTelInput
-                containerClassName="intl-tel-input mt-2 w-100"
-                type="tel"
-                name="phoneno"
-                inputClassName="form-control"
+                containerClassName='intl-tel-input mt-2 w-100'
+                type='tel'
+                name='phoneno'
+                inputClassName='form-control'
                 // type='number'
-                placeholder="(XXX) XXX-XXXX"
+                placeholder='(XXX) XXX-XXXX'
                 value={formik.values.phoneno.replace(/\D/g, "")}
                 onBlur={formik.handleBlur}
-                defaultCountry="CA"
+                defaultCountry='CA'
                 onlyCountries={["CA"]}
                 preferredCountries={["CA"]}
                 onPhoneNumberChange={(
@@ -395,103 +444,103 @@ function NewOrder() {
                 }}
               />
               {formik.touched.phoneno && formik.errors.phoneno ? (
-                <div className="text-danger">{formik.errors.phoneno}</div>
+                <div className='text-danger'>{formik.errors.phoneno}</div>
               ) : null}
-              <div className="my-3 m-0 p-0 d-flex justify-content-between">
-                <label className="radio d-flex align-items-center my-1 w-50">
+              <div className='my-3 m-0 p-0 d-flex justify-content-between'>
+                <label className='radio d-flex align-items-center my-1 w-50'>
                   <input
-                    className="mx-2"
-                    type="radio"
+                    className='mx-2'
+                    type='radio'
                     checked={deliveryType === "pickup" ? true : false}
                     onChange={(e) => {
                       formik.handleChange(e);
                       handleRadiobtn(e);
                     }}
-                    name="category"
-                    value="pickup"
+                    name='category'
+                    value='pickup'
                   />
                   Pickup
                 </label>
-                <label className="radio d-flex align-items-center my-1 mx-2 w-50">
+                <label className='radio d-flex align-items-center my-1 mx-2 w-50'>
                   <input
-                    className="mx-2"
-                    type="radio"
-                    name="category"
+                    className='mx-2'
+                    type='radio'
+                    name='category'
                     checked={deliveryType === "delivery" ? true : false}
                     onChange={(e) => {
                       formik.handleChange(e);
                       handleRadiobtn(e);
                     }}
-                    value="delivery"
+                    value='delivery'
                   />
                   Delivery
                 </label>
               </div>
-              <label className="form-label mt-2">Order Taken By</label>
+              <label className='form-label mt-2'>Order Taken By</label>
               <input
-                className="form-control mb-3"
-                type="text"
-                name="orderTakenBy"
-                id="orderTakenBy"
+                className='form-control mb-3'
+                type='text'
+                name='orderTakenBy'
+                id='orderTakenBy'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.orderTakenBy}
               />
               {formik.touched.orderTakenBy && formik.errors.orderTakenBy ? (
-                <div className="text-danger my-1">
+                <div className='text-danger my-1'>
                   {formik.errors.orderTakenBy}
                 </div>
               ) : null}
-              <label className="form-label">
+              <label className='form-label'>
                 Customer Name{" "}
                 {deliveryType === "delivery" && (
-                  <small className="text-danger">*</small>
+                  <small className='text-danger'>*</small>
                 )}
               </label>
               <input
-                className="form-control"
-                type="text"
-                name="customername"
-                id="customername"
+                className='form-control'
+                type='text'
+                name='customername'
+                id='customername'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.customername}
               />
               {formik.touched.customername && formik.errors.customername ? (
-                <div className="text-danger my-1">
+                <div className='text-danger my-1'>
                   {formik.errors.customername}
                 </div>
               ) : null}
-              <label className="form-label mt-2 mb-1">
+              <label className='form-label mt-2 mb-1'>
                 Address{" "}
                 {deliveryType === "delivery" && (
-                  <small className="text-danger">*</small>
+                  <small className='text-danger'>*</small>
                 )}
               </label>
               <textarea
-                className="form-control"
-                rows="4"
-                cols="50"
-                name="address"
+                className='form-control'
+                rows='4'
+                cols='50'
+                name='address'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.address}
               />
               {formik.touched.address && formik.errors.address ? (
-                <div className="text-danger my-1">{formik.errors.address}</div>
+                <div className='text-danger my-1'>{formik.errors.address}</div>
               ) : null}
               {deliveryType === "pickup" ? null : (
                 <>
-                  <label className="form-label mt-2 mb-1">
+                  <label className='form-label mt-2 mb-1'>
                     Postal Code{" "}
                     {deliveryType === "delivery" && (
-                      <small className="text-danger">*</small>
+                      <small className='text-danger'>*</small>
                     )}
                   </label>
                   <input
-                    className="form-control"
-                    name="postalcode"
-                    id="postalcode"
+                    className='form-control'
+                    name='postalcode'
+                    id='postalcode'
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.postalcode}
@@ -502,14 +551,10 @@ function NewOrder() {
                         ? "spinner-border spinner-border-sm d-flex mt-1"
                         : "d-none"
                     }
-                    role="status"
-                  >
-                    {/* <span className='visually-hidden'>
-                      Checking availability...
-                    </span> */}
-                  </div>
+                    role='status'
+                  ></div>
                   {formik.touched.postalcode && formik.errors.postalcode ? (
-                    <div className="text-danger my-1">
+                    <div className='text-danger my-1'>
                       {formik.errors.postalcode}
                     </div>
                   ) : null}
@@ -521,13 +566,13 @@ function NewOrder() {
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
               />
-              <label className="form-label mt-2 mb-1">
-                Store Location <small className="text-danger">*</small>
+              <label className='form-label mt-2 mb-1'>
+                Store Location <small className='text-danger'>*</small>
               </label>
               <select
-                className="form-select"
-                id="storesID"
-                name="stores"
+                className='form-select'
+                id='storesID'
+                name='stores'
                 defaultValue={formik.values.stores ?? user?.storeLocation}
                 value={formik.values.stores ?? ""}
                 onChange={formik.handleChange}
@@ -535,7 +580,7 @@ function NewOrder() {
               >
                 {user?.role === "R_4" ? (
                   <>
-                    <option value="">Choose Stores Location</option>
+                    <option value=''>Choose Stores Location</option>
                     {storesLocationData?.map((stores) => {
                       return (
                         <option
@@ -567,25 +612,25 @@ function NewOrder() {
               </select>
 
               {formik.touched.stores && formik.errors.stores ? (
-                <div className="text-danger my-1">{formik.errors.stores}</div>
+                <div className='text-danger my-1'>{formik.errors.stores}</div>
               ) : null}
 
               {/* delivery executive  */}
               {deliveryType === "delivery" && (
                 <>
-                  <label className="form-label mt-2 mb-1">
+                  <label className='form-label mt-2 mb-1'>
                     Delivery Executive
                   </label>
                   <select
-                    className="form-select"
-                    id="storesID"
-                    name="deliveryExecutive"
+                    className='form-select'
+                    id='storesID'
+                    name='deliveryExecutive'
                     defaultValue={formik.values.deliveryExecutive ?? "STR_1"}
                     value={formik.values.deliveryExecutive ?? ""}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   >
-                    <option value="">Choose Delivery Executive</option>
+                    <option value=''>Choose Delivery Executive</option>
                     {deliverExectiveList?.map((person) => {
                       return (
                         <option
@@ -601,29 +646,29 @@ function NewOrder() {
 
                   {formik.touched.deliveryExecutive &&
                   formik.errors.deliveryExecutive ? (
-                    <div className="text-danger my-1">
+                    <div className='text-danger my-1'>
                       {formik.errors.deliveryExecutive}
                     </div>
                   ) : null}
                 </>
               )}
 
-              <h6 className="my-3">Previous Order</h6>
+              <h6 className='my-3'>Previous Order</h6>
               <div>
-                <table className="table text-center border-none">
+                <table className='table text-center border-none'>
                   <thead>
                     <tr>
-                      <th scope="col">Date</th>
-                      <th scope="col">Order</th>
+                      <th scope='col'>Date</th>
+                      <th scope='col'>Order</th>
                     </tr>
                   </thead>
                   <tbody>
                     {prevOrderLoading ? (
                       <tr>
-                        <td scope="col" colspan="2">
+                        <td scope='col' colspan='2'>
                           <div
                             className={"spinner-border  mt-1"}
-                            role="status"
+                            role='status'
                           />
                         </td>
                       </tr>
@@ -632,16 +677,16 @@ function NewOrder() {
                         return (
                           <tr
                             key={order?.code}
-                            className="bg-white text-dark "
+                            className='bg-white text-dark '
                             style={{ cursor: "pointer" }}
                             onClick={() => {
                               dispatch(addToCart(order?.orderItems));
                             }}
                           >
-                            <td scope="col" className="px-0">
+                            <td scope='col' className='px-0'>
                               {order?.created_at?.split(" ")[0]}
                             </td>
-                            <td scope="col" className="px-0">
+                            <td scope='col' className='px-0'>
                               {order?.code}
                             </td>
                           </tr>
@@ -654,69 +699,69 @@ function NewOrder() {
             </div>
 
             {/* Section 2 */}
-            <div className="col-lg-6 my-1 sectionTwo">
+            <div className='col-lg-6 my-1 sectionTwo'>
               {/* Tabs Headings */}
               <ul
-                className="nav nav-tabs nav-fill psTabsUl mt-2 mb-3"
-                role="tablist"
+                className='nav nav-tabs nav-fill psTabsUl mt-2 mb-3'
+                role='tablist'
               >
-                <li className="nav-item">
+                <li className='nav-item'>
                   <Link
                     ref={createYourOwnRef}
-                    className="nav-link active py-2 px-auto psTabs"
-                    data-bs-toggle="tab"
-                    to="#createByOwn"
+                    className='nav-link active py-2 px-auto psTabs'
+                    data-bs-toggle='tab'
+                    to='#createByOwn'
                   >
                     Create Your Own
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className='nav-item'>
                   <Link
                     ref={specialTabRef}
-                    className="nav-link py-2 px-auto psTabs"
-                    data-bs-toggle="tab"
-                    to="#special"
+                    className='nav-link py-2 px-auto psTabs'
+                    data-bs-toggle='tab'
+                    to='#special'
                   >
                     Special
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className='nav-item'>
                   <Link
                     ref={sidesRef}
-                    className="nav-link py-2 px-auto psTabs"
-                    data-bs-toggle="tab"
-                    to="#sidesMenu"
+                    className='nav-link py-2 px-auto psTabs'
+                    data-bs-toggle='tab'
+                    to='#sidesMenu'
                   >
                     Sides
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className='nav-item'>
                   <Link
                     ref={dipsRef}
-                    className="nav-link py-2 px-auto psTabs"
-                    data-bs-toggle="tab"
-                    to="#dipsMenu"
+                    className='nav-link py-2 px-auto psTabs'
+                    data-bs-toggle='tab'
+                    to='#dipsMenu'
                   >
                     Dips
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className='nav-item'>
                   <Link
                     ref={drinksRef}
-                    className="nav-link py-2 px-auto psTabs"
-                    data-bs-toggle="tab"
-                    to="#drinksMenu"
+                    className='nav-link py-2 px-auto psTabs'
+                    data-bs-toggle='tab'
+                    to='#drinksMenu'
                   >
                     Drinks
                   </Link>
                 </li>
               </ul>
               {/* Tab Content */}
-              <div className="tab-content m-0 p-0 w-100">
+              <div className='tab-content m-0 p-0 w-100'>
                 {/* Create Your Own */}
                 <div
-                  id="createByOwn"
-                  className="container tab-pane active m-0 p-0 "
+                  id='createByOwn'
+                  className='container tab-pane active m-0 p-0 '
                 >
                   <CreateYourOwn
                     allIngredients={allIngredients}
@@ -736,7 +781,7 @@ function NewOrder() {
                 </div>
 
                 {/* SpecialMenu */}
-                <div id="special" className="container tab-pane m-0 p-0">
+                <div id='special' className='container tab-pane m-0 p-0'>
                   <SpecialMenu
                     payloadEdit={payloadEdit}
                     setPayloadEdit={setPayloadEdit}
@@ -745,7 +790,7 @@ function NewOrder() {
                 </div>
 
                 {/* All SIdes */}
-                <div id="sidesMenu" className="container tab-pane m-0 p-0">
+                <div id='sidesMenu' className='container tab-pane m-0 p-0'>
                   <SidesMenu
                     getCartList={getCartList}
                     discount={discount}
@@ -757,8 +802,8 @@ function NewOrder() {
 
                 {/* All Dips */}
                 <div
-                  id="dipsMenu"
-                  className="container tab-pane m-0 p-0 topping-list"
+                  id='dipsMenu'
+                  className='container tab-pane m-0 p-0 topping-list'
                 >
                   <DipsMenu
                     getCartList={getCartList}
@@ -770,7 +815,7 @@ function NewOrder() {
                 </div>
 
                 {/* All Drinks */}
-                <div id="drinksMenu" className="container tab-pane m-0 p-0">
+                <div id='drinksMenu' className='container tab-pane m-0 p-0'>
                   <DrinksMenu
                     payloadEdit={payloadEdit}
                     setPayloadEdit={setPayloadEdit}
@@ -784,18 +829,18 @@ function NewOrder() {
 
             {/* Section 3 */}
             <div
-              className="col-lg-4 mt-1 "
+              className='col-lg-4 mt-1 '
               style={{ backgroundColor: "#ff8c008as !important" }}
             >
-              <div className="d-flex pt-2">
-                <div className="col-6 ">
-                  <h6 className="text-end fs-5 fw-bold">Cart</h6>
+              <div className='d-flex pt-2'>
+                <div className='col-6 '>
+                  <h6 className='text-end fs-5 fw-bold'>Cart</h6>
                 </div>
-                <div className="col-6">
+                <div className='col-6'>
                   {cartdata?.length > 0 && (
-                    <div className="d-flex justify-content-end">
+                    <div className='d-flex justify-content-end'>
                       <button
-                        className="btn btn-danger btn-xs ms-5 "
+                        className='btn btn-danger btn-xs ms-5 '
                         onClick={() => dispatch(addToCart([]))}
                       >
                         <BiTrash /> Clear cart
@@ -806,9 +851,9 @@ function NewOrder() {
               </div>
 
               {/* Add to Cart */}
-              <div className="d-flex flex-column cart">
+              <div className='d-flex flex-column cart'>
                 <div
-                  className="p-3 rounded mb-3 overflow-auto"
+                  className='p-3 rounded mb-3 overflow-auto'
                   style={{
                     minHeight: "calc(100% - 45%)",
                     backgroundColor: "#ff8c0026",
@@ -821,27 +866,27 @@ function NewOrder() {
                   />
                 </div>
                 {/* Order Submit */}
-                <div className="">
+                <div className=''>
                   <form>
                     {/* Price / Sub Total */}
-                    <div className="d-flex flex-wrap my-2 justify-content-end align-items-center OrderAmount">
-                      <label className="form-label w-25">Price</label>
-                      <div className="input-group w-75">
-                        <div className="input-group-prepend">
-                          <span className="input-group-text inputGroupTxt px-2">
+                    <div className='d-flex flex-wrap my-2 justify-content-end align-items-center OrderAmount'>
+                      <label className='form-label w-25'>Price</label>
+                      <div className='input-group w-75'>
+                        <div className='input-group-prepend'>
+                          <span className='input-group-text inputGroupTxt px-2'>
                             $
                           </span>
                         </div>
                         <input
-                          className="form-control w-25 text-end"
-                          type="number"
-                          placeholder="0.00"
-                          step="0.01"
+                          className='form-control w-25 text-end'
+                          type='number'
+                          placeholder='0.00'
+                          step='0.01'
                           readOnly
                           value={Number(totalPrice).toFixed(2)}
                         ></input>
-                        <div className="input-group-append">
-                          <span className="input-group-text inputGroupTxt">
+                        <div className='input-group-append'>
+                          <span className='input-group-text inputGroupTxt'>
                             CAD
                           </span>
                         </div>
@@ -849,19 +894,19 @@ function NewOrder() {
                     </div>
 
                     {/* Discount */}
-                    <div className="d-flex flex-wrap my-2 my-2 justify-content-end align-items-center">
-                      <label className="form-label w-25">Discount</label>
-                      <div className="input-group w-75">
-                        <div className="input-group-prepend">
-                          <span className="input-group-text inputGroupTxt px-2">
+                    <div className='d-flex flex-wrap my-2 my-2 justify-content-end align-items-center'>
+                      <label className='form-label w-25'>Discount</label>
+                      <div className='input-group w-75'>
+                        <div className='input-group-prepend'>
+                          <span className='input-group-text inputGroupTxt px-2'>
                             $
                           </span>
                         </div>
                         <input
-                          className="form-control w-25 text-end"
-                          type="number"
-                          placeholder="0.00"
-                          step="1"
+                          className='form-control w-25 text-end'
+                          type='number'
+                          placeholder='0.00'
+                          step='1'
                           max={totalPrice.toFixed(2)}
                           value={discount}
                           onChange={(e) => {
@@ -875,8 +920,8 @@ function NewOrder() {
                           }}
                         ></input>
 
-                        <div className="input-group-append">
-                          <span className="input-group-text inputGroupTxt">
+                        <div className='input-group-append'>
+                          <span className='input-group-text inputGroupTxt'>
                             CAD
                           </span>
                         </div>
@@ -884,11 +929,11 @@ function NewOrder() {
                     </div>
 
                     {/* Tax Percentage */}
-                    <div className="d-flex flex-wrap my-2 justify-content-end align-items-center">
-                      <label className="form-label w-25">Tax</label>
-                      <div className="input-group w-75">
-                        <div className="input-group-prepend">
-                          <span className="input-group-text inputGroupTxt px-2">
+                    <div className='d-flex flex-wrap my-2 justify-content-end align-items-center'>
+                      <label className='form-label w-25'>Tax</label>
+                      <div className='input-group w-75'>
+                        <div className='input-group-prepend'>
+                          <span className='input-group-text inputGroupTxt px-2'>
                             {cartdata.length !== 0
                               ? settingsData?.filter(
                                   (item) =>
@@ -899,12 +944,12 @@ function NewOrder() {
                           </span>
                         </div>
                         <input
-                          className="form-control w-25 text-end"
-                          type="number"
+                          className='form-control w-25 text-end'
+                          type='number'
                           readOnly
-                          placeholder="0.00"
-                          min="0"
-                          step="1"
+                          placeholder='0.00'
+                          min='0'
+                          step='1'
                           defaultValue={0}
                           value={
                             cartdata.length !== 0
@@ -914,8 +959,8 @@ function NewOrder() {
                               : 0
                           }
                         ></input>
-                        <div className="input-group-append">
-                          <span className="input-group-text inputGroupTxt">
+                        <div className='input-group-append'>
+                          <span className='input-group-text inputGroupTxt'>
                             CAD
                           </span>
                         </div>
@@ -924,22 +969,22 @@ function NewOrder() {
 
                     {/* Grand Total / Total Price */}
                     {deliveryType === "delivery" ? (
-                      <div className="d-flex flex-wrap my-2 justify-content-end align-items-center">
-                        <label className="form-label w-25">
+                      <div className='d-flex flex-wrap my-2 justify-content-end align-items-center'>
+                        <label className='form-label w-25'>
                           Delivery Charges
                         </label>
-                        <div className="input-group w-75">
-                          <div className="input-group-prepend">
-                            <span className="input-group-text inputGroupTxt px-2">
+                        <div className='input-group w-75'>
+                          <div className='input-group-prepend'>
+                            <span className='input-group-text inputGroupTxt px-2'>
                               $
                             </span>
                           </div>
                           <input
-                            className="form-control w-25 text-end"
-                            type="number"
-                            placeholder="0.00"
-                            min="0"
-                            step="0.01"
+                            className='form-control w-25 text-end'
+                            type='number'
+                            placeholder='0.00'
+                            min='0'
+                            step='0.01'
                             value={
                               cartdata.length === 0 || deliveryType == "pickup"
                                 ? 0
@@ -950,8 +995,8 @@ function NewOrder() {
                             }
                             readOnly
                           ></input>
-                          <div className="input-group-append">
-                            <span className="input-group-text inputGroupTxt">
+                          <div className='input-group-append'>
+                            <span className='input-group-text inputGroupTxt'>
                               CAD
                             </span>
                           </div>
@@ -959,22 +1004,22 @@ function NewOrder() {
                       </div>
                     ) : null}
                     {deliveryType === "delivery" && !ispostalcodeAvailable ? (
-                      <div className="d-flex flex-wrap my-2 justify-content-end align-items-center">
-                        <label className="form-label w-25">
+                      <div className='d-flex flex-wrap my-2 justify-content-end align-items-center'>
+                        <label className='form-label w-25'>
                           Extra Delivery Charges
                         </label>
-                        <div className="input-group w-75">
-                          <div className="input-group-prepend">
-                            <span className="input-group-text inputGroupTxt px-2">
+                        <div className='input-group w-75'>
+                          <div className='input-group-prepend'>
+                            <span className='input-group-text inputGroupTxt px-2'>
                               $
                             </span>
                           </div>
                           <input
-                            className="form-control w-25 text-end"
-                            type="number"
-                            placeholder="0.00"
-                            min="0"
-                            step="1"
+                            className='form-control w-25 text-end'
+                            type='number'
+                            placeholder='0.00'
+                            min='0'
+                            step='1'
                             value={extraDeliveryCharges}
                             onChange={(e) =>
                               setExtraDeliveryCharges(
@@ -982,8 +1027,8 @@ function NewOrder() {
                               )
                             }
                           ></input>
-                          <div className="input-group-append">
-                            <span className="input-group-text inputGroupTxt">
+                          <div className='input-group-append'>
+                            <span className='input-group-text inputGroupTxt'>
                               CAD
                             </span>
                           </div>
@@ -991,25 +1036,25 @@ function NewOrder() {
                       </div>
                     ) : null}
 
-                    <div className="d-flex flex-wrap my-2 justify-content-end align-items-center">
-                      <label className="form-label w-25">Total Price</label>
-                      <div className="input-group w-75">
-                        <div className="input-group-prepend">
-                          <span className="input-group-text inputGroupTxt px-2">
+                    <div className='d-flex flex-wrap my-2 justify-content-end align-items-center'>
+                      <label className='form-label w-25'>Total Price</label>
+                      <div className='input-group w-75'>
+                        <div className='input-group-prepend'>
+                          <span className='input-group-text inputGroupTxt px-2'>
                             $
                           </span>
                         </div>
                         <input
-                          className="form-control w-25 text-end"
-                          type="number"
-                          placeholder="0.00"
-                          min="0"
-                          step="0.01"
+                          className='form-control w-25 text-end'
+                          type='number'
+                          placeholder='0.00'
+                          min='0'
+                          step='0.01'
                           value={Number(grandTotal).toFixed(2)}
                           readOnly
                         ></input>
-                        <div className="input-group-append">
-                          <span className="input-group-text inputGroupTxt">
+                        <div className='input-group-append'>
+                          <span className='input-group-text inputGroupTxt'>
                             CAD
                           </span>
                         </div>
@@ -1018,25 +1063,25 @@ function NewOrder() {
 
                     {/* Submit Order */}
 
-                    <div className="d-flex flex-row justify-content-end align-items-center">
+                    <div className='d-flex flex-row justify-content-end align-items-center'>
                       <button
-                        type="button"
+                        type='button'
                         onClick={formik.handleSubmit}
                         disabled={formik.isSubmitting}
-                        className="submitOrderbtn btn btn-sm mb-4 px-4 py-2"
+                        className='submitOrderbtn btn btn-sm mb-4 px-4 py-2'
                       >
                         {formik.isSubmitting
                           ? "Please wait..."
                           : "Submit Order"}
                       </button>
-                      <div className="d-none">
+                      <div className='d-none'>
                         <ReactToPrint
                           trigger={() => (
                             <button
                               ref={btnRef}
-                              type="button"
+                              type='button'
                               disabled={formik.isSubmitting}
-                              className="submitOrderbtn btn btn-sm mx-3 my-3 px-4 py-2"
+                              className='submitOrderbtn btn btn-sm mx-3 my-3 px-4 py-2'
                             >
                               {formik.isSubmitting ? "Please wait..." : "Print"}
                             </button>
@@ -1057,7 +1102,7 @@ function NewOrder() {
         </form>
       </div>
       <Print printRef={printRef2} orderDetail={orderDetail} />
-      <ToastContainer position="top-center" />
+      <ToastContainer position='top-center' />
     </>
   );
 }
