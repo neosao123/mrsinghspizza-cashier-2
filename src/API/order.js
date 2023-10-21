@@ -23,3 +23,10 @@ export const statusChange = async (payload) => {
 export const deliveryTypeChange = async (payload) => {
   return await privateAPi.post("/cashier/order/deliveryTypeChange", payload);
 };
+
+export const directDeliveryTypeChange = async (payload) => {
+  return await privateAPi.post(
+    "/cashier/order/directDeliveryTypeChange",
+    payload
+  );
+};

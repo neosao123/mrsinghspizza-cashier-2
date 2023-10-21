@@ -330,11 +330,6 @@ const Print = ({ orderDetail, printRef }) => {
                           pizzaData={item}
                           productType={product_type}
                         />
-                        {order?.comments !== "" && (
-                          <p className="m-0 text-capitalize fst-italic fw-bold">
-                            Comment : {order?.comments}
-                          </p>
-                        )}
                       </div>
                     </div>
                   );
@@ -394,6 +389,19 @@ const Print = ({ orderDetail, printRef }) => {
                   );
                 }
               })}
+
+              {order?.comments !== "" && (
+                <div className="row">
+                  <div className="col-2">
+                    <p className="m-0 text-capitalize fst-italic fw-bold"></p>
+                  </div>
+                  <div className="col-10">
+                    <p className="m-0 text-capitalize fst-italic fw-bold">
+                      Comment : {order?.comments}
+                    </p>
+                  </div>
+                </div>
+              )}
               <hr />
             </div>
           );
