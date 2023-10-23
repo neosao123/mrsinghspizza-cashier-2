@@ -27,7 +27,7 @@ function App() {
 
   async function requestPermission() {
     const permission = await Notification.requestPermission();
-    console.log("data");
+    // console.log("data");
     if (permission === "granted") {
       // Generate Token
       getToken(messaging, {
