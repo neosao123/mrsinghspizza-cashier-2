@@ -19,35 +19,42 @@ import PasswordChange from "./Pages/dashboard/PasswordChange";
 import HelmetHeader from "./components/order/HelmetHeader";
 import { messaging } from "./firebase";
 import { getToken } from "firebase/messaging";
+import { onBackgroundMessage } from "firebase/messaging/sw";
 import { data } from "jquery";
 
 function App() {
   const dispatch = useDispatch();
   const [hasToken, setHasToken] = useState(false);
 
-  async function requestPermission() {
-    const permission = await Notification.requestPermission();
-    // console.log("data");
-    if (permission === "granted") {
-      // Generate Token
-      getToken(messaging, {
-        vapidKey:
-          "BDLJUvZdBlpoKi5BMTZiLdyw0QRWPkrry6jDZk7CKm6-LnqAnSwI9S6ykgY58ntFHAFTS_DVDXsHz6v2hauTtjw",
-      }).then((res) => {
-        if (res) {
-          console.log("current token", res);
-        } else {
-          alert();
-        }
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker
+      .register("./firebase-messaging-sw.js")
+      .then(function (registration) {
+        console.log("Registration successful, scope is:", registration.scope);
+        getToken(messaging, {
+          vapidKey:
+            "BDLJUvZdBlpoKi5BMTZiLdyw0QRWPkrry6jDZk7CKm6-LnqAnSwI9S6ykgY58ntFHAFTS_DVDXsHz6v2hauTtjw",
+          serviceWorkerRegistration: registration,
+        })
+          .then((currentToken) => {
+            if (currentToken) {
+              console.log("current token for client: ", currentToken);
+              localStorage.setItem("firebaseId", currentToken);
+            } else {
+              console.log(
+                "No registration token available. Request permission to generate one."
+              );
+            }
+          })
+          .catch((err) => {
+            console.log("An error occurred while retrieving token. ", err);
+            // catch error while creating client token
+          });
+      })
+      .catch(function (err) {
+        console.log("Service worker registration failed, error:", err);
       });
-    } else if (permission === "denied") {
-      alert("You have ");
-    }
   }
-
-  useEffect(() => {
-    requestPermission();
-  }, []);
 
   return (
     <>

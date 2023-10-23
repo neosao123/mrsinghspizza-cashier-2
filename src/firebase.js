@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import { onBackgroundMessage } from "firebase/messaging/sw";
 import { getMessaging } from "firebase/messaging";
 
 const firebaseConfig = {
