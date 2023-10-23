@@ -28,6 +28,7 @@ import { useDebounce } from "../ongoingOrders/newOrder/newOrderFunctions";
 import { isZipCodeDelivarable } from "../ongoingOrders/newOrder/newOrderApi";
 import swal from "sweetalert";
 import { $ } from "jquery";
+import { Modal } from "react-bootstrap";
 
 const sideTypeArr = ["poutine", "subs"];
 
@@ -73,6 +74,11 @@ function Order() {
   const [storeLocationData, setStoreLocationData] = useState();
   const [teleStore, setTeleStore] = useState();
 
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   const user = useSelector((state) => state.user.userData);
 
   const [initialValues, setInitialValues] = useState({
@@ -103,6 +109,7 @@ function Order() {
 
         await deliveryTypeChange(payload)
           .then((res) => {
+            console.log(res.data);
             if (res.data?.delivarable === false) {
               swal({
                 title: "Postal Code is Undeliverable",
@@ -118,6 +125,7 @@ function Order() {
                       getOrderDetailsApi();
                       orderList();
                       resetForm();
+                      handleClose();
                     })
                     .catch((err) => {
                       toast.error(err?.response?.data?.message);
@@ -129,6 +137,7 @@ function Order() {
               getOrderDetailsApi();
               orderList();
               resetForm();
+              handleClose();
             }
           })
           .catch((err) => {
@@ -158,13 +167,6 @@ function Order() {
         console.log("ERROR From Order List API : ", err);
       });
   };
-
-  // const debouncedInputValue = useDebounce(formik.values.postalcode, 2000);
-
-  // const fetchpostalcodeIsDeliverable = async (postalcode) => {
-  //   setIsLoading(true);
-
-  // };
 
   const handleDeliveryExecutiveChange = (payload) => {
     if (payload !== "") {
@@ -219,10 +221,6 @@ function Order() {
       toast.error("Order is already " + payload?.orderCurrentStatus);
     }
   };
-
-  // const handleDeliveryExecutive = (e) => {
-  //   setDeliveryExecutive(e.target.value);
-  // };`
 
   const handleDeliveryToPickup = async (e) => {
     try {
@@ -586,8 +584,9 @@ function Order() {
                           <button
                             className="btn text-white"
                             style={{ backgroundColor: "#ff8c00" }}
-                            data-bs-toggle="modal"
-                            data-bs-target="#exampleModal1"
+                            // data-bs-toggle="modal"
+                            // data-bs-target="#exampleModal1"
+                            onClick={handleShow}
                           >
                             Change Delivery Type
                           </button>
@@ -971,167 +970,134 @@ function Order() {
         </div>
       </div>
 
-      {/* Change Delivery Type  */}
-      <div
-        class="modal fade"
-        id="exampleModal1"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Change Delivery Type</h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+      <Modal show={show} onHide={handleClose} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <h5>Change Delivery Type</h5>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <form onSubmit={formik.handleSubmit}>
+            <div className="mb-2">
+              Order No:
+              <strong className="mx-2">{orderDetail?.orderCode}</strong>
             </div>
-            <form onSubmit={formik.handleSubmit}>
-              <div class="modal-body">
-                <div className="mb-2">
-                  Order No:{" "}
-                  <strong className="mx-2">{orderDetail?.orderCode}</strong>
-                </div>
-                <div className="mb-2">
-                  Current Delivery Type:{" "}
-                  <strong className="mx-2">
-                    {orderDetail?.deliveryType.toUpperCase()}
-                  </strong>
-                </div>
-                <div className="mb-3">
-                  Change Delivery Type To :{" "}
-                  <strong className="text-danger mx-2">
-                    {orderDetail?.deliveryType === "pickup"
-                      ? "DELIVERY"
-                      : "PICKUP"}
-                  </strong>
-                </div>
-                {orderDetail?.deliveryType === "pickup" && (
-                  <>
-                    <label className="mb-2">
-                      Customer Name <small className="text-danger">*</small>
-                    </label>
-                    <input
-                      type="text"
-                      name="customerName"
-                      id="customerName"
-                      className="form-control mb-2"
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      value={formik.values.customerName}
-                    />
-                    {formik.touched.customerName &&
-                      formik.errors.customerName && (
-                        <div className="text-danger my-1">
-                          {formik.errors.customerName}
-                        </div>
-                      )}
-
-                    <label className="mb-2">
-                      Postal Code <small className="text-danger">*</small>
-                    </label>
-                    <input
-                      type="text"
-                      id="postalcode"
-                      name="postalcode"
-                      className="form-control mb-2"
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      value={formik.values.postalcode}
-                    />
-                    {formik.touched.postalcode && formik.errors.postalcode ? (
-                      <div className="text-danger my-1">
-                        {formik.errors.postalcode}
-                      </div>
-                    ) : null}
-
-                    <label className="mb-2">
-                      Address <small className="text-danger">*</small>
-                    </label>
-                    <textarea
-                      className="form-control mb-2"
-                      maxLength={50}
-                      placeholder="Address to deliver your order"
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      value={formik.values.address}
-                      name="address"
-                      id="address"
-                    />
-                    {formik.touched.address && formik.errors.address ? (
-                      <div className="text-danger my-1">
-                        {formik.errors.address}
-                      </div>
-                    ) : null}
-
-                    <label className="mb-2">
-                      Delivery Executive{" "}
-                      <small className="text-danger">*</small>
-                    </label>
-                    <select
-                      class="form-select form-select-sm mb-2"
-                      aria-label=".form-select-sm example"
-                      name="deliveryExe"
-                      id="deliveryExe"
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      value={formik.values.deliveryExe}
-                    >
-                      <option selected value={""}>
-                        Choose Delivery Executive
-                      </option>
-                      {allDeliveryExecutiveData?.map((executive) => {
-                        return (
-                          <option value={executive?.code} key={executive?.code}>
-                            {executive.firstName} {executive.lastName}
-                          </option>
-                        );
-                      })}
-                    </select>
-                    {formik.touched.deliveryExe &&
-                      formik.errors.deliveryExe && (
-                        <div className="text-danger my-1">
-                          {formik.errors.deliveryExe}
-                        </div>
-                      )}
-                  </>
+            <div className="mb-2">
+              Current Delivery Type:
+              <strong className="mx-2">
+                {orderDetail?.deliveryType.toUpperCase()}
+              </strong>
+            </div>
+            <div className="mb-3">
+              Change Delivery Type To :{" "}
+              <strong className="text-danger mx-2">
+                {orderDetail?.deliveryType === "pickup" ? "DELIVERY" : "PICKUP"}
+              </strong>
+            </div>
+            {orderDetail?.deliveryType === "pickup" && (
+              <>
+                <label className="mb-2">
+                  Customer Name <small className="text-danger">*</small>
+                </label>
+                <input
+                  type="text"
+                  name="customerName"
+                  id="customerName"
+                  className="form-control mb-2"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.customerName}
+                />
+                {formik.touched.customerName && formik.errors.customerName && (
+                  <div className="text-danger my-1">
+                    {formik.errors.customerName}
+                  </div>
                 )}
-              </div>
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Close
-                </button>
 
-                <button
-                  type="submit"
-                  style={{ backgroundColor: "#ff8c00" }}
-                  class="btn text-white"
-                  data-bs-dismiss={
-                    orderDetail?.deliveryType === "pickup"
-                      ? formik.values.postalcode === "" ||
-                        formik.values.customerName === "" ||
-                        formik.values.address === "" ||
-                        formik.values.deliveryExe === ""
-                        ? ""
-                        : "modal"
-                      : "modal"
-                  }
+                <label className="mb-2">
+                  Postal Code <small className="text-danger">*</small>
+                </label>
+                <input
+                  type="text"
+                  id="postalcode"
+                  name="postalcode"
+                  className="form-control mb-2"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.postalcode}
+                />
+                {formik.touched.postalcode && formik.errors.postalcode ? (
+                  <div className="text-danger my-1">
+                    {formik.errors.postalcode}
+                  </div>
+                ) : null}
+
+                <label className="mb-2">
+                  Address <small className="text-danger">*</small>
+                </label>
+                <textarea
+                  className="form-control mb-2"
+                  maxLength={50}
+                  placeholder="Address to deliver your order"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.address}
+                  name="address"
+                  id="address"
+                />
+                {formik.touched.address && formik.errors.address ? (
+                  <div className="text-danger my-1">
+                    {formik.errors.address}
+                  </div>
+                ) : null}
+
+                <label className="mb-2">
+                  Delivery Executive <small className="text-danger">*</small>
+                </label>
+                <select
+                  class="form-select form-select-sm mb-2"
+                  aria-label=".form-select-sm example"
+                  name="deliveryExe"
+                  id="deliveryExe"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.deliveryExe}
                 >
-                  Submit
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
+                  <option selected value={""}>
+                    Choose Delivery Executive
+                  </option>
+                  {allDeliveryExecutiveData?.map((executive) => {
+                    return (
+                      <option value={executive?.code} key={executive?.code}>
+                        {executive.firstName} {executive.lastName}
+                      </option>
+                    );
+                  })}
+                </select>
+                {formik.touched.deliveryExe && formik.errors.deliveryExe && (
+                  <div className="text-danger my-1">
+                    {formik.errors.deliveryExe}
+                  </div>
+                )}
+              </>
+            )}
+          </form>
+        </Modal.Body>
+        <Modal.Footer>
+          <button type="button" class="btn btn-secondary" onClick={handleClose}>
+            Close
+          </button>
+
+          <button
+            type="submit"
+            style={{ backgroundColor: "#ff8c00" }}
+            class="btn text-white"
+            onClick={formik.handleSubmit}
+          >
+            Submit
+          </button>
+        </Modal.Footer>
+      </Modal>
 
       <div
         class="modal fade"
