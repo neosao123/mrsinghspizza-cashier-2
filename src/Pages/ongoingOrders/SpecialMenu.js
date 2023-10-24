@@ -52,6 +52,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
   let calcOneTpsArr = [];
   let calcTwoTpsArr = [];
+
   let calcDipsArr = [];
   let calcToppingsArr = [];
   // let ides = [];
@@ -1218,9 +1219,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     }
   }, [getSpecialData]);
   const updateInCart = (data) => {
-    let calcOneTpsArr2 = [];
-    let calcTwoTpsArr2 = [];
-
     let cart = JSON.parse(localStorage.getItem("CartData"));
     let dipsArray = data?.dipsArray ? data?.dipsArray : dipsArr;
     let sidesArray = data?.sidesArray ? data?.sidesArray : sidesArr;
@@ -1246,6 +1244,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         ? getSpecialData?.largePizzaPrice
         : getSpecialData?.extraLargePizzaPrice;
     price += Number(pizzaPrice);
+
+    let calcOneTpsArr2 = [];
+    let calcTwoTpsArr2 = [];
 
     const calculate = () => {
       let totalPrice = Number(0);
@@ -1350,11 +1351,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       ).toFixed(2);
       return formattedPrice;
     };
-    // let totalAmount = calculate();
-
-    console.log("calc array toppings count as two : ", calcTwoTpsArr2);
-    console.log("Pizzas : ", pizzas);
-    console.log("pizzaState : ", pizzaState);
 
     let payload = {
       id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),
