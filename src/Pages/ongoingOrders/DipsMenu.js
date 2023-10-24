@@ -267,13 +267,13 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
   };
   return (
     <>
-      <ul className='list-group'>
+      <ul className="list-group">
         {dipsData?.map((data) => {
           let obj = dipsArr?.find((item) => item.dipsCode === data.dipsCode);
           return (
-            <li className='list-group-item' key={data.dipsCode}>
-              <div className='d-flex justify-content-between align-items-end py-2'>
-                <div className='d-flex justify-content-center w-auto'>
+            <li className="list-group-item" key={data.dipsCode}>
+              <div className="d-flex justify-content-between align-items-end py-2">
+                <div className="d-flex justify-content-center w-auto">
                   {/* <img
                     className='rounded'
                     src={data.image === "" ? `${specialImg1}` : data.image}
@@ -282,23 +282,23 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
                     alt=''
                   ></img> */}
                 </div>
-                <div className='d-flex justify-content-center flex-column py-1 w-100'>
-                  <div className='d-flex justify-content-between align-items-center'>
-                    <h6 className='mb-2'>{data.dipsName}</h6>
-                    <h6 className='mb-2'>$ {data.price}</h6>
+                <div className="d-flex justify-content-center flex-column py-1 w-100">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <h6 className="mb-2">{data.dipsName}</h6>
+                    <h6 className="mb-2">$ {data.price}</h6>
                   </div>
-                  <div className='d-flex justify-content-between align-items-center'>
+                  <div className="d-flex justify-content-between align-items-center">
                     <input
-                      type='number'
+                      type="number"
                       defaultValue={1}
-                      className='form-control'
+                      className="form-control"
                       value={obj !== undefined ? obj.qty : data.qty}
                       style={{ width: "20%" }}
                       onChange={(e) => handleQuantity(e, data.dipsCode, data)}
                     />
                     <button
-                      type='button'
-                      className='btn btn-sm customize py-1 px-2'
+                      type="button"
+                      className="btn btn-sm customize py-1 px-2"
                       style={{ width: "auto" }}
                       onClick={(e) => handleAddToCart(e, data)}
                     >
@@ -309,15 +309,15 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
                         : "Add To Cart"}
                     </button>
                   </div>
-                  <div className='d-flex justify-content-between align-items-center'>
+                  <div className="d-flex justify-content-between align-items-center">
                     {/* <label htmlFor="comment">comment </label> */}
                     <input
-                      id='comment'
-                      type='text'
+                      id="comment"
+                      type="text"
                       value={obj?.comment !== undefined ? obj?.comment : ""}
-                      className='form-control mt-2'
+                      className="form-control mt-2"
                       onChange={(e) => handleComment(e, data)}
-                      placeholder='eg. comment'
+                      placeholder="eg. comment"
                     />
                   </div>
                 </div>

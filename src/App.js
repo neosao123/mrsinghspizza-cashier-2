@@ -11,16 +11,18 @@ import OngoingOrder from "./Pages/ongoingOrders/NewOrder";
 import { useDispatch } from "react-redux";
 import Order from "./Pages/order/Order";
 import AuthLayout from "./layout/AuthLayout";
-import { cashierDetails } from "./API/ongoingOrder";
+import { cashierDetails, sendNotification } from "./API/ongoingOrder";
 import { GlobalProvider } from "./context/GlobalContext";
 import { setPrintRef } from "./reducer/cartReducer";
 import Profile from "./Pages/dashboard/Profile";
 import PasswordChange from "./Pages/dashboard/PasswordChange";
 import HelmetHeader from "./components/order/HelmetHeader";
 import { messaging } from "./firebase";
-import { getToken } from "firebase/messaging";
+import { getToken, onMessage } from "firebase/messaging";
 import { onBackgroundMessage } from "firebase/messaging/sw";
 import { data } from "jquery";
+import { async } from "@firebase/util";
+import { toast } from "react-toastify";
 
 function App() {
   const dispatch = useDispatch();
@@ -48,13 +50,32 @@ function App() {
           })
           .catch((err) => {
             console.log("An error occurred while retrieving token. ", err);
-            // catch error while creating client token
           });
       })
       .catch(function (err) {
         console.log("Service worker registration failed, error:", err);
       });
   }
+
+  const firebaseNotify = async () => {
+    const fb_token = localStorage.getItem("firebaseId");
+    await sendNotification({
+      fb_token: fb_token,
+    })
+      .then((res) => {
+        messaging.onMessage((payload) => {
+          console.log("Message received:", payload);
+          // You can process the message data here.
+        });
+      })
+      .catch((err) => {
+        toast.error(err);
+      });
+  };
+
+  useEffect(() => {
+    firebaseNotify();
+  });
 
   return (
     <>

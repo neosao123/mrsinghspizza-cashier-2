@@ -76,3 +76,7 @@ export const updateCartApi = async (payload) => {
 export const settingsApi = async () => {
   return await privateAPi.get("/settings");
 };
+
+export const sendNotification = async (payload) => {
+  return await privateAPi.post("/notification", payload);
+};
