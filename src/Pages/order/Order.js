@@ -1221,7 +1221,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
             <div className="row">
               <div className="col-9 text-capitalize pe-0" key={index}>
                 <strong style={{ color: "#191919" }}>Crust Type : </strong>
-                {ele?.crustType?.crustType}
+                {(ele?.crustType?.crustType).split(" ")[0]}
               </div>
               <div className="col-3 text-end m-0 p-0">
                 {ele?.crustType?.price === undefined ||
@@ -1343,7 +1343,14 @@ export const ToppingsList = ({ toppingsData }) => {
             return (
               <div className="row">
                 {/* <div>{topping}</div> */}
-                <div className="col-9 text-capitalize pe-0" key={index}>
+                <div
+                  className={`col-${
+                    topping.amount === undefined || Number(topping.amount) === 0
+                      ? "12"
+                      : "9"
+                  } text-capitalize pe-0`}
+                  key={index}
+                >
                   {countAs === "2" && "(2) "}
                   {topping.toppingsName}
                   <span className="fw-bold">

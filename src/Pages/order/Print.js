@@ -70,20 +70,27 @@ const Print = ({ orderDetail, printRef }) => {
               </p>
             </div>
           )}
-          <div className="d-flex">
+          <div
+            className={`d-flex ${
+              orderDetail?.deliveryType === "delivery" &&
+              (orderDetail?.address !== "" || orderDetail?.address !== undefined
+                ? "mt-3"
+                : "")
+            } `}
+          >
             <p
               className={`p-0 m-0 ${
                 orderDetail?.deliveryType === "delivery" ? "col-6" : "col-12"
               }`}
             >
-              OrderTakenBy:{" "}
+              <strong>OTB</strong>:{" "}
               {orderDetail?.orderTakenBy
                 ? orderDetail?.orderTakenBy
                 : orderDetail?.cashierName}
             </p>
             {orderDetail?.deliveryType === "delivery" && (
               <span className="col-6 text-end">
-                Delivery Executive : {orderDetail?.deliveryExecutiveName}
+                <strong>Driver</strong> : {orderDetail?.deliveryExecutiveName}
               </span>
             )}
           </div>

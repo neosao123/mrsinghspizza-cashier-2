@@ -1116,6 +1116,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       totalTwoTpsPrice += Number(tps?.amount);
     });
 
+    console.log("calc two toppings: ", calcTwoTpsArr);
+
     totalPrice += totalOneTpsPrice;
     totalPrice += totalTwoTpsPrice;
 
@@ -1216,6 +1218,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     }
   }, [getSpecialData]);
   const updateInCart = (data) => {
+    let calcOneTpsArr2 = [];
+    let calcTwoTpsArr2 = [];
+
     let cart = JSON.parse(localStorage.getItem("CartData"));
     let dipsArray = data?.dipsArray ? data?.dipsArray : dipsArr;
     let sidesArray = data?.sidesArray ? data?.sidesArray : sidesArr;
@@ -1250,8 +1255,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         sizeofpizza === "Large"
           ? Number(getSpecialData?.largePizzaPrice)
           : Number(getSpecialData?.extraLargePizzaPrice);
-      let calcOneTpsArr2 = [];
-      let calcTwoTpsArr2 = [];
+
       let pizzaCartons = [];
       for (let i = 0; i < getSpecialData?.noofPizzas; i++) {
         pizzaCartons.push(i);
@@ -1347,6 +1351,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       return formattedPrice;
     };
     // let totalAmount = calculate();
+
+    console.log("calc array toppings count as two : ", calcTwoTpsArr2);
+    console.log("Pizzas : ", pizzas);
+    console.log("pizzaState : ", pizzaState);
 
     let payload = {
       id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),

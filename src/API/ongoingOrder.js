@@ -79,3 +79,7 @@ export const updateCartApi = async (payload) => {
 export const settingsApi = async () => {
   return await privateAPi.get("/settings");
 };
+
+export const sendNotification = async ($id) => {
+  return await privateAPi.get(`/trial-notify?${$id}`);
+};
