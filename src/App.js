@@ -29,12 +29,14 @@ function App() {
 
   const [play] = useSound(bellSound);
   const [notification, setNotification] = useState({ title: "", body: "" });
+  const [show, setShow] = useState(false);
 
   requestToken();
 
   onMessageListener()
     .then((payload) => {
       console.log(payload);
+      setShow(true);
       play();
       toast.success(payload.notification.title, {
         position: "top-right",
@@ -51,25 +53,6 @@ function App() {
       });
     })
     .catch((err) => console.log("failed: ", err));
-
-  const firebaseNotify = async () => {
-    const fb_token = localStorage.getItem("firebaseId");
-    await sendNotification({
-      fb_token: fb_token,
-    })
-      .then((res) => {
-        messaging.onMessage((payload) => {
-          console.log("Message received:", payload);
-        });
-      })
-      .catch((err) => {
-        toast.error(err);
-      });
-  };
-
-  useEffect(() => {
-    firebaseNotify();
-  });
 
   return (
     <>

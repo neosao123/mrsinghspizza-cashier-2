@@ -2,7 +2,7 @@
   "name": "pizza",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://192.168.128.25/mrsinghscashier/",
+  "homepage": "https://neotesing.online/mrsinghscashier",
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.5",
     "@testing-library/jest-dom": "^5.16.5",

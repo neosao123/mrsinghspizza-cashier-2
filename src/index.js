@@ -1,4 +1,4 @@
-import React from "react";
+import React, { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
@@ -11,15 +11,15 @@ import persistStore from "redux-persist/es/persistStore";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  // <React.StrictMode>
-  <BrowserRouter basename='/mrsinghscashier'>
+  // <StrictMode>
+  <BrowserRouter basename="/mrsinghscashier">
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <App />
       </PersistGate>
     </Provider>
   </BrowserRouter>
-  // </React.StrictMode>
+  // </StrictMode>
 );
 
 reportWebVitals();

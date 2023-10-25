@@ -83,3 +83,7 @@ export const settingsApi = async () => {
 export const sendNotification = async ($id) => {
   return await privateAPi.get(`/trial-notify?${$id}`);
 };
+
+export const updateFirebaseId = async (payload) => {
+  return await privateAPi.post("/cashier/updateFirebaseId", payload);
+};
