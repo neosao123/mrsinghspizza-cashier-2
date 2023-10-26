@@ -10,6 +10,7 @@ const initialState = {
   dipsArray: [],
   updateOrder: false,
   updateOrderData: {},
+  setnotificationcount: [],
 };
 
 const cartSlice = createSlice({
@@ -40,6 +41,9 @@ const cartSlice = createSlice({
     setUpdateOrder: (state, action) => {
       state.updateOrder = action.payload;
     },
+    setNotification: (state, action) => {
+      state.setnotificationcount = action.payload;
+    },
   },
 });
 
@@ -52,6 +56,7 @@ export const {
   setDisplaySpecialForm,
   setUpdateOrderData,
   setUpdateOrder,
+  setNotification,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
