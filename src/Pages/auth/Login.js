@@ -44,43 +44,35 @@ function Login() {
         .then(async (res) => {
           // Store res in LocalStorage
 
-          const firebasePayload = {
-            cashierCode: res.data.data.code,
-            firebaseId: localStorage.getItem("firebaseId"),
-          };
-          await updateFirebaseId(firebasePayload)
-            .then((response) => {
-              let data = res.data;
-              if (data.token && data.data) {
-                let parseToken = res.data.token;
-                localStorage.setItem("token", parseToken);
-                localStorage.setItem("cashierCode", res.data.data.code);
-                const payload = {
-                  code: data.data.code,
-                  userName: data.data.userName,
-                  firstName: data.data.firstName,
-                  lastName: data.data.lastName,
-                  mobileNumber: data.data.mobileNumber,
-                  email: data.data.email,
-                  isActive: data.data.isActive,
-                  firebaseId: data.data.firebaseId,
-                  profilePhoto: data.data.profilePhoto,
-                  storeLocation: data.data.storeLocation,
-                  role: data.data.role,
-                };
-                dispatch(setUser(payload));
-                dispatch(setToken(res.data.token));
-                setTimeout(() => {
-                  navigate("/ongoing-orders");
-                }, 800);
-              } else {
-                setLoading(false);
-                toast.error(data.message);
-              }
-            })
-            .catch((err) => {
-              toast.error(err);
-            });
+          let data = res.data;
+          if (data.token && data.data) {
+            let parseToken = res.data.token;
+            localStorage.setItem("token", parseToken);
+            localStorage.setItem("cashierCode", res.data.data.code);
+            const payload = {
+              code: data.data.code,
+              userName: data.data.userName,
+              firstName: data.data.firstName,
+              lastName: data.data.lastName,
+              mobileNumber: data.data.mobileNumber,
+              email: data.data.email,
+              isActive: data.data.isActive,
+              firebaseId: data.data.firebaseId,
+              profilePhoto: data.data.profilePhoto,
+              storeLocation: data.data.storeLocation,
+              role: data.data.role,
+            };
+
+            
+            dispatch(setUser(payload));
+            dispatch(setToken(res.data.token));
+            setTimeout(() => {
+              navigate("/ongoing-orders");
+            }, 800);
+          } else {
+            setLoading(false);
+            toast.error(data.message);
+          }
         })
         .catch((err) => {
           setLoading(false);
@@ -178,6 +170,8 @@ function Login() {
               </button>
             </div>
           </form>
+
+          {/* <button onClick={requestNotificationPermission}>notify</button> */}
         </div>
       </div>
       <ToastContainer hideProgressBar={true} position="top-center" />

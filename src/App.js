@@ -11,7 +11,11 @@ import OngoingOrder from "./Pages/ongoingOrders/NewOrder";
 import { useDispatch, useSelector } from "react-redux";
 import Order from "./Pages/order/Order";
 import AuthLayout from "./layout/AuthLayout";
-import { cashierDetails, sendNotification } from "./API/ongoingOrder";
+import {
+  cashierDetails,
+  sendNotification,
+  updateFirebaseId,
+} from "./API/ongoingOrder";
 import { GlobalProvider } from "./context/GlobalContext";
 import { setNotification, setPrintRef } from "./reducer/cartReducer";
 import Profile from "./Pages/dashboard/Profile";
@@ -28,17 +32,67 @@ function App() {
   const [hasToken, setHasToken] = useState(false);
 
   const [play] = useSound(bellSound);
-  // const [notification, setNotification] = useState({ title: "", body: "" });
 
   let notificationData = useSelector(
     (state) => state.cart.setnotificationcount
   );
 
-  requestToken();
+  const user = useSelector((state) => state.user.userData);
+
+  const requestToken = () => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("./firebase-messaging-sw.js")
+        .then(function (registration) {
+          console.log("Registration successful, scope is:", registration.scope);
+          getToken(messaging, {
+            vapidKey:
+              "BDLJUvZdBlpoKi5BMTZiLdyw0QRWPkrry6jDZk7CKm6-LnqAnSwI9S6ykgY58ntFHAFTS_DVDXsHz6v2hauTtjw",
+            serviceWorkerRegistration: registration,
+          })
+            .then((currentToken) => {
+              if (currentToken) {
+                console.log("current token for client: ", currentToken);
+                localStorage.setItem("firebaseId", currentToken);
+                const firebasePayload = {
+                  cashierCode: user?.code,
+                  firebaseId: localStorage.getItem("firebaseId"),
+                };
+                updateFirebaseId(firebasePayload)
+                  .then((response) => {})
+                  .catch((err) => {
+                    toast.error(err);
+                  });
+              } else {
+                console.log(
+                  "No registration token available. Request permission to generate one."
+                );
+              }
+            })
+            .catch((err) => {
+              console.log("An error occurred while retrieving token. ", err);
+            });
+        })
+        .catch(function (err) {
+          console.log("Service worker registration failed, error:", err);
+        });
+    }
+  };
+
+  if (!("Notification" in window)) {
+    alert("This browser does not support desktop notification");
+  } else if (Notification.permission === "granted") {
+    requestToken();
+  } else if (Notification.permission !== "denied") {
+    Notification.requestPermission().then((permission) => {
+      if (permission === "granted") {
+        requestToken();
+      }
+    });
+  }
 
   onMessageListener()
     .then((payload) => {
-      console.log(payload);
       play();
       toast.success(payload.notification.title, {
         position: "top-right",
@@ -49,10 +103,6 @@ function App() {
         draggable: true,
         theme: "light",
       });
-      // setNotification({
-      //   title: payload.notification.title,
-      //   body: payload.notification.body,
-      // });
 
       const notifyData = {
         messageId: payload?.messageId,

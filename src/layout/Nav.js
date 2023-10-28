@@ -7,7 +7,7 @@ import arrowKey from "../assets/arrow-key.png";
 import { useDispatch, useSelector } from "react-redux";
 import { user, setUser, setToken } from "../reducer/userReducer";
 import { setEditRef, setNotification } from "../reducer/cartReducer";
-import { getNotificationList } from "../API/ongoingOrder";
+import { getNotificationList, updateFirebaseId } from "../API/ongoingOrder";
 import { toast } from "react-toastify";
 
 function Nav() {
@@ -19,6 +19,8 @@ function Nav() {
   const [loginUserData, setLoginUserData] = useState(null);
   const [notifyCount, setNotifyCount] = useState(0);
   const [notifylistData, setNotifylistData] = useState([]);
+
+  const [notifyPermission, setNotifyPermission] = useState("default");
 
   let userData = useSelector((state) => state.user.userData);
   let setnotificationcount = useSelector(
@@ -65,7 +67,7 @@ function Nav() {
 
   useEffect(() => {
     notificationlist();
-    setNotifyCount(setnotificationcount.length);
+    setNotifyCount(setnotificationcount?.length);
   }, [notifyCount, setnotificationcount]);
 
   return (
@@ -106,7 +108,7 @@ function Nav() {
               <i className="fa fa-bell-o" aria-hidden="true"></i>
               <span
                 className={`notify-count ${
-                  setnotificationcount.length === 0 ? "d-none" : ""
+                  setnotificationcount?.length === 0 ? "d-none" : ""
                 }`}
               ></span>
             </button>
