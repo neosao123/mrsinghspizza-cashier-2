@@ -13,7 +13,6 @@ import {
   SelectDropDownSpecialBases,
   SelectDropDownSpicy,
 } from "./createYourOwn/selectDropDown";
-import {} from "./createYourOwn/selectDropDown";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, setCart } from "../../reducer/cartReducer";
 import { resetFields } from "./createYourOwn/createYourOwnFn";
@@ -145,6 +144,7 @@ function CreateYourOwn({
     }
     let totalAmount = 0;
     let sizeofpizza = data?.pizzaSize ? data.pizzaSize : sizesOfPizzaSelected;
+    console.log(sizeofpizza, "sizesOfPizzaSelected");
 
     // let pizzaPrice = sizeofpizza === "Large" ? 11.49 : 16.49;
 
@@ -160,7 +160,18 @@ function CreateYourOwn({
       let cheese_price = data?.cheese
         ? data?.cheese?.price
         : cheeseSelected?.price;
-      let specialbase_price = data?.specialBase ? data?.specialBase?.price : 0;
+      let specialbase_price = data?.specialBase
+        ? data?.specialBase?.price
+        : specialBasesSelected?.price !== undefined
+        ? specialBasesSelected?.price
+        : 0;
+      console.log(data?.specialBase, "specialbase_price data?.specialBase");
+      console.log(
+        specialBasesSelected,
+        "specialbase_price specialBasesSelected"
+      );
+      console.log(specialbase_price, "specialbase_price");
+
       let cook_price = data?.cook ? data?.cook?.price : cookSelected?.price;
       console.log(cook_price, "cook_price");
       let sause_price = data?.sause ? data?.sause?.price : sauseSelected?.price;
@@ -238,7 +249,7 @@ function CreateYourOwn({
         drinks: data?.drinksArr ? data?.drinksArr : drinks,
       },
       quantity: "1",
-      price: data?.pizzaSize == "Extra Large" ? 16.49 : 11.49,
+      price: sizeofpizza === "Large" ? 11.49 : 16.49,
       amount: totalAmount?.toFixed(2),
       comments: data?.comment ? data.comment : comments,
       pizzaSize: data.pizzaSize ? data.pizzaSize : sizesOfPizzaSelected,
@@ -955,16 +966,24 @@ function CreateYourOwn({
   //special base
   const handleSpecialBasesChange = (event) => {
     const selectedValue = event.target.value;
-    // if (selectedValue !== undefined) {
-    const selectedObject = allIngredients?.specialbases?.find(
-      (option) => option.specialbaseCode === selectedValue
-    );
-    console.log(selectedObject, "selectedObject");
-    updateInCart({
-      specialBase: selectedObject,
-    });
-    setSpecialBasesSelected(selectedObject);
-    // }
+    if (selectedValue !== "") {
+      const selectedObject = allIngredients?.specialbases?.find(
+        (option) => option.specialbaseCode === selectedValue
+      );
+      updateInCart({
+        specialBase: selectedObject,
+      });
+      setSpecialBasesSelected(selectedObject);
+    } else {
+      updateInCart({
+        specialBase: { specialbaseCode: "", price: 0, specialbaseName: "" },
+      });
+      setSpecialBasesSelected({
+        specialbaseCode: "",
+        price: 0,
+        specialbaseName: "",
+      });
+    }
   };
 
   // all indian toppings

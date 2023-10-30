@@ -11,7 +11,9 @@ const Cart = ({ setPayloadEdit, payloadEdit, onProductClick }) => {
   const deleteItemFromCart = (ind) => {
     let tmp = [...cartListData];
     tmp.splice(ind, 1);
+
     dispatch(addToCart([...tmp]));
+    setPayloadEdit();
     toast.error("Item deleted successfully");
   };
   const duplicateItem = (item) => {

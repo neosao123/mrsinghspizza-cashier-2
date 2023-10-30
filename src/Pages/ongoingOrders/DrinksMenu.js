@@ -451,7 +451,9 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
                       type='button'
                       className='btn btn-sm customize py-1 px-2'
                       style={{ width: "auto" }}
-                      onClick={(e) => handleAddToCart(e, data)}
+                      onClick={(e) => {
+                        handleAddToCart(e, data);
+                      }}
                     >
                       {payloadEdit !== undefined &&
                       payloadEdit.productType === "drinks" &&
