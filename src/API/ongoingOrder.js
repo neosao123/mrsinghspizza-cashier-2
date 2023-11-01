@@ -1,4 +1,3 @@
-import axios from "axios";
 import { privateAPi } from "./privateapis";
 import { publicApi } from "./publicapis";
 

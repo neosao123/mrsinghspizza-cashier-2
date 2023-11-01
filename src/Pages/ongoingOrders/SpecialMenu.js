@@ -159,6 +159,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             toppingsName: item?.toppingsName,
             toppingsPrice: Number(item?.price),
             toppingsPlacement: toppingsPlacement,
+            amount: Number(0.0).toFixed(2),
           };
         }
       );
@@ -480,6 +481,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                 toppingsName: freeToppings?.toppingsName,
                 toppingsPrice: Number(freeToppings?.price),
                 toppingsPlacement: placement,
+                amount: Number(0.0).toFixed(2),
               },
             ],
           },
@@ -854,7 +856,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           drinks: drinksArr,
         },
         quantity: "1",
-        price: "0",
+        price: price,
         amount: price,
         comments: comments,
         pizzaSize: pizzaSize === "Large" ? "Large" : "Extra Large",
@@ -940,7 +942,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
           drinks: drinksArr, // Changes
         },
         quantity: "1",
-        price: "0",
+        price: price,
         amount: price,
         comments: comments,
         pizzaSize: pizzaSize === "Large" ? "Large" : "Extra Large",
@@ -1409,7 +1411,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         drinks: drinksArray,
       },
       quantity: "1",
-      price: "0",
+      price: finalVal,
       amount: finalVal,
       comments: data?.comment ? data?.comment : comments,
       pizzaSize: data?.pizzaSize ? data.pizzaSize : pizzaSize,

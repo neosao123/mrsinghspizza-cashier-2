@@ -64,7 +64,6 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
   useEffect(() => {
     if (payloadEdit !== undefined && payloadEdit.productType === "dips") {
       setDipsArr([
-        ...dipsArr,
         {
           dipsCode: payloadEdit?.productCode,
           dipsName: payloadEdit?.productName,
@@ -78,6 +77,7 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
 
   // Onclick Add To Cart - API Add To Cart
   const handleAddToCart = async (e, dipsitem) => {
+    console.log(payloadEdit, "payloadEdit edit");
     e.preventDefault();
     let cart = JSON.parse(localStorage.getItem("CartData"));
     let cartCode;
@@ -116,6 +116,9 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       );
       return;
     }
+    // if (payloadEdit !== undefined && payloadEdit.productType === "dips") {
+    //   console.log(payloadEdit, "payloadEdit");
+    // }
 
     if (cart !== null && cart !== undefined) {
       cartCode = cart.cartCode;
@@ -129,6 +132,11 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       (selectedDips[0]?.qty !== undefined ? Number(selectedDips[0]?.qty) : 1);
 
     if (payloadEdit !== undefined && payloadEdit.productType === "dips") {
+      console.log(payloadEdit, "payloadEdit edit");
+      if (payloadEdit.productCode != selectedDips[0].dipsCode) {
+        toast.error("complete your first edit first");
+        return;
+      }
       const payloadForEdit = {
         id: payloadEdit?.id,
         cartCode: cartCode ? cartCode : "#NA",
@@ -148,6 +156,7 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       };
       let tempPayload = [...cartdata];
       tempPayload[0] = payloadForEdit;
+
       addToCartAndResetQty(
         dispatch,
         addToCart,
@@ -201,6 +210,7 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         selectedDips,
         "Added Successfully"
       );
+      setPayloadEdit();
     }
   };
 
@@ -265,11 +275,13 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       setDipsArr([{ ...obj, comment: e.target.value }]);
     }
   };
+
   return (
     <>
       <ul className='list-group'>
         {dipsData?.map((data) => {
           let obj = dipsArr?.find((item) => item.dipsCode === data.dipsCode);
+          console.log(obj, "dips object found");
           return (
             <li className='list-group-item' key={data.dipsCode}>
               <div className='d-flex justify-content-between align-items-end py-2'>

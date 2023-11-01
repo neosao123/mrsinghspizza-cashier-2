@@ -61,7 +61,6 @@ const Cart = ({ setPayloadEdit, payloadEdit, onProductClick }) => {
                   {data?.productType?.toLowerCase() === "drinks" ? (
                     <>
                       <h6>Drink Type : </h6>
-                      {console.log(data?.config, "data?.config")}
                       <span className='mx-1'>{data?.config?.type}</span>
                     </>
                   ) : null}

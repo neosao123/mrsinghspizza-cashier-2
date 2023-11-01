@@ -44,12 +44,19 @@ const NotDeliverableModel = ({
               className='form-control w-25 text-end'
               type='number'
               placeholder='0.00'
-              min='0'
+              min={0}
+              max={999}
               step='1'
               defaultValue={0}
               value={extraDeliveryCharges}
               onChange={(e) =>
-                setExtraDeliveryCharges(e.target.value < 0 ? 0 : e.target.value)
+                setExtraDeliveryCharges(
+                  e.target.value < 0
+                    ? 0
+                    : e.target.value > 999
+                    ? 999
+                    : e.target.value
+                )
               }
             ></input>
             <div className='input-group-append'>

@@ -249,10 +249,11 @@ function CreateYourOwn({
         drinks: data?.drinksArr ? data?.drinksArr : drinks,
       },
       quantity: "1",
-      price: sizeofpizza === "Large" ? 11.49 : 16.49,
+      price: totalAmount?.toFixed(2),
       amount: totalAmount?.toFixed(2),
       comments: data?.comment ? data.comment : comments,
       pizzaSize: data.pizzaSize ? data.pizzaSize : sizesOfPizzaSelected,
+      pizzaPrice: sizeofpizza === "Large" ? 11.49 : 16.49,
       discountAmount: discount,
       taxPer: taxPer,
     };
@@ -484,6 +485,7 @@ function CreateYourOwn({
           ? selectedTopping[0].price
           : "0",
         toppingsPlacement: placement,
+        amount: selectedTopping[0].price ? selectedTopping[0].price : "0",
       };
 
       setCountTwoToppingsArr((prevTps) => {
@@ -557,6 +559,7 @@ function CreateYourOwn({
           ? selectedTopping[0].price
           : "0",
         toppingsPlacement: placement,
+        amount: selectedTopping[0].price ? selectedTopping[0].price : "0",
       };
 
       setCountOneToppingsArr((prevToppings) => {
@@ -624,10 +627,11 @@ function CreateYourOwn({
       const toppingObj = {
         toppingsCode: selectedTopping[0].toppingsCode,
         toppingsName: selectedTopping[0].toppingsName,
-        toppingsPrice: selectedTopping[0].toppingsCode
+        toppingsPrice: selectedTopping[0].price
           ? selectedTopping[0].price
           : "0",
         toppingsPlacement: placement,
+        amount: selectedTopping[0].price ? selectedTopping[0].price : "0",
       };
 
       setFreeToppingsArr((prevToppings) => {

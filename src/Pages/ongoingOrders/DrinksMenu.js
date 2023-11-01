@@ -273,6 +273,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         [drink],
         "Added Successfully"
       );
+      setPayloadEdit();
+
       return;
     }
     if (payloadEdit !== undefined && payloadEdit.productType === "drinks") {
@@ -364,11 +366,13 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         [drink],
         "Added Successfully"
       );
+
+      setPayloadEdit();
     }
   };
-  // useEffect(() => {
-  //   console.log(drinksArr);
-  // }, [drinksArr])
+  useEffect(() => {
+    console.log(drinksArr, "drinksArrdrinksArr");
+  }, [drinksArr]);
 
   return (
     <>
@@ -469,7 +473,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
                       value={obj?.comment !== undefined ? obj?.comment : ""}
                       onChange={(e) => handleComments(e, data)}
                       className='form-control mt-2'
-                      placeholder='eg. add additional drinks, pops, juice, can, coke'
+                      placeholder='comment'
                     />
                   </div>
                 </div>
