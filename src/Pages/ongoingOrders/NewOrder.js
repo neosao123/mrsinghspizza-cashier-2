@@ -233,7 +233,6 @@ function NewOrder() {
         ? null
         : Yup.string()
             .min(3, "Minimum 3 characters")
-            .max(50, "Maximum 50 characters")
             .required("Address is Required"),
     postalcode:
       deliveryType === "pickup"
@@ -241,9 +240,7 @@ function NewOrder() {
         : canadianPostalCode.required("Postal Code is Required"),
 
     stores: Yup.string().required("Store Location is Required."),
-    orderTakenBy: Yup.string()
-      .min(3, "Minimum 3 characters")
-      .max(30, "Maximum 30 characters"),
+    orderTakenBy: Yup.string().min(3, "Minimum 3 characters").notRequired(),
   });
   useEffect(() => {
     if (updateOrder) {
@@ -1032,7 +1029,11 @@ function NewOrder() {
                           value={extraDeliveryCharges}
                           onChange={(e) =>
                             setExtraDeliveryCharges(
-                              e.target.value < 0 ? 0 : e.target.value
+                              e.target.value < 0
+                                ? 0
+                                : e.target.value > 999
+                                ? 999
+                                : e.target.value
                             )
                           }
                         ></input>

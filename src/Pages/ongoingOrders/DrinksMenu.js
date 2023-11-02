@@ -12,19 +12,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
   const [comment, setComment] = useState("");
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [drinksArr, setDrinksArr] = useState([]);
-  const [quantity, setQuantity] = useState(1);
   let cartdata = useSelector((state) => state.cart.cart);
-  let JuiceType = ["Apple", "Pineapple", "Orange", "Mango"];
-  let PopsType = [
-    "Coke",
-    "Sprite",
-    "Ginger-ale(Canada Dry)",
-    "Fanta(Orange)",
-    "Diet Coke",
-    "Zero Coke",
-    "Pepsi",
-    "Nestea",
-  ];
   const dispatch = useDispatch();
   useEffect(() => {
     drinks();
@@ -145,7 +133,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       productType: "drinks",
       quantity: data?.qty,
       config: {
-        type: data?.drinkType,
+        type: data?.drinkType[0],
       },
       price: data?.price,
       amount: totalAmount.toFixed(2),
@@ -220,7 +208,10 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
   // Onclick Add To Cart - API Add To Cart
   const handleAddToCart = async (e, drink) => {
     // e.preventDefault();
-    const selectedDrinks = drinksArr?.filter(
+    console.log(drink, "selectedDrinks");
+    console.log(drinksArr, "selectedDrinks drinksArr");
+    let selectedDrinks;
+    selectedDrinks = drinksArr?.filter(
       (drinks) => drinks.softdrinkCode === drink.softdrinkCode
     );
     let cart = JSON.parse(localStorage.getItem("CartData"));
@@ -237,7 +228,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       (selectedDrinks[0]?.qty !== undefined
         ? Number(selectedDrinks[0]?.qty)
         : 1);
-    console.log(selectedDrinks, "selected");
+    console.log(selectedDrinks, "selectedDrinks");
     if (drinksArr.length === 0) {
       const payload = {
         id: uuidv4(),
@@ -250,7 +241,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         quantity: 1,
         config: {
           type:
-            selectedTypes.length === 0 ? drink?.drinkType[0] : selectedTypes,
+            selectedTypes.length === 0 ? drink?.drinkType[0] : selectedTypes[0],
         },
         price: drink?.price,
         amount: drink?.price,
@@ -287,10 +278,10 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productCode: selectedDrinks[0].softdrinkCode,
         productName: selectedDrinks[0].softDrinksName,
         productType: "drinks",
-        config:
-          selectedTypes.length === 0
-            ? selectedDrinks[0].drinkType
-            : selectedTypes,
+        config: {
+          type:
+            selectedTypes.length === 0 ? drink?.drinkType[0] : selectedTypes[0],
+        },
         quantity: selectedDrinks[0].qty ? selectedDrinks[0].qty : 1,
         price: selectedDrinks[0].price,
         amount: totalAmount.toFixed(2),
@@ -337,9 +328,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productType: "drinks",
         config: {
           type:
-            selectedTypes.length === 0
-              ? selectedDrinks[0]?.drinkType
-              : selectedTypes,
+            selectedTypes.length === 0 ? drink?.drinkType[0] : selectedTypes[0],
         },
         quantity: selectedDrinks[0]?.qty ? selectedDrinks[0]?.qty : 1,
         price: selectedDrinks[0]?.price,
@@ -350,8 +339,10 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         comments: selectedDrinks[0]?.comment,
       };
       if (updatedCartId !== -1) {
+        console.log(payload, "drinks payload");
         tempPayload[updatedCartId] = payload;
       } else {
+        console.log(payload, "drinks payload");
         tempPayload.unshift(payload);
       }
       setComment("");
@@ -400,6 +391,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
                   </div>
                   <div className='d-flex justify-content-between align-items-center'>
                     <input
+                      readOnly
                       type='number'
                       defaultValue={1}
                       min={1}
