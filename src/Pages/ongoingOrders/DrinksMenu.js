@@ -214,6 +214,10 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
     selectedDrinks = drinksArr?.filter(
       (drinks) => drinks.softdrinkCode === drink.softdrinkCode
     );
+    if (selectedDrinks?.length == 0 || !selectedDrinks) {
+      alert("selectedDrinks replaced");
+      selectedDrinks = [drink];
+    }
     let cart = JSON.parse(localStorage.getItem("CartData"));
     let cartCode;
     let customerCode;
@@ -268,7 +272,11 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
 
       return;
     }
-    if (payloadEdit !== undefined && payloadEdit.productType === "drinks") {
+    if (
+      payloadEdit !== undefined &&
+      payloadEdit.productType === "drinks" &&
+      e.target.innerText.toLowerCase().trim() === "edit"
+    ) {
       console.log(selectedDrinks, "selectedDrinks");
       const payloadForEdit = {
         id: payloadEdit?.id,
@@ -312,6 +320,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       setDrinksArr([]);
     } else {
       let tempPayload = [...cartdata];
+      console.log(selectedDrinks);
 
       const updatedCartId = cartdata?.findIndex(
         (item) => item?.productCode === selectedDrinks[0].softdrinkCode
