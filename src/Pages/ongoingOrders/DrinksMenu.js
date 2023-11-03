@@ -98,10 +98,6 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
     // handleAddToCart(e, data);
   };
   const updateInCart = (softdrinkCode, data) => {
-    // let itemToUpdate = drinksArr?.find((item) => {
-    //   item.softdrinkCode === softdrinkCode;
-    // });
-    console.log(data, "drink data");
     let cart = JSON.parse(localStorage.getItem("CartData"));
 
     let tempPayload = [...cartdata];
@@ -119,10 +115,6 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
     let totalAmount = 0;
     totalAmount =
       Number(price) * (data?.qty !== undefined ? Number(data?.qty) : 1);
-    console.log(
-      selectedTypes.length === 0 ? data?.drinkType : selectedTypes,
-      "new change"
-    );
     const payload = {
       id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),
       cartCode: cartCode ? cartCode : "#NA",
@@ -143,10 +135,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       comments: data?.comment,
     };
     if (updatedCartId !== -1) {
-      console.log(payload, "drinks payload");
       tempPayload[updatedCartId] = payload;
     } else {
-      console.log(payload, "drinks payload");
       tempPayload.unshift(payload);
     }
     dispatch(addToCart([...tempPayload]));
@@ -154,7 +144,6 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
   useEffect(() => {
     if (payloadEdit !== undefined && payloadEdit.productType === "drinks") {
       setDrinksArr([
-        ...drinksArr,
         {
           softdrinkCode: payloadEdit?.productCode,
           softDrinksName: payloadEdit?.productName,
@@ -164,7 +153,6 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           comment: payloadEdit?.comments,
         },
       ]);
-      console.log(payloadEdit, "payload");
       setSelectedTypes(payloadEdit.config);
     }
   }, [payloadEdit]);
@@ -207,15 +195,11 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
 
   // Onclick Add To Cart - API Add To Cart
   const handleAddToCart = async (e, drink) => {
-    // e.preventDefault();
-    console.log(drink, "selectedDrinks");
-    console.log(drinksArr, "selectedDrinks drinksArr");
     let selectedDrinks;
     selectedDrinks = drinksArr?.filter(
       (drinks) => drinks.softdrinkCode === drink.softdrinkCode
     );
     if (selectedDrinks?.length == 0 || !selectedDrinks) {
-      alert("selectedDrinks replaced");
       selectedDrinks = [drink];
     }
     let cart = JSON.parse(localStorage.getItem("CartData"));
@@ -232,7 +216,6 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       (selectedDrinks[0]?.qty !== undefined
         ? Number(selectedDrinks[0]?.qty)
         : 1);
-    console.log(selectedDrinks, "selectedDrinks");
     if (drinksArr.length === 0) {
       const payload = {
         id: uuidv4(),
@@ -254,7 +237,6 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         pizzaSize: "",
         comments: selectedDrinks[0]?.comment,
       };
-      console.log(payload, "drinks payload");
       setComment("");
       addToCartAndResetQty(
         // setComment,
@@ -277,7 +259,6 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       payloadEdit.productType === "drinks" &&
       e.target.innerText.toLowerCase().trim() === "edit"
     ) {
-      console.log(selectedDrinks, "selectedDrinks");
       const payloadForEdit = {
         id: payloadEdit?.id,
         cartCode: cartCode ? cartCode : "#NA",
@@ -302,12 +283,12 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         (item) => item.id === payloadEdit.id
       );
       let tempPayload = [...cartdata];
+
       tempPayload[0] = payloadForEdit;
       dispatch(addToCart([...tempPayload]));
       toast.success(
         `${selectedDrinks[0].softDrinksName} ` + "Updated Successfully"
       );
-      console.log(payloadForEdit, "payload");
       setComment("");
       setPayloadEdit();
       let temp = softDrinksData.map((item) => {
@@ -320,12 +301,10 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       setDrinksArr([]);
     } else {
       let tempPayload = [...cartdata];
-      console.log(selectedDrinks);
 
       const updatedCartId = cartdata?.findIndex(
         (item) => item?.productCode === selectedDrinks[0].softdrinkCode
       );
-      console.log(updatedCartId, "updatedCartId");
 
       const payload = {
         id: updatedCartId !== -1 ? cartdata[updatedCartId].id : uuidv4(),
@@ -336,8 +315,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productName: selectedDrinks[0]?.softDrinksName,
         productType: "drinks",
         config: {
-          type:
-            selectedTypes.length === 0 ? drink?.drinkType[0] : selectedTypes[0],
+          type: drink?.drinkType[0],
         },
         quantity: selectedDrinks[0]?.qty ? selectedDrinks[0]?.qty : 1,
         price: selectedDrinks[0]?.price,
@@ -347,11 +325,10 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         pizzaSize: "",
         comments: selectedDrinks[0]?.comment,
       };
+
       if (updatedCartId !== -1) {
-        console.log(payload, "drinks payload");
         tempPayload[updatedCartId] = payload;
       } else {
-        console.log(payload, "drinks payload");
         tempPayload.unshift(payload);
       }
       setComment("");
@@ -370,9 +347,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       setPayloadEdit();
     }
   };
-  useEffect(() => {
-    console.log(drinksArr, "drinksArrdrinksArr");
-  }, [drinksArr]);
+  useEffect(() => {}, [drinksArr]);
 
   return (
     <>

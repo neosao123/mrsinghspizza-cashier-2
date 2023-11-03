@@ -148,6 +148,8 @@ function NewOrder() {
         setStoreLocationData(res.data.data);
       })
       .catch((err) => {
+        toast.error(err.response.data.message);
+
         console.log("ERROR From Store Location API : ", err);
       });
   };
@@ -191,6 +193,8 @@ function NewOrder() {
           setCartListData(res.data.data);
         })
         .catch((err) => {
+          toast.error(err.response.data.message);
+
           console.log("Error From Get Cart List API: ", err);
         });
     }
@@ -199,6 +203,8 @@ function NewOrder() {
     await settingsApi()
       .then((res) => setSettingsData(res.data.data))
       .catch((err) => {
+        toast.error(err.response.data.message);
+
         console.log("Error From Settings API: ", err);
       });
   };
@@ -298,13 +304,6 @@ function NewOrder() {
           extraDeliveryCharges: extraDeliveryCharges ? extraDeliveryCharges : 0,
           grandTotal: grandTotal,
         };
-        console.log(
-          {
-            orderCode: updateOrderData?.code,
-            ...payload,
-          },
-          "update order payload"
-        );
         // let response;
         const response = updateOrder
           ? await orderEditApi({
@@ -312,8 +311,6 @@ function NewOrder() {
               ...payload,
             })
           : await orderPlaceApi(payload);
-
-        console.log(response, "api res for place order");
         if (response.status === 200) {
           resetForm();
           dispatch(addToCart([]));
@@ -334,7 +331,6 @@ function NewOrder() {
         if (cartdata?.length === 0 || cartdata == undefined) {
           toast.error("Add something to cart");
         } else {
-          console.log(error, "error in catch");
           toast.error(error.response.data.message);
         }
       }
@@ -364,7 +360,6 @@ function NewOrder() {
     await prevOrderDetails(phoneno)
       .then((res) => {
         setPrevOrders(res.data.data);
-        console.log(res.data.data, "res.data.data");
         setPrevOrderLoading(false);
       })
       .catch((err) => {
