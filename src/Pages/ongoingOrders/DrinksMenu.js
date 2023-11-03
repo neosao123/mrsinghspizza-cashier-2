@@ -149,7 +149,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           softDrinksName: payloadEdit?.productName,
           price: payloadEdit?.price,
           qty: payloadEdit?.quantity,
-          drinkType: payloadEdit?.config[0],
+          drinkType: payloadEdit?.config?.type,
           comment: payloadEdit?.comments,
         },
       ]);
@@ -217,6 +217,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         ? Number(selectedDrinks[0]?.qty)
         : 1);
     if (drinksArr.length === 0) {
+      alert("length 0");
+
       const payload = {
         id: uuidv4(),
         cartCode: cartCode ? cartCode : "#NA",
@@ -238,6 +240,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         comments: selectedDrinks[0]?.comment,
       };
       setComment("");
+      setSelectedTypes([]);
+
       addToCartAndResetQty(
         // setComment,
         dispatch,
@@ -298,6 +302,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         };
       });
       setSoftDrinksData(temp);
+      setSelectedTypes([]);
+
       setDrinksArr([]);
     } else {
       let tempPayload = [...cartdata];
@@ -315,7 +321,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         productName: selectedDrinks[0]?.softDrinksName,
         productType: "drinks",
         config: {
-          type: drink?.drinkType[0],
+          type: selectedTypes ? selectedTypes[0] : drink?.drinkType[0],
         },
         quantity: selectedDrinks[0]?.qty ? selectedDrinks[0]?.qty : 1,
         price: selectedDrinks[0]?.price,
@@ -343,6 +349,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         [drink],
         "Added Successfully"
       );
+      setSelectedTypes([]);
 
       setPayloadEdit();
     }
@@ -356,6 +363,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           let obj = drinksArr?.find(
             (item) => item.softdrinkCode === data.softdrinkCode
           );
+
           return (
             <li className='list-group-item' key={data.softdrinkCode}>
               <div className='d-flex justify-content-between align-items-end py-2 px-1'>
