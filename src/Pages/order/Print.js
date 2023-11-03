@@ -143,7 +143,7 @@ const Print = ({ orderDetail, printRef }) => {
                         <b>Pizza ({order?.pizzaSize})</b>
                       </div>
                     </div>
-                    <div className="col-3 text-end">$ {order.amount}</div>
+                    <div className="col-3 text-end">$ {order.pizzaPrice}</div>
                   </div>
                 </div>
               ) : (

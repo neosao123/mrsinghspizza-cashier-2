@@ -1005,6 +1005,7 @@ function CreateYourOwn({
             toppingsName: item.toppingsName,
             toppingsCode: item.toppingsCode,
             toppingsPlacement: placement,
+            amount: 0
           };
         }
       );
