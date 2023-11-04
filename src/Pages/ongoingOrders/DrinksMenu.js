@@ -10,7 +10,7 @@ import { addToCartAndResetQty } from "./drinksMenuFunctions/drinksMenuFunction";
 function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
   const [softDrinksData, setSoftDrinksData] = useState();
   const [comment, setComment] = useState("");
-  const [selectedTypes, setSelectedTypes] = useState([]);
+  // const [selectedTypes, setSelectedTypes] = useState([]);
   const [drinksArr, setDrinksArr] = useState([]);
   let cartdata = useSelector((state) => state.cart.cart);
   const dispatch = useDispatch();
@@ -23,36 +23,46 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
     let itemToUpdate = drinksArr?.findIndex(
       (item) => item.softdrinkCode === data.softdrinkCode
     );
-
-    if (itemToUpdate !== -1) {
-      let arr = [...drinksArr];
-      arr[itemToUpdate] = {
-        ...arr[itemToUpdate],
-        drinkType: [e.target.value],
-      };
-
-      setSelectedTypes([e.target.value]);
-      setDrinksArr(arr);
-      updateInCart(data.softdrinkCode, {
-        ...arr[itemToUpdate],
-        drinkType: [e.target.value],
-      });
+    if (
+      payloadEdit !== undefined &&
+      payloadEdit.productType === "drinks" &&
+      payloadEdit?.productCode != data.softdrinkCode
+    ) {
+      toast.error("complete your last edit first");
+      return;
     } else {
-      setSelectedTypes([e.target.value]);
-      updateInCart(data.softdrinkCode, {
-        ...data,
-        drinkType: [e.target.value],
-        qty: 1,
-      });
-      setDrinksArr([
-        ...drinksArr,
-        {
+      if (itemToUpdate !== -1) {
+        let arr = [...drinksArr];
+        arr[itemToUpdate] = {
+          ...arr[itemToUpdate],
+          drinkType: [e.target.value],
+        };
+
+        // setSelectedTypes([e.target.value]);
+
+        setDrinksArr(arr);
+        updateInCart({
+          ...arr[itemToUpdate],
+          drinkType: [e.target.value],
+        });
+      } else {
+        // setSelectedTypes([e.target.value]);
+        updateInCart({
           ...data,
           drinkType: [e.target.value],
           qty: 1,
-        },
-      ]);
+        });
+        setDrinksArr([
+          ...drinksArr,
+          {
+            ...data,
+            drinkType: [e.target.value],
+            qty: 1,
+          },
+        ]);
+      }
     }
+
     // handleAddToCart(e, data);
   };
 
@@ -81,7 +91,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
         ...data,
         qty: inputValue <= 0 ? 1 : inputValue,
         drinkType:
-          selectedTypes.length === 0 ? data?.drinkType[0] : selectedTypes,
+          // selectedTypes.length === 0 ? data?.drinkType[0] : selectedTypes,
+          data?.drinkType[0],
       });
 
       setDrinksArr([
@@ -90,14 +101,15 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           ...data,
           qty: inputValue <= 0 ? 1 : inputValue,
           drinkType:
-            selectedTypes.length === 0 ? data?.drinkType[0] : selectedTypes,
+            // selectedTypes.length === 0 ? data?.drinkType[0] : selectedTypes,
+            data?.drinkType[0],
         },
       ]);
     }
 
     // handleAddToCart(e, data);
   };
-  const updateInCart = (softdrinkCode, data) => {
+  const updateInCart = (data) => {
     let cart = JSON.parse(localStorage.getItem("CartData"));
 
     let tempPayload = [...cartdata];
@@ -125,7 +137,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       productType: "drinks",
       quantity: data?.qty,
       config: {
-        type: data?.drinkType[0],
+        type: data?.drinkType,
       },
       price: data?.price,
       amount: totalAmount.toFixed(2),
@@ -153,7 +165,7 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           comment: payloadEdit?.comments,
         },
       ]);
-      setSelectedTypes(payloadEdit.config);
+      // setSelectedTypes(payloadEdit.config);
     }
   }, [payloadEdit]);
 
@@ -187,7 +199,8 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
           comment: e.target.value,
           qty: 1,
           drinkType:
-            selectedTypes.length === 0 ? data?.drinkType[0] : selectedTypes,
+            // selectedTypes.length === 0 ? data?.drinkType[0] : selectedTypes,
+            data?.drinkType,
         },
       ]);
     }
@@ -195,165 +208,181 @@ function DrinksMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
 
   // Onclick Add To Cart - API Add To Cart
   const handleAddToCart = async (e, drink) => {
-    let selectedDrinks;
-    selectedDrinks = drinksArr?.filter(
-      (drinks) => drinks.softdrinkCode === drink.softdrinkCode
-    );
-    if (selectedDrinks?.length == 0 || !selectedDrinks) {
-      selectedDrinks = [drink];
-    }
-    let cart = JSON.parse(localStorage.getItem("CartData"));
-    let cartCode;
-    let customerCode;
-    if (cart !== null && cart !== undefined) {
-      cartCode = cart.cartCode;
-      customerCode = cart.customerCode;
-    }
-    let price = selectedDrinks[0]?.price;
-    let totalAmount = 0;
-    totalAmount =
-      Number(price) *
-      (selectedDrinks[0]?.qty !== undefined
-        ? Number(selectedDrinks[0]?.qty)
-        : 1);
-    if (drinksArr.length === 0) {
-      alert("length 0");
-
-      const payload = {
-        id: uuidv4(),
-        cartCode: cartCode ? cartCode : "#NA",
-        customerCode: customerCode ? customerCode : "#NA",
-        cashierCode: localStorage.getItem("cashierCode"),
-        productCode: drink?.softdrinkCode,
-        productName: drink?.softDrinksName,
-        productType: "drinks",
-        quantity: 1,
-        config: {
-          type:
-            selectedTypes.length === 0 ? drink?.drinkType[0] : selectedTypes[0],
-        },
-        price: drink?.price,
-        amount: drink?.price,
-        discountAmount: discount,
-        taxPer: taxPer,
-        pizzaSize: "",
-        comments: selectedDrinks[0]?.comment,
-      };
-      setComment("");
-      setSelectedTypes([]);
-
-      addToCartAndResetQty(
-        // setComment,
-        dispatch,
-        addToCart,
-        [payload, ...cartdata],
-        toast,
-        setDrinksArr,
-        setSoftDrinksData,
-        softDrinksData,
-        [drink],
-        "Added Successfully"
-      );
-      setPayloadEdit();
-
-      return;
-    }
     if (
       payloadEdit !== undefined &&
       payloadEdit.productType === "drinks" &&
-      e.target.innerText.toLowerCase().trim() === "edit"
+      payloadEdit?.productCode != drink.softdrinkCode
     ) {
-      const payloadForEdit = {
-        id: payloadEdit?.id,
-        cartCode: cartCode ? cartCode : "#NA",
-        customerCode: customerCode ? customerCode : "#NA",
-        cashierCode: localStorage.getItem("cashierCode"),
-        productCode: selectedDrinks[0].softdrinkCode,
-        productName: selectedDrinks[0].softDrinksName,
-        productType: "drinks",
-        config: {
-          type:
-            selectedTypes.length === 0 ? drink?.drinkType[0] : selectedTypes[0],
-        },
-        quantity: selectedDrinks[0].qty ? selectedDrinks[0].qty : 1,
-        price: selectedDrinks[0].price,
-        amount: totalAmount.toFixed(2),
-        discountAmount: discount,
-        taxPer: taxPer,
-        pizzaSize: "",
-        comments: selectedDrinks[0]?.comment,
-      };
-      const updatedCart = cartdata.findIndex(
-        (item) => item.id === payloadEdit.id
-      );
-      let tempPayload = [...cartdata];
-
-      tempPayload[0] = payloadForEdit;
-      dispatch(addToCart([...tempPayload]));
-      toast.success(
-        `${selectedDrinks[0].softDrinksName} ` + "Updated Successfully"
-      );
-      setComment("");
-      setPayloadEdit();
-      let temp = softDrinksData.map((item) => {
-        return {
-          ...item,
-          qty: 1,
-        };
-      });
-      setSoftDrinksData(temp);
-      setSelectedTypes([]);
-
-      setDrinksArr([]);
+      toast.error("complete your last edit first");
+      return;
     } else {
-      let tempPayload = [...cartdata];
-
-      const updatedCartId = cartdata?.findIndex(
-        (item) => item?.productCode === selectedDrinks[0].softdrinkCode
+      let selectedDrinks;
+      selectedDrinks = drinksArr?.filter(
+        (drinks) => drinks.softdrinkCode === drink.softdrinkCode
       );
-
-      const payload = {
-        id: updatedCartId !== -1 ? cartdata[updatedCartId].id : uuidv4(),
-        cartCode: cartCode ? cartCode : "#NA",
-        customerCode: customerCode ? customerCode : "#NA",
-        cashierCode: localStorage.getItem("cashierCode"),
-        productCode: selectedDrinks[0]?.softdrinkCode,
-        productName: selectedDrinks[0]?.softDrinksName,
-        productType: "drinks",
-        config: {
-          type: selectedTypes ? selectedTypes[0] : drink?.drinkType[0],
-        },
-        quantity: selectedDrinks[0]?.qty ? selectedDrinks[0]?.qty : 1,
-        price: selectedDrinks[0]?.price,
-        amount: totalAmount.toFixed(2),
-        discountAmount: discount,
-        taxPer: taxPer,
-        pizzaSize: "",
-        comments: selectedDrinks[0]?.comment,
-      };
-
-      if (updatedCartId !== -1) {
-        tempPayload[updatedCartId] = payload;
-      } else {
-        tempPayload.unshift(payload);
+      if (selectedDrinks?.length == 0 || !selectedDrinks) {
+        selectedDrinks = [drink];
       }
-      setComment("");
-      addToCartAndResetQty(
-        dispatch,
-        addToCart,
-        [...tempPayload],
-        toast,
-        setDrinksArr,
-        setSoftDrinksData,
-        softDrinksData,
-        [drink],
-        "Added Successfully"
-      );
-      setSelectedTypes([]);
+      let cart = JSON.parse(localStorage.getItem("CartData"));
+      let cartCode;
+      let customerCode;
+      if (cart !== null && cart !== undefined) {
+        cartCode = cart.cartCode;
+        customerCode = cart.customerCode;
+      }
+      let price = selectedDrinks[0]?.price;
+      let totalAmount = 0;
+      totalAmount =
+        Number(price) *
+        (selectedDrinks[0]?.qty !== undefined
+          ? Number(selectedDrinks[0]?.qty)
+          : 1);
+      if (drinksArr.length === 0) {
+        // alert("length 0");
 
-      setPayloadEdit();
+        const payload = {
+          id: uuidv4(),
+          cartCode: cartCode ? cartCode : "#NA",
+          customerCode: customerCode ? customerCode : "#NA",
+          cashierCode: localStorage.getItem("cashierCode"),
+          productCode: drink?.softdrinkCode,
+          productName: drink?.softDrinksName,
+          productType: "drinks",
+          quantity: 1,
+          config: {
+            type: drink?.drinkType[0],
+            // selectedTypes.length === 0 ? drink?.drinkType[0] : selectedTypes[0],
+          },
+          price: drink?.price,
+          amount: drink?.price,
+          discountAmount: discount,
+          taxPer: taxPer,
+          pizzaSize: "",
+          comments: selectedDrinks[0]?.comment,
+        };
+        setComment("");
+        console.log(payload, "drinks payload");
+        // setSelectedTypes([]);
+        addToCartAndResetQty(
+          // setComment,
+          dispatch,
+          addToCart,
+          [payload, ...cartdata],
+          toast,
+          setDrinksArr,
+          setSoftDrinksData,
+          softDrinksData,
+          [drink],
+          "Added Successfully"
+        );
+        setPayloadEdit();
+
+        return;
+      }
+      if (
+        payloadEdit !== undefined &&
+        payloadEdit.productType === "drinks" &&
+        e.target.innerText.toLowerCase().trim() === "edit"
+      ) {
+        // alert("edit item");
+
+        const payloadForEdit = {
+          id: payloadEdit?.id,
+          cartCode: cartCode ? cartCode : "#NA",
+          customerCode: customerCode ? customerCode : "#NA",
+          cashierCode: localStorage.getItem("cashierCode"),
+          productCode: selectedDrinks[0].softdrinkCode,
+          productName: selectedDrinks[0].softDrinksName,
+          productType: "drinks",
+          config: {
+            type: selectedDrinks[0]?.drinkType,
+          },
+          quantity: selectedDrinks[0].qty ? selectedDrinks[0].qty : 1,
+          price: selectedDrinks[0].price,
+          amount: totalAmount.toFixed(2),
+          discountAmount: discount,
+          taxPer: taxPer,
+          pizzaSize: "",
+          comments: selectedDrinks[0]?.comment,
+        };
+        console.log(payloadForEdit, "drinks payload");
+        const updatedCart = cartdata.findIndex(
+          (item) => item.id === payloadEdit.id
+        );
+        let tempPayload = [...cartdata];
+
+        tempPayload[0] = payloadForEdit;
+        dispatch(addToCart([...tempPayload]));
+        toast.success(
+          `${selectedDrinks[0].softDrinksName} ` + "Updated Successfully"
+        );
+        setComment("");
+        setPayloadEdit();
+        // setSelectedTypes([]);
+
+        let temp = softDrinksData.map((item) => {
+          return {
+            ...item,
+            qty: 1,
+          };
+        });
+        setSoftDrinksData(temp);
+        // setSelectedTypes([]);
+
+        setDrinksArr([]);
+      } else {
+        // alert("new item");
+
+        let tempPayload = [...cartdata];
+        const updatedCartId = cartdata?.findIndex(
+          (item) => item?.productCode === selectedDrinks[0].softdrinkCode
+        );
+
+        const payload = {
+          id: updatedCartId !== -1 ? cartdata[updatedCartId].id : uuidv4(),
+          cartCode: cartCode ? cartCode : "#NA",
+          customerCode: customerCode ? customerCode : "#NA",
+          cashierCode: localStorage.getItem("cashierCode"),
+          productCode: selectedDrinks[0]?.softdrinkCode,
+          productName: selectedDrinks[0]?.softDrinksName,
+          productType: "drinks",
+          config: {
+            type: selectedDrinks[0]?.drinkType,
+          },
+          quantity: selectedDrinks[0]?.qty ? selectedDrinks[0]?.qty : 1,
+          price: selectedDrinks[0]?.price,
+          amount: totalAmount.toFixed(2),
+          discountAmount: discount,
+          taxPer: taxPer,
+          pizzaSize: "",
+          comments: selectedDrinks[0]?.comment,
+        };
+        if (updatedCartId !== -1) {
+          tempPayload[updatedCartId] = payload;
+        } else {
+          tempPayload.unshift(payload);
+        }
+        setComment("");
+        // setSelectedTypes([]);
+        addToCartAndResetQty(
+          dispatch,
+          addToCart,
+          [...tempPayload],
+          toast,
+          setDrinksArr,
+          setSoftDrinksData,
+          softDrinksData,
+          [drink],
+          "Added Successfully"
+        );
+        setPayloadEdit();
+        // setSelectedTypes([]);
+      }
     }
   };
+  // useEffect(() => {
+  //   console.log(selectedTypes, "selectedTypes");
+  // }, [selectedTypes]);
   useEffect(() => {}, [drinksArr]);
 
   return (

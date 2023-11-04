@@ -78,139 +78,151 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
   // Onclick Add To Cart - API Add To Cart
   const handleAddToCart = async (e, dipsitem) => {
     console.log(payloadEdit, "payloadEdit edit");
-    e.preventDefault();
-    let cart = JSON.parse(localStorage.getItem("CartData"));
-    let cartCode;
-    let customerCode;
-    const selectedDips = dipsArr?.filter(
-      (dips) => dips.dipsCode === dipsitem.dipsCode
-    );
-    if (selectedDips.length === 0) {
-      const payload = {
-        id: uuidv4(),
-        customerCode: customerCode ? customerCode : "#NA",
-        cashierCode: localStorage.getItem("cashierCode"),
-        productCode: dipsitem?.dipsCode,
-        productName: dipsitem?.dipsName,
-        productType: "dips",
-        config: {},
-        quantity: 1,
-        price: dipsitem?.price,
-        amount: dipsitem?.price,
-        discountAmount: discount,
-        taxPer: taxPer,
-        pizzaSize: "",
-        comments: "",
-      };
-
-      addToCartAndResetQty(
-        dispatch,
-        addToCart,
-        [payload, ...cartdata],
-        toast,
-        setDipsArr,
-        setDipsData,
-        dipsData,
-        [dipsitem],
-        "Added Successfully"
-      );
+    if (
+      payloadEdit !== undefined &&
+      payloadEdit.productType === "dips" &&
+      payloadEdit?.productCode != dipsitem.dipsCode
+    ) {
+      toast.error("complete your last edit first");
       return;
-    }
-    // if (payloadEdit !== undefined && payloadEdit.productType === "dips") {
-    //   console.log(payloadEdit, "payloadEdit");
-    // }
+    } else {
+      e.preventDefault();
+      let cart = JSON.parse(localStorage.getItem("CartData"));
+      let cartCode;
+      let customerCode;
+      const selectedDips = dipsArr?.filter(
+        (dips) => dips.dipsCode === dipsitem.dipsCode
+      );
+      if (selectedDips.length === 0) {
+        // alert("length 0");
 
-    if (cart !== null && cart !== undefined) {
-      cartCode = cart.cartCode;
-      customerCode = cart.customerCode;
-    }
-    let price = selectedDips[0]?.price;
-    let totalAmount = 0;
+        const payload = {
+          id: uuidv4(),
+          customerCode: customerCode ? customerCode : "#NA",
+          cashierCode: localStorage.getItem("cashierCode"),
+          productCode: dipsitem?.dipsCode,
+          productName: dipsitem?.dipsName,
+          productType: "dips",
+          config: {},
+          quantity: 1,
+          price: dipsitem?.price,
+          amount: dipsitem?.price,
+          discountAmount: discount,
+          taxPer: taxPer,
+          pizzaSize: "",
+          comments: "",
+        };
 
-    totalAmount =
-      Number(price) *
-      (selectedDips[0]?.qty !== undefined ? Number(selectedDips[0]?.qty) : 1);
-
-    if (payloadEdit !== undefined && payloadEdit.productType === "dips") {
-      console.log(payloadEdit, "payloadEdit edit");
-      if (payloadEdit.productCode != selectedDips[0].dipsCode) {
-        toast.error("complete your first edit first");
+        addToCartAndResetQty(
+          dispatch,
+          addToCart,
+          [payload, ...cartdata],
+          toast,
+          setDipsArr,
+          setDipsData,
+          dipsData,
+          [dipsitem],
+          "Added Successfully"
+        );
         return;
       }
-      const payloadForEdit = {
-        id: payloadEdit?.id,
-        cartCode: cartCode ? cartCode : "#NA",
-        customerCode: customerCode ? customerCode : "#NA",
-        cashierCode: localStorage.getItem("cashierCode"),
-        productCode: selectedDips[0].dipsCode,
-        productName: selectedDips[0].dipsName,
-        productType: "dips",
-        config: {},
-        quantity: selectedDips[0].qty ? selectedDips[0].qty : 1,
-        price: selectedDips[0].price,
-        amount: totalAmount.toFixed(2),
-        discountAmount: discount,
-        taxPer: taxPer,
-        pizzaSize: "",
-        comments: selectedDips[0].comment,
-      };
-      let tempPayload = [...cartdata];
-      tempPayload[0] = payloadForEdit;
 
-      addToCartAndResetQty(
-        dispatch,
-        addToCart,
-        [...tempPayload],
-        toast,
-        setDipsArr,
-        setDipsData,
-        dipsData,
-        selectedDips,
-        "Updated Successfully"
-      );
-
-      setPayloadEdit();
-    } else {
-      let tempPayload = [...cartdata];
-
-      const updatedCartId = cartdata?.findIndex(
-        (item) => item?.productCode === selectedDips[0].dipsCode
-      );
-
-      const payload = {
-        id: updatedCartId !== -1 ? cartdata[updatedCartId].id : uuidv4(),
-        cartCode: cartCode ? cartCode : "#NA",
-        customerCode: customerCode ? customerCode : "#NA",
-        cashierCode: localStorage.getItem("cashierCode"),
-        productCode: selectedDips[0].dipsCode,
-        productName: selectedDips[0].dipsName,
-        productType: "dips",
-        config: {},
-        quantity: selectedDips[0].qty ? selectedDips[0].qty : 1,
-        price: selectedDips[0].price,
-        amount: totalAmount.toFixed(2),
-        discountAmount: discount,
-        taxPer: taxPer,
-        pizzaSize: "",
-        comments: selectedDips[0].comment,
-      };
-      if (updatedCartId !== -1) {
-        tempPayload[updatedCartId] = payload;
-      } else {
-        tempPayload.unshift(payload);
+      if (cart !== null && cart !== undefined) {
+        cartCode = cart.cartCode;
+        customerCode = cart.customerCode;
       }
-      addToCartAndResetQty(
-        dispatch,
-        addToCart,
-        [...tempPayload],
-        toast,
-        setDipsArr,
-        setDipsData,
-        dipsData,
-        selectedDips,
-        "Added Successfully"
-      );
-      setPayloadEdit();
+      let price = selectedDips[0]?.price;
+      let totalAmount = 0;
+
+      totalAmount =
+        Number(price) *
+        (selectedDips[0]?.qty !== undefined ? Number(selectedDips[0]?.qty) : 1);
+
+      if (payloadEdit !== undefined && payloadEdit.productType === "dips") {
+        console.log(payloadEdit, "payloadEdit edit");
+        if (payloadEdit.productCode != selectedDips[0].dipsCode) {
+          toast.error("complete your first edit first");
+          return;
+        }
+        // alert("edit item");
+
+        const payloadForEdit = {
+          id: payloadEdit?.id,
+          cartCode: cartCode ? cartCode : "#NA",
+          customerCode: customerCode ? customerCode : "#NA",
+          cashierCode: localStorage.getItem("cashierCode"),
+          productCode: selectedDips[0].dipsCode,
+          productName: selectedDips[0].dipsName,
+          productType: "dips",
+          config: {},
+          quantity: selectedDips[0].qty ? selectedDips[0].qty : 1,
+          price: selectedDips[0].price,
+          amount: totalAmount.toFixed(2),
+          discountAmount: discount,
+          taxPer: taxPer,
+          pizzaSize: "",
+          comments: selectedDips[0].comment,
+        };
+        let tempPayload = [...cartdata];
+        tempPayload[0] = payloadForEdit;
+
+        addToCartAndResetQty(
+          dispatch,
+          addToCart,
+          [...tempPayload],
+          toast,
+          setDipsArr,
+          setDipsData,
+          dipsData,
+          selectedDips,
+          "Updated Successfully"
+        );
+
+        setPayloadEdit();
+      } else {
+        // alert("new item");
+        let tempPayload = [...cartdata];
+
+        const updatedCartId = cartdata?.findIndex(
+          (item) => item?.productCode === selectedDips[0].dipsCode
+        );
+
+        const payload = {
+          id: updatedCartId !== -1 ? tempPayload[updatedCartId].id : uuidv4(),
+          cartCode: cartCode ? cartCode : "#NA",
+          customerCode: customerCode ? customerCode : "#NA",
+          cashierCode: localStorage.getItem("cashierCode"),
+          productCode: selectedDips[0].dipsCode,
+          productName: selectedDips[0].dipsName,
+          productType: "dips",
+          config: {},
+          quantity: selectedDips[0].qty ? selectedDips[0].qty : 1,
+          price: selectedDips[0].price,
+          amount: totalAmount.toFixed(2),
+          discountAmount: discount,
+          taxPer: taxPer,
+          pizzaSize: "",
+          comments: selectedDips[0].comment,
+        };
+        // tempPayload.unshift(payload);
+        if (updatedCartId !== -1) {
+          tempPayload[updatedCartId] = payload;
+        } else {
+          tempPayload.unshift(payload);
+        }
+        addToCartAndResetQty(
+          dispatch,
+          addToCart,
+          [...tempPayload],
+          toast,
+          setDipsArr,
+          setDipsData,
+          dipsData,
+          selectedDips,
+          "Added Successfully"
+        );
+        setPayloadEdit();
+      }
     }
   };
 
@@ -267,11 +279,11 @@ function DipsMenu({ discount, taxPer, setPayloadEdit, payloadEdit }) {
       let arr = [...dipsArr];
 
       arr[index] = { ...arr[index], comment: e.target.value };
-      updateInCart(data.dipsCode, { ...arr[index], comment: e.target.value });
+      // updateInCart(data.dipsCode, { ...arr[index], comment: e.target.value });
 
       setDipsArr(arr);
     } else {
-      updateInCart(data.dipsCode, { ...obj, comment: e.target.value });
+      // updateInCart(data.dipsCode, { ...obj, comment: e.target.value });
       setDipsArr([{ ...obj, comment: e.target.value }]);
     }
   };

@@ -250,7 +250,9 @@ function NewOrder() {
   });
   useEffect(() => {
     if (updateOrder) {
+      console.log(updateOrderData, "updateOrderData");
       setDeliveryType(updateOrderData?.deliveryType);
+      setExtraDeliveryCharges(Number(updateOrderData?.extraDeliveryCharges));
       formik.values.phoneno = updateOrderData?.mobileNumber;
       formik.values.orderTakenBy = updateOrderData?.orderTakenBy;
       formik.values.address = updateOrderData?.address;
@@ -347,7 +349,12 @@ function NewOrder() {
     await isZipCodeDelivarable(postalcode)
       .then((res) => {
         setIspostalcodeAvailable(res.data.deliverable);
-        res.data.deliverable ? setIsOpen(false) : setIsOpen(true);
+        if (res.data.deliverable) {
+          setIsOpen(false);
+        } else if (!updateOrder) {
+          setIsOpen(true);
+        } else {
+        }
         setIsLoading(false);
       })
       .catch((err) => {
@@ -836,8 +843,8 @@ function NewOrder() {
                   <h6 className='text-end fs-5 fw-bold'>Cart</h6>
                 </div>
                 <div className='col-6'>
-                  {cartdata?.length > 0 && (
-                    <div className='d-flex justify-content-end'>
+                  <div className='d-flex justify-content-end'>
+                    {cartdata?.length > 0 && (
                       <button
                         type='button'
                         className='btn btn-danger btn-xs ms-5 '
@@ -850,8 +857,21 @@ function NewOrder() {
                       >
                         <BiTrash /> Clear cart
                       </button>
-                    </div>
-                  )}
+                    )}
+                    {updateOrder && (
+                      <button
+                        type='button'
+                        className='btn btn-danger btn-xs ms-1'
+                        onClick={() => {
+                          dispatch(addToCart([]));
+                          setPayloadEdit();
+                          refreshPage();
+                        }}
+                      >
+                        Cancel edit
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 

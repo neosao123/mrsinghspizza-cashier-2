@@ -119,175 +119,185 @@ function SidesMenu({ discount, taxPer, payloadEdit, setPayloadEdit }) {
 
   // Onclick handle Add To Cart & API - Add To Cart
   const handleAddToCart = async (e, sideCode, Obj) => {
-    e.preventDefault();
-    const updatedCartId = cartdata?.findIndex(
-      (item) => item?.productCode === Obj?.sideCode
-    );
-    let cart = JSON.parse(localStorage.getItem("CartData"));
-    let cartCode;
-    let customerCode;
-    let lineCode = $("#combination-" + sideCode)
-      .find(":selected")
-      .attr("data-key");
-
-    if (cart !== null && cart !== undefined) {
-      cartCode = cart.cartCode;
-      customerCode = cart.customerCode;
-    }
-
-    const selectedSideForNewItem = sidesArr?.filter(
-      (sides) => sides.sideCode === sideCode
-    );
-    const selectedCombination = selectedSideForNewItem[0]?.combination?.filter(
-      (data) => data.lineCode === lineCode
-    );
-
-    const selectedCombinationObj = Obj?.combination?.filter(
-      (data) => data.lineCode === lineCode
-    );
-
-    let price =
-      selectedCombination !== undefined && selectedCombination[0].price
-        ? selectedCombination[0]?.price
-        : selectedCombinationObj[0]?.price;
-
-    let totalAmount = 0;
-
-    totalAmount =
-      Number(price) *
-      (selectedSideForNewItem[0]?.qty !== undefined
-        ? Number(selectedSideForNewItem[0]?.qty)
-        : 1);
-
-    if (selectedSideForNewItem.length === 0) {
-      const payload = {
-        id: uuidv4(),
-        customerCode: customerCode ? customerCode : "#NA",
-        cashierCode: localStorage.getItem("cashierCode"),
-        productCode: Obj.sideCode,
-        productName: Obj?.sideName,
-        productType: "side",
-        config: {
-          lineCode: selectedCombinationObj[0].lineCode,
-          sidesSize: selectedCombinationObj[0].size,
-          sidesType: Obj?.type,
-        },
-        quantity: 1,
-        price: selectedCombinationObj[0].price,
-        amount: totalAmount.toFixed(2),
-        discountAmount: discount,
-        taxPer: taxPer,
-        pizzaSize: "",
-        comments: "",
-      };
-      let temp = sidesData.map((item) => {
-        return {
-          ...item,
-          qty: 1,
-          comment: "",
-        };
-      });
-      setSidesData(temp);
-      setSidesArr([]);
-      dispatch(addToCart([payload, ...cartdata]));
-      toast.success(`${Obj.sideName} Added Successfully`);
+    if (
+      payloadEdit !== undefined &&
+      payloadEdit.productType === "side" &&
+      payloadEdit?.productCode != Obj?.sideCode
+    ) {
+      toast.error("complete your last edit first");
       return;
-    }
-
-    setSidesArr([
-      ...sidesArr,
-      {
-        ...selectedSideForNewItem,
-        qty: 1,
-      },
-    ]);
-
-    const selectedSide = sidesArr?.filter(
-      (sides) => sides.sideCode === sideCode
-    );
-
-    if (payloadEdit !== undefined && payloadEdit.productType === "side") {
-      const payloadForEdit = {
-        id: payloadEdit?.id,
-        customerCode: customerCode ? customerCode : "#NA",
-        cashierCode: localStorage.getItem("cashierCode"),
-        productCode: selectedSide[0].sideCode,
-        productName: selectedSide[0].sideName,
-        productType: "side",
-        config: {
-          lineCode: selectedSide[0].combination[0].lineCode,
-          sidesSize: selectedSide[0].combination[0].sidesSize
-            ? selectedSide[0].combination[0].sidesSize
-            : selectedSide[0].combination[0].size,
-          sideType: selectedSide[0].type,
-        },
-        quantity: selectedSide[0].qty,
-        price: selectedSide[0].price,
-        amount: totalAmount.toFixed(2),
-        discountAmount: discount,
-        taxPer: taxPer,
-        pizzaSize: "",
-        comments: selectedSide[0].comment,
-      };
-      const updatedCart = cartdata.findIndex(
-        (item) => item.id === payloadEdit.id
-      );
-      let tempPayload = [...cartdata];
-      tempPayload[0] = payloadForEdit;
-      dispatch(addToCart([...tempPayload]));
-      setPayloadEdit();
-      let temp = sidesData.map((item) => {
-        return {
-          ...item,
-          qty: 1,
-        };
-      });
-      setSidesData(temp);
-      setSidesArr([]);
-      setQuantity(1);
     } else {
-      let tempPayload = [...cartdata];
-
-      const payload = {
-        id: updatedCartId !== -1 ? cartdata[updatedCartId].id : uuidv4(),
-        customerCode: customerCode ? customerCode : "#NA",
-        cashierCode: localStorage.getItem("cashierCode"),
-        productCode: selectedSideForNewItem[0]?.sideCode,
-        productName: selectedSideForNewItem[0]?.sideName,
-        productType: "side",
-        config: {
-          lineCode: selectedCombination[0]?.lineCode,
-          sidesSize: selectedCombination[0]?.size,
-          sideType: selectedSideForNewItem[0]?.type,
-        },
-        quantity: selectedSideForNewItem[0]?.qty
-          ? selectedSideForNewItem[0]?.qty
-          : 1,
-        price: selectedCombination[0]?.price,
-        amount: totalAmount.toFixed(2),
-        discountAmount: discount,
-        taxPer: taxPer,
-        pizzaSize: "",
-        comments: selectedSideForNewItem[0].comment,
-      };
-      let temp = sidesData.map((item) => {
-        return {
-          ...item,
-          qty: 1,
-        };
-      });
-      setSidesData(temp);
-      setSidesArr([]);
-      // let
-      if (updatedCartId !== -1) {
-        tempPayload[updatedCartId] = payload;
-      } else {
-        tempPayload.unshift(payload);
-      }
-      dispatch(addToCart([...tempPayload]));
-      toast.success(
-        `${selectedSideForNewItem[0]?.sideName} Added Successfully`
+      e.preventDefault();
+      const updatedCartId = cartdata?.findIndex(
+        (item) => item?.productCode === Obj?.sideCode
       );
+      let cart = JSON.parse(localStorage.getItem("CartData"));
+      let cartCode;
+      let customerCode;
+      let lineCode = $("#combination-" + sideCode)
+        .find(":selected")
+        .attr("data-key");
+
+      if (cart !== null && cart !== undefined) {
+        cartCode = cart.cartCode;
+        customerCode = cart.customerCode;
+      }
+
+      const selectedSideForNewItem = sidesArr?.filter(
+        (sides) => sides.sideCode === sideCode
+      );
+      const selectedCombination =
+        selectedSideForNewItem[0]?.combination?.filter(
+          (data) => data.lineCode === lineCode
+        );
+
+      const selectedCombinationObj = Obj?.combination?.filter(
+        (data) => data.lineCode === lineCode
+      );
+
+      let price =
+        selectedCombination !== undefined && selectedCombination[0].price
+          ? selectedCombination[0]?.price
+          : selectedCombinationObj[0]?.price;
+
+      let totalAmount = 0;
+
+      totalAmount =
+        Number(price) *
+        (selectedSideForNewItem[0]?.qty !== undefined
+          ? Number(selectedSideForNewItem[0]?.qty)
+          : 1);
+
+      if (selectedSideForNewItem.length === 0) {
+        const payload = {
+          id: uuidv4(),
+          customerCode: customerCode ? customerCode : "#NA",
+          cashierCode: localStorage.getItem("cashierCode"),
+          productCode: Obj.sideCode,
+          productName: Obj?.sideName,
+          productType: "side",
+          config: {
+            lineCode: selectedCombinationObj[0].lineCode,
+            sidesSize: selectedCombinationObj[0].size,
+            sidesType: Obj?.type,
+          },
+          quantity: 1,
+          price: selectedCombinationObj[0].price,
+          amount: totalAmount.toFixed(2),
+          discountAmount: discount,
+          taxPer: taxPer,
+          pizzaSize: "",
+          comments: "",
+        };
+        let temp = sidesData.map((item) => {
+          return {
+            ...item,
+            qty: 1,
+            comment: "",
+          };
+        });
+        setSidesData(temp);
+        setSidesArr([]);
+        dispatch(addToCart([payload, ...cartdata]));
+        toast.success(`${Obj.sideName} Added Successfully`);
+        return;
+      }
+
+      setSidesArr([
+        ...sidesArr,
+        {
+          ...selectedSideForNewItem,
+          qty: 1,
+        },
+      ]);
+
+      const selectedSide = sidesArr?.filter(
+        (sides) => sides.sideCode === sideCode
+      );
+
+      if (payloadEdit !== undefined && payloadEdit.productType === "side") {
+        const payloadForEdit = {
+          id: payloadEdit?.id,
+          customerCode: customerCode ? customerCode : "#NA",
+          cashierCode: localStorage.getItem("cashierCode"),
+          productCode: selectedSide[0].sideCode,
+          productName: selectedSide[0].sideName,
+          productType: "side",
+          config: {
+            lineCode: selectedSide[0].combination[0].lineCode,
+            sidesSize: selectedSide[0].combination[0].sidesSize
+              ? selectedSide[0].combination[0].sidesSize
+              : selectedSide[0].combination[0].size,
+            sideType: selectedSide[0].type,
+          },
+          quantity: selectedSide[0].qty,
+          price: selectedSide[0].price,
+          amount: totalAmount.toFixed(2),
+          discountAmount: discount,
+          taxPer: taxPer,
+          pizzaSize: "",
+          comments: selectedSide[0].comment,
+        };
+        const updatedCart = cartdata.findIndex(
+          (item) => item.id === payloadEdit.id
+        );
+        let tempPayload = [...cartdata];
+        tempPayload[0] = payloadForEdit;
+        dispatch(addToCart([...tempPayload]));
+        setPayloadEdit();
+        let temp = sidesData.map((item) => {
+          return {
+            ...item,
+            qty: 1,
+          };
+        });
+        setSidesData(temp);
+        setSidesArr([]);
+        setQuantity(1);
+      } else {
+        let tempPayload = [...cartdata];
+
+        const payload = {
+          id: updatedCartId !== -1 ? cartdata[updatedCartId].id : uuidv4(),
+          customerCode: customerCode ? customerCode : "#NA",
+          cashierCode: localStorage.getItem("cashierCode"),
+          productCode: selectedSideForNewItem[0]?.sideCode,
+          productName: selectedSideForNewItem[0]?.sideName,
+          productType: "side",
+          config: {
+            lineCode: selectedCombination[0]?.lineCode,
+            sidesSize: selectedCombination[0]?.size,
+            sideType: selectedSideForNewItem[0]?.type,
+          },
+          quantity: selectedSideForNewItem[0]?.qty
+            ? selectedSideForNewItem[0]?.qty
+            : 1,
+          price: selectedCombination[0]?.price,
+          amount: totalAmount.toFixed(2),
+          discountAmount: discount,
+          taxPer: taxPer,
+          pizzaSize: "",
+          comments: selectedSideForNewItem[0].comment,
+        };
+        let temp = sidesData.map((item) => {
+          return {
+            ...item,
+            qty: 1,
+          };
+        });
+        setSidesData(temp);
+        setSidesArr([]);
+        // let
+        if (updatedCartId !== -1) {
+          tempPayload[updatedCartId] = payload;
+        } else {
+          tempPayload.unshift(payload);
+        }
+        dispatch(addToCart([...tempPayload]));
+        toast.success(
+          `${selectedSideForNewItem[0]?.sideName} Added Successfully`
+        );
+      }
     }
   };
 
