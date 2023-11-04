@@ -861,7 +861,7 @@ function NewOrder() {
                     {updateOrder && (
                       <button
                         type='button'
-                        className='btn btn-danger btn-xs ms-1'
+                        className='btn btn-dark btn-xs ms-1'
                         onClick={() => {
                           dispatch(addToCart([]));
                           setPayloadEdit();

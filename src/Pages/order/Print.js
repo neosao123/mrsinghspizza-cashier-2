@@ -231,9 +231,10 @@ const Print = ({ orderDetail, printRef }) => {
                                         {product_type !== "special_pizza" && (
                                           <div className="col-3 text-end pe-0 ">
                                             $
-                                            {dips.dipsPrice !== undefined
+                                            {/* {dips.dipsPrice !== undefined
                                               ? dips.dipsPrice
-                                              : dips?.price}
+                                              : dips?.price} */}
+                                            {dips?.totalPrice}
                                           </div>
                                         )}
                                       </div>
