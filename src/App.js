@@ -118,7 +118,7 @@ function App() {
       <HelmetHeader />
       <GlobalProvider>
         <Routes>
-          <Route path="/" exact element={<Login />} />
+          <Route path="/" index exact element={<Login />} />
           <Route path="/forget-password" exact element={<ForgetPass />} />
           <Route path="/reset-password" exact element={<ResetPass />} />
           <Route
