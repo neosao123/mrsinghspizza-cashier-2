@@ -63,7 +63,6 @@ function Login() {
               role: data.data.role,
             };
 
-            
             dispatch(setUser(payload));
             dispatch(setToken(res.data.token));
             setTimeout(() => {
