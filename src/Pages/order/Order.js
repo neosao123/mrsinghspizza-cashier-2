@@ -84,6 +84,7 @@ function Order() {
   const handleShow = () => setShow(true);
 
   const user = useSelector((state) => state.user.userData);
+  const cart = useSelector((state) => state?.cart?.setnotificationcount);
 
   const [initialValues, setInitialValues] = useState({
     customerName: "",
@@ -282,7 +283,7 @@ function Order() {
     getStoreLocation();
     getDeliveryCharges();
     // setOrderByStatus("");
-  }, [orderFrom, orderByStatus, teleStore]);
+  }, [orderFrom, orderByStatus, teleStore, cart]);
 
   return (
     <>
@@ -1361,8 +1362,10 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
 
           {ele?.toppings?.isAllIndiansTps === true && (
             <div className="row">
-              <div className="col-9 text-capitalize">
-                <strong style={{ color: "#191919" }}>Indian Style</strong>
+              <div className="col-12 text-capitalize">
+                <strong style={{ color: "#191919" }}>
+                  Indian Style + Coriander
+                </strong>
               </div>
             </div>
           )}

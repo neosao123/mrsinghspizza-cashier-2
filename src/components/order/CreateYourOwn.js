@@ -145,6 +145,7 @@ function CreateYourOwn({
     let totalAmount = 0;
     let sizeofpizza = data?.pizzaSize ? data.pizzaSize : sizesOfPizzaSelected;
     console.log(sizeofpizza, "sizesOfPizzaSelected");
+    console.log(freeTopping, freeToppingsArr, "realtime free tps");
 
     // let pizzaPrice = sizeofpizza === "Large" ? 11.49 : 16.49;
 
@@ -212,6 +213,7 @@ function CreateYourOwn({
     };
     calculate();
     console.log(totalAmount, "create your own price");
+
     // totalAmount += Number(pizzaPrice);
     const payload = {
       id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),
@@ -240,7 +242,11 @@ function CreateYourOwn({
               freeToppings: data?.freeTpsArr
                 ? data?.freeTpsArr
                 : freeToppingsArr,
-              isAllIndiansTps: isAllIndiansTps,
+              isAllIndiansTps:
+                freeTopping.length ===
+                allIngredients?.toppings?.freeToppings?.length
+                  ? true
+                  : false,
             },
           },
         ],
