@@ -28,9 +28,11 @@ import {
   isZipCodeDelivarable,
   prevOrderDetails,
   sidesApi,
+  pizzaPriceApi,
 } from "./newOrder/newOrderApi";
 import {
   pizzaIngredients,
+  pizzaPriceData,
   sidesIngredient,
 } from "./newOrder/newOrderCustomApiHandler";
 import Cart from "./cart";
@@ -51,6 +53,7 @@ import { BiTrash } from "react-icons/bi";
 
 function NewOrder() {
   const [allIngredients, setAllIngredients] = useState();
+  const [pizzaPriceObj, setPizzaPriceObj] = useState(); // Developer: Shreyas Mahamuni, 23-11-2023
   const [sidesData, setSidesData] = useState();
   const [deliveryType, setDeliveryType] = useState("pickup");
   const [storesLocationData, setStoreLocationData] = useState();
@@ -411,6 +414,7 @@ function NewOrder() {
   useEffect(() => {
     pizzaIngredients(allIngredientsApi, setAllIngredients);
     sidesIngredient(sidesApi, setSidesData);
+    pizzaPriceData(pizzaPriceApi, setPizzaPriceObj); // Developer: Shreyas Mahamuni, 23-11-2023
     storeLocation();
     getCartList();
     settings();
@@ -776,6 +780,7 @@ function NewOrder() {
                   <CreateYourOwn
                     allIngredients={allIngredients}
                     sidesData={sidesData}
+                    pizzaPriceObj={pizzaPriceObj} // Developer: Shreyas Mahamuni, 22-11-2023
                     discount={discount}
                     taxPer={taxPer}
                     getCartList={getCartList}

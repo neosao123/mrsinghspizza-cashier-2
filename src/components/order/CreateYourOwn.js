@@ -20,6 +20,7 @@ import { resetFields } from "./createYourOwn/createYourOwnFn";
 function CreateYourOwn({
   allIngredients,
   sidesData,
+  pizzaPriceObj,
   discount,
   taxPer,
   getCartList,
@@ -99,7 +100,10 @@ function CreateYourOwn({
     calculatePrice += totalFreeToppings;
     calculatePrice += totalDips;
     calculatePrice += totalDrinks;
-    let priceBySize = sizesOfPizzaSelected === "Large" ? 11.49 : 16.49;
+    let priceBySize =
+      sizesOfPizzaSelected === "Large"
+        ? Number(pizzaPriceObj?.largePizzaPrice)
+        : Number(pizzaPriceObj?.extraLargePizzaPrice); // Developer: Shreyas Mahamuni, 22-11-2023
     calculatePrice += priceBySize;
     setPrice(calculatePrice.toFixed(2));
   };
@@ -135,7 +139,7 @@ function CreateYourOwn({
 
       updatedCartId = updatedCartId2;
     }
-    console.log(updatedCartId, "special pizza payload");
+    // console.log(updatedCartId, "special pizza payload");
     let cartCode;
     let customerCode;
     if (cart !== null && cart !== undefined) {
@@ -144,8 +148,8 @@ function CreateYourOwn({
     }
     let totalAmount = 0;
     let sizeofpizza = data?.pizzaSize ? data.pizzaSize : sizesOfPizzaSelected;
-    console.log(sizeofpizza, "sizesOfPizzaSelected");
-    console.log(freeTopping, freeToppingsArr, "realtime free tps");
+    // console.log(sizeofpizza, "sizesOfPizzaSelected");
+    // console.log(freeTopping, freeToppingsArr, "realtime free tps");
 
     // let pizzaPrice = sizeofpizza === "Large" ? 11.49 : 16.49;
 
@@ -166,12 +170,13 @@ function CreateYourOwn({
         : specialBasesSelected?.price !== undefined
         ? specialBasesSelected?.price
         : 0;
-      console.log(data?.specialBase, "specialbase_price data?.specialBase");
-      console.log(
-        specialBasesSelected,
-        "specialbase_price specialBasesSelected"
-      );
-      console.log(specialbase_price, "specialbase_price");
+      // console.log(data?.specialBase, "specialbase_price data?.specialBase");
+      // console.log(
+      //   specialBasesSelected,
+      //   "specialbase_price specialBasesSelected"
+      // );
+      // console.log(specialbase_price, "specialbase_price");
+      // console.log("pizzaprice", pizzaPriceObj);
 
       let cook_price = data?.cook ? data?.cook?.price : cookSelected?.price;
       console.log(cook_price, "cook_price");
@@ -206,13 +211,17 @@ function CreateYourOwn({
       calculatePrice += totalFreeToppings;
       calculatePrice += totalDips;
       calculatePrice += totalDrinks;
-      let priceBySize = sizeofpizza === "Large" ? 11.49 : 16.49;
+      let priceBySize =
+        sizeofpizza === "Large"
+          ? Number(pizzaPriceObj?.largePizzaPrice)
+          : Number(pizzaPriceObj?.extraLargePizzaPrice); // Developer: Shreyas Mahamuni, 22-11-2023
       calculatePrice += priceBySize;
+
       totalAmount = calculatePrice;
       return calculatePrice.toFixed(2);
     };
     calculate();
-    console.log(totalAmount, "create your own price");
+    // console.log(totalAmount, "create your own price");
 
     // totalAmount += Number(pizzaPrice);
     const payload = {
@@ -259,7 +268,10 @@ function CreateYourOwn({
       amount: totalAmount?.toFixed(2),
       comments: data?.comment ? data.comment : comments,
       pizzaSize: data.pizzaSize ? data.pizzaSize : sizesOfPizzaSelected,
-      pizzaPrice: sizeofpizza === "Large" ? 11.49 : 16.49,
+      pizzaPrice:
+        sizeofpizza === "Large"
+          ? Number(pizzaPriceObj.largePizzaPrice)
+          : Number(pizzaPriceObj.extraLargePizzaPrice), // Developer: Shreyas Mahamuni, 22-11-2023
       discountAmount: discount,
       taxPer: taxPer,
     };
@@ -309,7 +321,10 @@ function CreateYourOwn({
         amount: price,
         comments: comments,
         pizzaSize: sizesOfPizzaSelected,
-        pizzaPrice: sizesOfPizzaSelected === "Large" ? 11.49 : 16.49,
+        pizzaPrice:
+          sizesOfPizzaSelected === "Large"
+            ? Number(pizzaPriceObj.largePizzaPrice)
+            : Number(pizzaPriceObj.extraLargePizzaPrice), // Developer: Shreyas Mahamuni, 22-11-2023
         discountAmount: discount,
         taxPer: taxPer,
       };
@@ -387,6 +402,10 @@ function CreateYourOwn({
           amount: price,
           comments: comments,
           pizzaSize: sizesOfPizzaSelected,
+          pizzaPrice:
+            sizesOfPizzaSelected === "Large"
+              ? Number(pizzaPriceObj.largePizzaPrice)
+              : Number(pizzaPriceObj.extraLargePizzaPrice), // Developer: Shreyas Mahamuni, 22-11-2023
           discountAmount: discount,
           taxPer: taxPer,
         };
@@ -933,6 +952,7 @@ function CreateYourOwn({
     count,
     sizesOfPizzaSelected,
     freeToppingsArr,
+    pizzaPriceObj, // Developer: Shreyas Mahamuni, 22-11-2023
   ]);
 
   //pizza size (large or extra-large)

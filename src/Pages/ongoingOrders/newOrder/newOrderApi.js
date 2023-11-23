@@ -17,3 +17,9 @@ export const prevOrderDetails = async (payload) => {
     `/customer/previousorder?mobileNumber=${payload}`
   );
 };
+
+// Developer: Shreyas Mahamuni, Working Date: 23-11-2023
+// It return largestPizzaPrice & extraLargePizzaPrice for custom_pizza
+export const pizzaPriceApi = async () => {
+  return await privateAPi.get(`/pizzaPrice`);
+};
