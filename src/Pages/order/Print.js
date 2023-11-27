@@ -131,7 +131,7 @@ const Print = ({ orderDetail, printRef }) => {
                         <b>Pizza ({order?.pizzaSize})</b>
                       </div>
                     </div>
-                    <div className="col-3 text-end">$ {order.pizzaPrice}</div>
+                    <div className="col-3 pro_price text-end">$ {order.pizzaPrice}</div>
                   </div>
                 </div>
               )}
@@ -143,7 +143,7 @@ const Print = ({ orderDetail, printRef }) => {
                         <b>Pizza ({order?.pizzaSize})</b>
                       </div>
                     </div>
-                    <div className="col-3 text-end">$ {order.pizzaPrice}</div>
+                    <div className="col-3 pro_price text-end">$ {order.pizzaPrice}</div>
                   </div>
                 </div>
               ) : (
@@ -166,7 +166,7 @@ const Print = ({ orderDetail, printRef }) => {
                       )}
                     </div>
                     {product_type !== "special_pizza" ? (
-                      <div className="col-3 text-end ">$ {order.amount}</div>
+                      <div className="col-3 pro_price text-end ">$ {order.amount}</div>
                     ) : (
                       ""
                     )}
@@ -229,7 +229,7 @@ const Print = ({ orderDetail, printRef }) => {
                                           {dips.dipsName}
                                         </div>
                                         {product_type !== "special_pizza" && (
-                                          <div className="col-3 text-end pe-0 ">
+                                          <div className="col-3 pro_price text-end pe-0 ">
                                             $
                                             {/* {dips.dipsPrice !== undefined
                                               ? dips.dipsPrice
@@ -300,7 +300,7 @@ const Print = ({ orderDetail, printRef }) => {
                                           </span>
                                         </div>
                                         {product_type !== "special_pizza" && (
-                                          <div className="col-3 text-end p-0">
+                                          <div className="col-3 pro_price text-end p-0">
                                             {product_type !== "special_pizza" &&
                                               (side?.sidePrice !== undefined
                                                 ? `$ ` + side?.sidePrice
@@ -378,7 +378,7 @@ const Print = ({ orderDetail, printRef }) => {
                                             </div>
                                             {product_type !==
                                               "special_pizza" && (
-                                              <div className="col-3 text-end pe-0">
+                                              <div className="col-3 pro_price text-end pe-0">
                                                 ${drink.drinksPrice}
                                               </div>
                                             )}

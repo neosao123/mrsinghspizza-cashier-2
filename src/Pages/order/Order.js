@@ -1377,7 +1377,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
 
                 {ele?.cheese?.cheeseName}
               </div>
-              <div className="col-3 text-end m-0 p-0">
+              <div className="col-3 pro_price text-end m-0 p-0">
                 {ele?.cheese?.price === undefined ||
                 ele?.cheese?.price === "0.00"
                   ? ""
@@ -1391,7 +1391,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
                 <strong style={{ color: "#191919" }}>Crust : </strong>
                 {ele?.crust?.crustName}
               </div>
-              <div className="col-3 text-end m-0 p-0">
+              <div className="col-3 pro_price text-end m-0 p-0">
                 {ele?.crust?.crustPrice === undefined ||
                 ele?.crust?.crustPrice === "0.00"
                   ? ""
@@ -1409,7 +1409,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
                 <strong style={{ color: "#191919" }}>Crust Type : </strong>
                 {(ele?.crustType?.crustType).split(" ")[0]}
               </div>
-              <div className="col-3 text-end m-0 p-0">
+              <div className="col-3 pro_price text-end m-0 p-0">
                 {ele?.crustType?.price === undefined ||
                 ele?.crustType?.price === "0.00"
                   ? ""
@@ -1426,7 +1426,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
                     <strong style={{ color: "#191919" }}>Spb : </strong>{" "}
                     <span>{ele?.specialBases?.specialbaseName}</span>
                   </div>
-                  <div className="col-3 pe-0 text-end">
+                  <div className="col-3 pro_price pe-0 text-end">
                     {ele?.specialBases?.price === undefined ||
                     ele?.specialBases?.price === "0.00"
                       ? ""
@@ -1449,7 +1449,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
                     <strong style={{ color: "#191919" }}>Spicy : </strong>{" "}
                     <span>{ele?.spicy?.spicy}</span>
                   </div>
-                  <div className="col-3 pe-0 text-end">
+                  <div className="col-3 pro_price pe-0 text-end">
                     {ele?.spicy?.price === undefined ||
                     ele?.spicy?.price === "0.00"
                       ? ""
@@ -1467,7 +1467,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
                     <strong style={{ color: "#191919" }}>Sauce : </strong>{" "}
                     <span>{ele?.sauce?.sauce}</span>
                   </div>
-                  <div className="col-3 pe-0 text-end">
+                  <div className="col-3 pro_price pe-0 text-end">
                     {ele?.sauce?.price === undefined ||
                     ele?.sauce?.price === "0.00"
                       ? ""
@@ -1485,7 +1485,7 @@ export const PizzaDetails = ({ pizzaData, productType }) => {
                     <strong style={{ color: "#191919" }}>Cook : </strong>{" "}
                     <span>{ele?.cook?.cook}</span>
                   </div>
-                  <div className="col-3 pe-0 text-end">
+                  <div className="col-3 pro_price pe-0 text-end">
                     {ele?.cook?.price === undefined ||
                     ele?.cook?.price === "0.00"
                       ? ""
@@ -1546,7 +1546,7 @@ export const ToppingsList = ({ toppingsData }) => {
                   </span>
                 </div>
                 {/* {console.log("topping :", topping, topping.amount)} */}
-                <div className="col-3 text-end m-0 p-0">
+                <div className="col-3 pro_price text-end m-0 p-0">
                   {/* {topping.amount === undefined || topping.amount === 0
                   ? ""
                   : `$ ${topping.price}`} */}

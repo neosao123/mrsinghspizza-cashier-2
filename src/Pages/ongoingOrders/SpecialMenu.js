@@ -1089,7 +1089,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                 // };
                 calcTwoTpsArr.push({
                   ...items,
-                  amount: Number(items?.toppingsPrice).toFixed(2),
+                  amount: Number(items?.toppingsPrice).toFixed(2) / 2,
                 });
                 setOfferedFreeToppings((prev) => prev - 1);
                 noOfFreeToppings -= Number(1);
@@ -1310,7 +1310,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                 } else if (noOfFreeToppings2 === 1) {
                   calcTwoTpsArr2.push({
                     ...items,
-                    amount: Number(items?.toppingsPrice).toFixed(2),
+                    amount: Number(items?.toppingsPrice).toFixed(2) / 2,
                   });
                   noOfFreeToppings2 -= Number(1);
                   noOfAdditionalTps2++;
@@ -1441,14 +1441,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
   return (
     <>
-      <div className='d-flex flex-wrap justify-content-center'>
-        <div className='w-100'>
+      <div className="d-flex flex-wrap justify-content-center">
+        <div className="w-100">
           {displaySpecialForm ? (
             <>
               {/* Back Button */}
               <button
-                type='button'
-                className='btn btn-secondary btn-xs mb-1'
+                type="button"
+                className="btn btn-secondary btn-xs mb-1"
                 onClick={() => {
                   if (
                     payloadEdit !== undefined &&
@@ -1468,8 +1468,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
               >
                 <BiChevronLeftCircle /> Back
               </button>
-              <div className='customizablePizza px-3'>
-                <div className='d-flex justify-content-between'>
+              <div className="customizablePizza px-3">
+                <div className="d-flex justify-content-between">
                   <h6>
                     {getSpecialData?.name}
                     {getSpecialData?.subtitle !== null && (
@@ -1477,40 +1477,40 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                         style={{
                           color: "#b1130be4",
                         }}
-                        className='ms-1'
+                        className="ms-1"
                       >
                         ({getSpecialData?.subtitle})
                       </span>
                     )}
                   </h6>
-                  <h6 className='mx-2 text-nowrap'>$ {price}</h6>
+                  <h6 className="mx-2 text-nowrap">$ {price}</h6>
                 </div>
-                <div className='mb-1'>
-                  <p className='mb-1'>
+                <div className="mb-1">
+                  <p className="mb-1">
                     Toppings :{" "}
-                    <span className='mx-2'>
+                    <span className="mx-2">
                       {offeredFreeToppings <= 0 ? 0 : offeredFreeToppings} /{" "}
                       {getSpecialData?.noofToppings}
                     </span>
                   </p>
 
-                  <p className='mb-1'>
+                  <p className="mb-1">
                     Additional Toppings Used :
-                    <span className='mx-2'>
+                    <span className="mx-2">
                       {offeredFreeToppings <= 0 ? additionalToppingsCount : 0}{" "}
                     </span>
                   </p>
-                  <p className='mb-1 d-inline'>Size : </p>
+                  <p className="mb-1 d-inline">Size : </p>
                   <select
-                    className='form-select mx-2 my-2 w-25 d-inline'
+                    className="form-select mx-2 my-2 w-25 d-inline"
                     value={pizzaSize}
                     onChange={(e) => handleSizeOfPizza(e)}
                   >
                     {Number(getSpecialData?.largePizzaPrice) > 0 && (
-                      <option value='Large'>Large</option>
+                      <option value="Large">Large</option>
                     )}
                     {Number(getSpecialData?.extraLargePizzaPrice) > 0 && (
-                      <option value='Extra Large'>Extra Large</option>
+                      <option value="Extra Large">Extra Large</option>
                     )}
                   </select>
                 </div>
@@ -1520,9 +1520,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                 {/* Sides */}
                 {getSpecialData?.freesides.length === 0 ? null : (
                   <>
-                    <h6 className='text-left mt-1 mb-2'>Sides</h6>
-                    <div id='sides' className='mb-3'>
-                      <ul className='list-group'>
+                    <h6 className="text-left mt-1 mb-2">Sides</h6>
+                    <div id="sides" className="mb-3">
+                      <ul className="list-group">
                         {getSpecialData?.freesides?.map((sidesData) => {
                           const comm = sidesArr.findIndex(
                             (item) => item.sideCode === sidesData.code
@@ -1530,14 +1530,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                           return (
                             <>
                               <li
-                                className='list-group-item d-flex justify-content-between align-items-center'
+                                className="list-group-item d-flex justify-content-between align-items-center"
                                 key={sidesData.code + "sidesData"}
                               >
-                                <label className='d-flex align-items-center'>
+                                <label className="d-flex align-items-center">
                                   <input
-                                    type='radio'
-                                    name='sides'
-                                    className='mx-3 d-inline-block'
+                                    type="radio"
+                                    name="sides"
+                                    className="mx-3 d-inline-block"
                                     checked={comm !== -1 ? true : false}
                                     onChange={(e) => handleSides(e, sidesData)}
                                   />
@@ -1557,7 +1557,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                         ? sidesArr[comm]?.lineCode
                                         : ""
                                     }
-                                    className='form-select w-100 d-inline-block'
+                                    className="form-select w-100 d-inline-block"
                                     onChange={(e) => {
                                       handleSidelineEntries(e, sidesData);
                                     }}
@@ -1573,7 +1573,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                             <span>
                                               {lineEntriesData.size} -{" "}
                                             </span>
-                                            <span className='mb-0 mx-2'>
+                                            <span className="mb-0 mx-2">
                                               $ {lineEntriesData.price}
                                             </span>
                                           </option>
@@ -1596,23 +1596,23 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   ""
                 ) : (
                   <>
-                    <h6 className='text-left mt-1 mb-2'>Dips</h6>
-                    <div id='dips' className='mb-3'>
-                      <ul className='list-group'>
+                    <h6 className="text-left mt-1 mb-2">Dips</h6>
+                    <div id="dips" className="mb-3">
+                      <ul className="list-group">
                         {dipsData?.map((data, index) => {
                           const comm = dipsArr?.findIndex(
                             (item) => item.dipsCode === data.dipsCode
                           );
 
                           return (
-                            <li className='list-group-item' key={data.dipsCode}>
-                              <div className='d-flex justify-content-between align-items-center'>
-                                <div className='d-flex align-items-center'>
-                                  <label className='d-flex align-items-center'>
+                            <li className="list-group-item" key={data.dipsCode}>
+                              <div className="d-flex justify-content-between align-items-center">
+                                <div className="d-flex align-items-center">
+                                  <label className="d-flex align-items-center">
                                     <input
-                                      type='radio'
-                                      name='dips'
-                                      className='mx-3 d-inline-block'
+                                      type="radio"
+                                      name="dips"
+                                      className="mx-3 d-inline-block"
                                       checked={comm !== -1 ? true : false}
                                       onChange={(e) => handleDips(e, data)}
                                     />
@@ -1621,7 +1621,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                 </div>
 
                                 <input
-                                  type='number'
+                                  type="number"
                                   defaultValue={1}
                                   readOnly
                                   min={1}
@@ -1634,7 +1634,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                       ? Number(getSpecialData?.noofDips)
                                       : 1
                                   }
-                                  className='form-control mx-2'
+                                  className="form-control mx-2"
                                   style={{ width: "75px" }}
                                   // onChange={(e) => handleDipsCount(e, data)}
                                 />
@@ -1652,11 +1652,11 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                   <>
                     {(getSpecialData?.pops.length > 0 ||
                       getSpecialData.bottle.length > 0) && (
-                      <h6 className='text-left mt-1 mb-2'>Drinks</h6>
+                      <h6 className="text-left mt-1 mb-2">Drinks</h6>
                     )}
 
-                    <div id='drinks' className='mb-3'>
-                      <ul className='list-group'>
+                    <div id="drinks" className="mb-3">
+                      <ul className="list-group">
                         {getSpecialData?.pops.map((pop) => {
                           const comm = drinksArr?.findIndex(
                             (item) => item.drinksCode === pop.code
@@ -1664,14 +1664,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
                           return (
                             <li
-                              className='list-group-item d-flex justify-content-between align-items-center'
+                              className="list-group-item d-flex justify-content-between align-items-center"
                               key={pop.code}
                             >
-                              <label className='d-flex align-items-center'>
+                              <label className="d-flex align-items-center">
                                 <input
-                                  type='radio'
-                                  name='drinks'
-                                  className='mx-3 d-inline-block'
+                                  type="radio"
+                                  name="drinks"
+                                  className="mx-3 d-inline-block"
                                   checked={comm !== -1 ? true : false}
                                   onChange={(e) =>
                                     specialMenuParamsObj.handlePops.callback({
@@ -1684,7 +1684,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                                 />
                                 {pop.softDrinkName}
                               </label>
-                              <p className='mb-0 mx-2'>$ {pop.price}</p>
+                              <p className="mb-0 mx-2">$ {pop.price}</p>
                             </li>
                           );
                         })}
@@ -1694,20 +1694,20 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                           );
                           return (
                             <li
-                              className='list-group-item d-flex justify-content-between align-items-center'
+                              className="list-group-item d-flex justify-content-between align-items-center"
                               key={pop.code}
                             >
-                              <label className='d-flex align-items-center'>
+                              <label className="d-flex align-items-center">
                                 <input
-                                  type='radio'
-                                  name='drinks'
-                                  className='mx-3 d-inline-block'
+                                  type="radio"
+                                  name="drinks"
+                                  className="mx-3 d-inline-block"
                                   checked={comm !== -1 ? true : false}
                                   onChange={(e) => handleDrinks(e, pop)}
                                 />
                                 {pop.softDrinkName}
                               </label>
-                              <p className='mb-0 mx-2'>$ {pop.price}</p>
+                              <p className="mb-0 mx-2">$ {pop.price}</p>
                             </li>
                           );
                         })}
@@ -1717,12 +1717,12 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                 )}
 
                 {/* Comments */}
-                <h6 className='text-left mt-1 mb-2'>Comments</h6>
-                <div className=''>
+                <h6 className="text-left mt-1 mb-2">Comments</h6>
+                <div className="">
                   <textarea
-                    className='form-control'
-                    rows='4'
-                    cols='50'
+                    className="form-control"
+                    rows="4"
+                    cols="50"
                     value={comments}
                     onChange={(e) => {
                       updateInCart({ comment: e.target.value });
@@ -1734,10 +1734,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                 {/* Add to Cart Button */}
                 {payloadEdit !== undefined &&
                 payloadEdit?.productType.toLowerCase() === "special_pizza" ? (
-                  <div className='d-flex flex-row justify-content-center align-items-center addToCartDiv mt-3 mb-3'>
+                  <div className="d-flex flex-row justify-content-center align-items-center addToCartDiv mt-3 mb-3">
                     <button
-                      type='button'
-                      className='btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn'
+                      type="button"
+                      className="btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn"
                       onClick={handleAddToCart}
                     >
                       Edit
@@ -1752,23 +1752,23 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
             </>
           ) : (
             <ul
-              className='list-group'
+              className="list-group"
               style={{ overflowY: "scroll", height: "30rem" }}
             >
               {specialData?.map((speicalPizza) => {
                 return (
-                  <li className='list-group-item' key={speicalPizza.code}>
-                    <div className='d-flex align-items-start justify-content-between px-1'>
-                      <div className='d-flex align-align-items-start'>
-                        <div className='d-flex flex-column'>
-                          <h6 className='mb-1'>
+                  <li className="list-group-item" key={speicalPizza.code}>
+                    <div className="d-flex align-items-start justify-content-between px-1">
+                      <div className="d-flex align-align-items-start">
+                        <div className="d-flex flex-column">
+                          <h6 className="mb-1">
                             {speicalPizza.name}
                             {speicalPizza?.subtitle !== null && (
                               <span
                                 style={{
                                   color: "#b1130be4",
                                 }}
-                                className='ms-1'
+                                className="ms-1"
                               >
                                 ({speicalPizza?.subtitle})
                               </span>
@@ -1778,29 +1778,29 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                           <span>{speicalPizza.noofPizzas} Pizzas</span>
                         </div>
                       </div>
-                      <div className='d-flex flex-column align-items-end'>
+                      <div className="d-flex flex-column align-items-end">
                         <h6>
-                          <p className='m-0 mb-1 p-0 text-end'>
+                          <p className="m-0 mb-1 p-0 text-end">
                             Large{" "}
-                            <span className='text-large-pizza-price'>
+                            <span className="text-large-pizza-price">
                               ${Number(speicalPizza.largePizzaPrice)}
                             </span>
                           </p>
-                          <p className='m-0 p-0 text-end text-nowrap'>
+                          <p className="m-0 p-0 text-end text-nowrap">
                             Extra Large{" "}
-                            <span className='text-xlarge-pizza-price'>
+                            <span className="text-xlarge-pizza-price">
                               ${Number(speicalPizza.extraLargePizzaPrice)}
                             </span>
                           </p>
                         </h6>
                         <button
-                          type='button'
+                          type="button"
                           // ref={
                           //   speicalPizza.name === payloadEdit?.productName
                           //     ? specialTabRef
                           //     : null
                           // }
-                          className='btn btn-sm customize py-1 px-2'
+                          className="btn btn-sm customize py-1 px-2"
                           onClick={() => {
                             handleGetSpecial(speicalPizza?.code);
                             createEmptyObjects(

@@ -5,4 +5,8 @@
     font-size: 0.9rem !important;
     /* margin: 0px; */
   } /* Add other styles as needed for your print layout */
+
+  .pro_price {
+    font-size: 0.8rem !important;
+  }
 }
