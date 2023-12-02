@@ -11,6 +11,7 @@ import {
   deliveryExecutiveApi,
   settingsApi,
   orderEditApi,
+  getPrevAddressApi,
 } from "../../API/ongoingOrder";
 import SidesMenu from "./SidesMenu";
 import DipsMenu from "./DipsMenu";
@@ -68,6 +69,7 @@ function NewOrder() {
   const [settingsData, setSettingsData] = useState();
   const [isOrderSubmittedSuccessfully, setIsOrderSubmittedSuccessfully] =
     useState(false);
+  const [prevAddress, setPrevAddress] = useState("");
   const [prevOrderLoading, setPrevOrderLoading] = useState(false);
   const [prevOrders, setPrevOrders] = useState([]);
   const [orderData, setOrderData] = useState();
@@ -137,7 +139,7 @@ function NewOrder() {
     phoneno: "",
     category: "pickup",
     customername: "",
-    address: "",
+    address: prevAddress ? prevAddress : "",
     stores: user?.role !== "R_4" ? user?.storeLocation : "",
     postalcode: "",
     deliveryExecutive: "",
@@ -311,29 +313,31 @@ function NewOrder() {
           extraDeliveryCharges: extraDeliveryCharges ? extraDeliveryCharges : 0,
           grandTotal: grandTotal,
         };
-        // let response;
-        const response = updateOrder
-          ? await orderEditApi({
-              orderCode: updateOrderData?.code,
-              ...payload,
-            })
-          : await orderPlaceApi(payload);
-        if (response.status === 200) {
-          resetForm();
-          dispatch(addToCart([]));
-          dispatch(setUpdateOrderData({}));
-          dispatch(setUpdateOrder(false));
-          setDiscount(0);
-          setPrevOrders([]);
-          setExtraDeliveryCharges(0);
-          orderDetails({ orderCode: response.data.orderCode }).then((data) => {
-            setOrderDetail(data.data.data);
-            setIsOrderSubmittedSuccessfully(true);
-          });
-          toast.success(response.data.message);
-        } else {
-          toast.error("Failed to place the order");
-        }
+
+        console.log(payload);
+        // // let response;
+        // const response = updateOrder
+        //   ? await orderEditApi({
+        //       orderCode: updateOrderData?.code,
+        //       ...payload,
+        //     })
+        //   : await orderPlaceApi(payload);
+        // if (response.status === 200) {
+        //   resetForm();
+        //   dispatch(addToCart([]));
+        //   dispatch(setUpdateOrderData({}));
+        //   dispatch(setUpdateOrder(false));
+        //   setDiscount(0);
+        //   setPrevOrders([]);
+        //   setExtraDeliveryCharges(0);
+        //   orderDetails({ orderCode: response.data.orderCode }).then((data) => {
+        //     setOrderDetail(data.data.data);
+        //     setIsOrderSubmittedSuccessfully(true);
+        //   });
+        //   toast.success(response.data.message);
+        // } else {
+        //   toast.error("Failed to place the order");
+        // }
       } catch (error) {
         if (cartdata?.length === 0 || cartdata == undefined) {
           toast.error("Add something to cart");
@@ -380,6 +384,19 @@ function NewOrder() {
       });
   };
 
+  const getPrevAddress = async (phoneno) => {
+    await getPrevAddressApi({ mobileNumber: phoneno })
+      .then((res) => {
+        formik.values.address = res.data.data.prevOrderAddress;
+        formik.values.customername = res.data.data.customerName;
+      })
+      .catch((error) => {
+        formik.values.address = "";
+        formik.values.customername = "";
+        toast.error(error.response.data.message);
+      });
+  };
+
   useEffect(() => {
     if (formik?.values?.postalcode?.length > 0) {
       fetchpostalcodeIsDeliverable(formik.values.postalcode);
@@ -390,6 +407,14 @@ function NewOrder() {
       fetchPrevOrder(formik.values.phoneno);
     }
   }, [debouncedInputValueForphoneNumber]);
+  useEffect(() => {
+    if (formik.values?.phoneno?.length >= 9 && deliveryType === "delivery") {
+      getPrevAddress(formik.values.phoneno);
+    } else {
+      formik.values.address = "";
+      formik.values.customername = "";
+    }
+  }, [debouncedInputValueForphoneNumber, deliveryType]);
 
   useEffect(() => {
     setTaxPer(

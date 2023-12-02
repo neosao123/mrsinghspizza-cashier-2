@@ -6,6 +6,8 @@
     /* margin: 0px; */
   } /* Add other styles as needed for your print layout */
 
+  /* Developer: ShreyasM, Working Date: 27-11-2023 */
+  /* Its used for font size of prices for all on print page only */
   .pro_price {
     font-size: 0.8rem !important;
   }

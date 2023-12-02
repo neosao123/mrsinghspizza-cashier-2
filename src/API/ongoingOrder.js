@@ -90,3 +90,7 @@ export const updateFirebaseId = async (payload) => {
 export const getNotificationList = async (payload) => {
   return await privateAPi.post("/cashier/order/notificationList", payload);
 };
+
+export const getPrevAddressApi = async (payload) => {
+  return await privateAPi.post("/cashier/getPrevAddress", payload);
+};
