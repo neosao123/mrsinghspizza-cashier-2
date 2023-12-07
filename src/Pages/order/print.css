@@ -11,4 +11,8 @@
   .pro_price {
     font-size: 0.8rem !important;
   }
+  .summary {
+    padding-right: 25px !important;
+    font-size: .95rem I !important;
+  }
 }

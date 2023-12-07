@@ -415,16 +415,16 @@ const Print = ({ orderDetail, printRef }) => {
           );
         })}
         <div className="row">
-          <div className="col-4 m-0">
+          <div className="col-3 m-0">
             <img
               src={Barcode}
-              width={"100px"}
-              height={"100px"}
+              width={"85px"}
+              height={"85px"}
               className="mt-1"
               alt=""
             />
           </div>
-          <div className="col-8 text-end pe-1">
+          <div className="col-9 text-end pe-1 summary ">
             <p className="m-0 p-0">Sub Total : $ {orderDetail?.subTotal}</p>
             <p className="m-0 p-0">Tax : $ {orderDetail?.taxAmount}</p>
             {orderDetail?.deliveryType === "delivery" && (
