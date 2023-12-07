@@ -314,30 +314,29 @@ function NewOrder() {
           grandTotal: grandTotal,
         };
 
-        console.log(payload);
-        // // let response;
-        // const response = updateOrder
-        //   ? await orderEditApi({
-        //       orderCode: updateOrderData?.code,
-        //       ...payload,
-        //     })
-        //   : await orderPlaceApi(payload);
-        // if (response.status === 200) {
-        //   resetForm();
-        //   dispatch(addToCart([]));
-        //   dispatch(setUpdateOrderData({}));
-        //   dispatch(setUpdateOrder(false));
-        //   setDiscount(0);
-        //   setPrevOrders([]);
-        //   setExtraDeliveryCharges(0);
-        //   orderDetails({ orderCode: response.data.orderCode }).then((data) => {
-        //     setOrderDetail(data.data.data);
-        //     setIsOrderSubmittedSuccessfully(true);
-        //   });
-        //   toast.success(response.data.message);
-        // } else {
-        //   toast.error("Failed to place the order");
-        // }
+        // let response;
+        const response = updateOrder
+          ? await orderEditApi({
+              orderCode: updateOrderData?.code,
+              ...payload,
+            })
+          : await orderPlaceApi(payload);
+        if (response.status === 200) {
+          resetForm();
+          dispatch(addToCart([]));
+          dispatch(setUpdateOrderData({}));
+          dispatch(setUpdateOrder(false));
+          setDiscount(0);
+          setPrevOrders([]);
+          setExtraDeliveryCharges(0);
+          orderDetails({ orderCode: response.data.orderCode }).then((data) => {
+            setOrderDetail(data.data.data);
+            setIsOrderSubmittedSuccessfully(true);
+          });
+          toast.success(response.data.message);
+        } else {
+          toast.error("Failed to place the order");
+        }
       } catch (error) {
         if (cartdata?.length === 0 || cartdata == undefined) {
           toast.error("Add something to cart");
