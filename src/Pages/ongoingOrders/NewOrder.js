@@ -388,10 +388,12 @@ function NewOrder() {
       .then((res) => {
         formik.values.address = res.data.data.prevOrderAddress;
         formik.values.customername = res.data.data.customerName;
+        formik.values.postalcode = res.data.data.postalCode;
       })
       .catch((error) => {
         formik.values.address = "";
         formik.values.customername = "";
+        formik.values.postalcode = "";
         toast.error(error.response.data.message);
       });
   };
@@ -404,6 +406,8 @@ function NewOrder() {
   useEffect(() => {
     if (formik.values?.phoneno?.length > 9) {
       fetchPrevOrder(formik.values.phoneno);
+    } else {
+      setPrevOrders([]);
     }
   }, [debouncedInputValueForphoneNumber]);
   useEffect(() => {
@@ -412,6 +416,7 @@ function NewOrder() {
     } else {
       formik.values.address = "";
       formik.values.customername = "";
+      formik.values.postalcode = "";
     }
   }, [debouncedInputValueForphoneNumber, deliveryType]);
 
@@ -688,6 +693,42 @@ function NewOrder() {
                       {formik.errors.deliveryExecutive}
                     </div>
                   ) : null}
+                </>
+              )}
+
+              {/* Previous Order Credit Comments */}
+              {prevOrderLoading ? (
+                <>
+                  <div className="d-flex justify-content-center align-items-center my-2">
+                    <div className={"spinner-border  mt-1"} role="status" />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div
+                    className="my-3 p-2 shadow-sm bg-white"
+                    style={{
+                      border: "3px solid #ffe1cb",
+                      borderRadius: "0.25rem",
+                    }}
+                  >
+                    <h6 className="">Previous Order Credit Comment</h6>
+                    <div className="" style={{ textAlign: "justify" }}>
+                      <span style={{ color: "#db6a00", fontWeight: "500" }}>
+                        {prevOrders?.length > 0 ? (
+                          <>
+                            {prevOrders[0]?.comments === "" ? (
+                              <>No any comments</>
+                            ) : (
+                              prevOrders[0]?.comments
+                            )}
+                          </>
+                        ) : (
+                          <>No any comments</>
+                        )}
+                      </span>
+                    </div>
+                  </div>
                 </>
               )}
 

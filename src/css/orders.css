@@ -1,11 +1,26 @@
-.orderList {
-  background-color: #fff8ee;
+.storeOrder,
+.onlineOrder {
   cursor: pointer;
   border-right: none;
   border-top: none;
   border-left: none;
   border-bottom: 2px solid #ffb65d !important;
 }
+.storeOrder {
+  background-color: #fff8ee;
+}
+.onlineOrder {
+  background-color: #defffd80;
+}
+.s_store {
+  background-color: #ffdbb0eb;
+  padding: 0.15rem 0.5rem;
+}
+.o_store {
+  background-color: #a1dbd780;
+  padding: 0.15rem 0.5rem;
+}
+
 .list-group {
   background-color: #fff8ee;
 }
@@ -21,6 +36,40 @@
 }
 .orderTitle {
   background-color: #ff8c00;
+}
+.actionDropDown {
+  transition: 0.5s ease-in-out;
+}
+.actionButton {
+  background-color: #ff920d;
+  border: none;
+  color: #fff8ee;
+  padding: 0.4rem 0.8rem;
+}
+.actionButton:hover {
+  color: #fff;
+  background-color: #ff8c00;
+}
+
+.actionButton:active,
+.actionButton:focus,
+.actionButton:visited,
+.actionDropDown .dropdown-item:active,
+.actionDropDown .dropdown-item:focus,
+.actionDropDown .dropdown-item:visited {
+  border-color: none !important;
+  box-shadow: none;
+}
+.actionDropDown .dropdown-item {
+  padding: 0.4rem 1rem !important;
+  font-weight: 480;
+  border-bottom: 0.01rem solid #feedda;
+  border-radius: 0;
+}
+.actionDropDown .dropdown-item:hover {
+  background-color: #ffb65d;
+  color: #fff;
+  transition: 0.1s ease-in-out;
 }
 /* billing.css */
 @media print {

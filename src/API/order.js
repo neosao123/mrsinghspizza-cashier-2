@@ -30,3 +30,9 @@ export const directDeliveryTypeChange = async (payload) => {
     payload
   );
 };
+
+// Developer: Shreyas Mahamuni, Working Time: 08-12-2023
+// This API Routes for adding credit comments into ordermaster table
+export const addCreditComment = async (payload) => {
+  return await privateAPi.post("/cashier/order/addCreditComments", payload);
+};

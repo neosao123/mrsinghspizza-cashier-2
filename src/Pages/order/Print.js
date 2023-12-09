@@ -131,7 +131,9 @@ const Print = ({ orderDetail, printRef }) => {
                         <b>Pizza ({order?.pizzaSize})</b>
                       </div>
                     </div>
-                    <div className="col-3 pro_price text-end">$ {order.pizzaPrice}</div>
+                    <div className="col-3 pro_price text-end">
+                      $ {order.pizzaPrice}
+                    </div>
                   </div>
                 </div>
               )}
@@ -143,7 +145,9 @@ const Print = ({ orderDetail, printRef }) => {
                         <b>Pizza ({order?.pizzaSize})</b>
                       </div>
                     </div>
-                    <div className="col-3 pro_price text-end">$ {order.pizzaPrice}</div>
+                    <div className="col-3 pro_price text-end">
+                      $ {order.pizzaPrice}
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -166,7 +170,9 @@ const Print = ({ orderDetail, printRef }) => {
                       )}
                     </div>
                     {product_type !== "special_pizza" ? (
-                      <div className="col-3 pro_price text-end ">$ {order.amount}</div>
+                      <div className="col-3 pro_price text-end ">
+                        $ {order.amount}
+                      </div>
                     ) : (
                       ""
                     )}
@@ -287,9 +293,9 @@ const Print = ({ orderDetail, printRef }) => {
                                         >
                                           <span className="me-1 fw-bold">
                                             {sideTypeArr.includes(
-                                              side?.sidesType
+                                              side?.sideType
                                             )
-                                              ? `(${side?.sidesType})`
+                                              ? `(${side?.sideType}) `
                                               : ""}
                                             {side?.sideName}
                                           </span>
@@ -418,8 +424,8 @@ const Print = ({ orderDetail, printRef }) => {
           <div className="col-3 m-0">
             <img
               src={Barcode}
-              width={"85px"}
-              height={"85px"}
+              width={"75px"}
+              height={"75px"}
               className="mt-1"
               alt=""
             />

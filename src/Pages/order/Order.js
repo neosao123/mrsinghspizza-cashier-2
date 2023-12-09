@@ -3,6 +3,7 @@ import Nav from "../../layout/Nav";
 import "../../css/orders.css";
 import ReactToPrint from "react-to-print";
 import {
+  addCreditComment,
   allDeliveryExecutiveApi,
   changeDeliveryExecutive,
   deliveryTypeChange,
@@ -27,8 +28,8 @@ import { useFormik } from "formik";
 import { useDebounce } from "../ongoingOrders/newOrder/newOrderFunctions";
 import { isZipCodeDelivarable } from "../ongoingOrders/newOrder/newOrderApi";
 import swal from "sweetalert";
-import { $ } from "jquery";
-import { Modal } from "react-bootstrap";
+import { $, nodeName } from "jquery";
+import { Dropdown, DropdownButton, Modal } from "react-bootstrap";
 
 const sideTypeArr = ["poutine", "subs"];
 
@@ -57,6 +58,13 @@ const ValidateSchema = Yup.object({
   ),
 });
 
+// Developer: Shreyas Mahamuni, Working Date: 08-12-2023
+// Validation Schema for credit comments - Start
+const ValidateSchemaCr = Yup.object({
+  creditComment: Yup.string().required("Customer Name is Required."),
+});
+// Validation Schema for credit comments - End
+
 function Order() {
   const dispatch = useDispatch();
 
@@ -79,12 +87,25 @@ function Order() {
   const [deliveryCharges, setDeliveryCharges] = useState();
 
   const [show, setShow] = useState(false);
-
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
   const user = useSelector((state) => state.user.userData);
   const cart = useSelector((state) => state?.cart?.setnotificationcount);
+
+  // Developer: Shreyas Mahamuni, Working Date: 08-12-2023
+  // Credit Comments Functionality Modal Popup - Start
+  const [showCredit, setShowCredit] = useState(false);
+  const handleCloseCredit = () => setShowCredit(false);
+  const handleShowCredit = () => setShowCredit(true);
+  // Credit Comments Functionality Modal Popup - END
+
+  // Developer: Shreyas Mahamuni, Working Date: 08-12-2023
+  // Formik Initialize for credit comments - Start
+  const [initialValuesCr, setInitialValuesCr] = useState({
+    creditComment: "",
+  });
+  // Formik Initialize for credit comments - End
 
   const [initialValues, setInitialValues] = useState({
     customerName: "",
@@ -140,6 +161,38 @@ function Order() {
       }
     },
   });
+
+  // Developer: Shreyas Mahamuni, Working Date: 08-12-2023
+  // Formik for credit comments - Start
+  const formikCr = useFormik({
+    initialValues: initialValuesCr,
+    validateOnBlur: true,
+    validationSchema: ValidateSchemaCr,
+    enableReinitialize: true,
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        const payload = {
+          orderCode: orderDetail?.code,
+          creditComment: values.creditComment,
+        };
+
+        await addCreditComment(payload)
+          .then((res) => {
+            toast.success(res.data.message);
+            getOrderDetailsApi();
+            orderList();
+            resetForm();
+            handleCloseCredit();
+          })
+          .catch((err) => {
+            toast.error(err?.response?.data?.message);
+          });
+      } catch (err) {
+        toast.error(err);
+      }
+    },
+  });
+  // Formik for credit comments - End
 
   const orderList = async () => {
     let cashierCode = localStorage.getItem("cashierCode");
@@ -359,7 +412,11 @@ function Order() {
                     {listData?.map((data) => {
                       return (
                         <li
-                          className="list-group-item p-1 orderList"
+                          className={
+                            data.orderFrom === "store"
+                              ? "storeOrder p-1 list-group-item"
+                              : "onlineOrder p-1 list-group-item"
+                          }
                           key={data.code}
                           onClick={() => setOrderId(data.code)}
                         >
@@ -378,7 +435,13 @@ function Order() {
                                 </span>
                                 <b className="mx-1">Order #{data.orderCode}</b>
                               </div>
-                              <div className="store-highlight">
+                              <div
+                                className={
+                                  data.orderFrom === "store"
+                                    ? "rounded s_store"
+                                    : "rounded o_store"
+                                }
+                              >
                                 {data?.storeName}
                               </div>
                             </div>
@@ -538,80 +601,111 @@ function Order() {
                 style={{ backgroundColor: "#ff8c0021" }}
               >
                 <div className="col-12 d-flex justify-content-between my-3">
-                  <div className="col-6 h5">Order Details</div>
+                  <div className="col-4 h5">Order Details</div>
 
-                  <div className=" d-flex pe-4">
-                    {orderDetail?.deliveryType === "delivery" && (
+                  <div className="d-flex pe-4">
+                    {/* Developer: Shreyas Mahamuni, Working Date: 08-12-2023 */}
+                    {/* Adding action dropdown button to replace all sepearate button*/}
+                    <div className="actionDropDown dropdown">
                       <button
-                        className="btn text-white mx-3"
-                        style={{ backgroundColor: "#ff8c00" }}
-                        data-bs-toggle="modal"
-                        data-bs-target="#exampleModal"
+                        className="btn dropdown-toggle actionButton"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
                       >
-                        Change Delivery Person
+                        <span className="mx-2">Action</span>
                       </button>
-                    )}
-                    <ReactToPrint
-                      trigger={() => (
-                        <button
-                          style={{ backgroundColor: "#ff8c00" }}
-                          className="btn text-white mx-3"
-                          onClick={() => {}}
-                        >
-                          Print
-                        </button>
-                      )}
-                      content={() => printRef?.current}
-                      onBeforePrint={() => {}}
-                    ></ReactToPrint>
-                    {orderDetail?.orderStatus === "placed" ||
-                    orderDetail?.orderStatus === "cancelled" ? (
-                      <button
-                        className="btn text-white mx-3"
-                        style={{ backgroundColor: "#ff8c00" }}
-                        onClick={() => {
-                          dispatch(setUpdateOrder(true));
-                          dispatch(setUpdateOrderData(orderDetail));
-                          dispatch(addToCart(orderDetail?.orderItems));
-                          navigate("/ongoing-orders");
+                      <ul
+                        className="dropdown-menu dropdown-menu-end"
+                        style={{
+                          padding: "0px",
+                          border: "none",
                         }}
                       >
-                        Edit
-                      </button>
-                    ) : null}
+                        <li>
+                          {/* Credit Comments Functionality handle Button - Start */}
+                          {orderDetail?.comments === "" && (
+                            <button
+                              className="btn dropdown-item"
+                              onClick={handleShowCredit}
+                              type="button"
+                            >
+                              Add Credits
+                            </button>
+                          )}
+                          {/* Credit Comments Functionality handle Button - END */}
+                        </li>
+                        <li>
+                          {orderDetail?.deliveryType === "delivery" && (
+                            <button
+                              className="btn dropdown-item"
+                              data-bs-toggle="modal"
+                              data-bs-target="#exampleModal"
+                            >
+                              Change Delivery Person
+                            </button>
+                          )}
+                        </li>
+                        <li>
+                          {orderDetail?.isDeliveryTypeChange !== "1" &&
+                            orderDetail?.orderStatus === "placed" && (
+                              <>
+                                {orderDetail?.deliveryType === "pickup" && (
+                                  <button
+                                    className="btn dropdown-item"
+                                    onClick={handleShow}
+                                  >
+                                    Change Delivery Type
+                                  </button>
+                                )}
+                                {orderDetail?.deliveryType === "delivery" && (
+                                  <button
+                                    className="btn dropdown-item"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal2"
+                                  >
+                                    Change Delivery Type
+                                  </button>
+                                )}
+                              </>
+                            )}
+                        </li>
+                        <li>
+                          {orderDetail?.orderStatus === "placed" ||
+                          orderDetail?.orderStatus === "cancelled" ? (
+                            <button
+                              className="btn dropdown-item"
+                              onClick={() => {
+                                dispatch(setUpdateOrder(true));
+                                dispatch(setUpdateOrderData(orderDetail));
+                                dispatch(addToCart(orderDetail?.orderItems));
+                                navigate("/ongoing-orders");
+                              }}
+                            >
+                              Edit
+                            </button>
+                          ) : null}
+                        </li>
+                        <li>
+                          <ReactToPrint
+                            trigger={() => (
+                              <button
+                                className="btn dropdown-item"
+                                onClick={() => {}}
+                                type="button"
+                              >
+                                Print
+                              </button>
+                            )}
+                            content={() => printRef?.current}
+                            onBeforePrint={() => {}}
+                          ></ReactToPrint>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
 
-                {orderDetail?.isDeliveryTypeChange !== "1" &&
-                  orderDetail?.orderStatus === "placed" && (
-                    <>
-                      {orderDetail?.deliveryType === "pickup" && (
-                        <div className="col-12 text-end mb-3">
-                          <button
-                            className="btn text-white"
-                            style={{ backgroundColor: "#ff8c00" }}
-                            // data-bs-toggle="modal"
-                            // data-bs-target="#exampleModal1"
-                            onClick={handleShow}
-                          >
-                            Change Delivery Type
-                          </button>
-                        </div>
-                      )}
-                      {orderDetail?.deliveryType === "delivery" && (
-                        <div className="col-12 text-end mb-3">
-                          <button
-                            className="btn text-white"
-                            style={{ backgroundColor: "#ff8c00" }}
-                            data-bs-toggle="modal"
-                            data-bs-target="#exampleModal2"
-                          >
-                            Change Delivery Type
-                          </button>
-                        </div>
-                      )}
-                    </>
-                  )}
                 <div className="col-12 d-flex ">
                   <div className="col-4">
                     <h6 className="mb-2">
@@ -654,6 +748,13 @@ function Order() {
                     </h6>
                   </div>
                 </div>
+                {orderDetail?.comments !== "" && (
+                  <div className="col-12 py-3">
+                    <h6 className="mb-2">
+                      <strong>Credit Comments :</strong> {orderDetail?.comments}
+                    </h6>
+                  </div>
+                )}
 
                 <div className="col-12">
                   <h5>Product Details :</h5>
@@ -866,6 +967,7 @@ function Order() {
                         </>
                       );
                     })}
+
                     <tr>
                       <td></td>
                       <td></td>
@@ -982,6 +1084,7 @@ function Order() {
         </div>
       </div>
 
+      {/* Change Delivery type Modal Popup */}
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
           <Modal.Title>
@@ -1215,6 +1318,63 @@ function Order() {
           </button>
         </Modal.Footer>
       </Modal>
+
+      {/* Developer: Shreyas Mahamuni, Working Date: 08-12-2023 */}
+      {/* Add Credits Comments Modal Popup - Start */}
+      <Modal show={showCredit} onHide={handleCloseCredit} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <h5>Add Credit</h5>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <form onSubmit={formikCr.handleSubmit}>
+            <div className="mb-2">
+              Order No:
+              <strong className="mx-2">{orderDetail?.orderCode}</strong>
+            </div>
+
+            <label className="mb-2">
+              Comments with Credits Amount{" "}
+              <small className="text-danger">*</small>
+            </label>
+            <input
+              type="text"
+              name="creditComment"
+              id="creditComment"
+              className="form-control mb-2"
+              onChange={formikCr.handleChange}
+              onBlur={formikCr.handleBlur}
+              value={formikCr.values.creditComment}
+            />
+            {formikCr.touched.creditComment &&
+              formikCr.errors.creditComment && (
+                <div className="text-danger my-1">
+                  {formikCr.errors.creditComment}
+                </div>
+              )}
+          </form>
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onClick={handleCloseCredit}
+          >
+            Close
+          </button>
+
+          <button
+            type="submit"
+            style={{ backgroundColor: "#ff8c00" }}
+            class="btn text-white"
+            onClick={formikCr.handleSubmit}
+          >
+            Add Credit
+          </button>
+        </Modal.Footer>
+      </Modal>
+      {/* Add Credits Comments Modal Popup - END */}
 
       <div
         class="modal fade"
