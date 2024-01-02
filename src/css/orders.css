@@ -40,6 +40,9 @@
 .actionDropDown {
   transition: 0.5s ease-in-out;
 }
+.applyfilterbtn {
+  background-color: #eb8100;
+}
 .actionButton {
   background-color: #ff920d;
   border: none;

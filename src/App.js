@@ -37,7 +37,7 @@ function App() {
     (state) => state.cart.setnotificationcount
   );
 
-  const user = useSelector((state) => state.user.userData);
+  const user = useSelector((state) => state?.user?.userData);
 
   const requestToken = () => {
     if ("serviceWorker" in navigator) {

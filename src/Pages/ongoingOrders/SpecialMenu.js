@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { BiChevronLeftCircle } from "react-icons/bi";
 import { v4 as uuidv4 } from "uuid";
 import "../../css/specialMenu.css";
@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import { getSpecialDetails } from "./specialMenu/specialMenuCustomApiHandler";
 import { handlePops } from "./specialMenuFunctions";
 import { specialMenuParamsFn } from "./specialMenuParameters";
+import LoadingLayout from "../../layout/LoadingLayout";
 
 function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   sessionStorage.setItem("welcome", "Test");
@@ -26,6 +27,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   );
   const [getSpecialData, setGetSpecialData] = useState();
   const [pizzaSize, setPizzaSize] = useState();
+  const [pizzaSizePrice, setPizzaSizePrice] = useState(0);
+
   // For Data
   const [selectedLineEntries, setSelectedLineEntries] = useState();
   const [specialData, setSpecialData] = useState();
@@ -49,6 +52,10 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   const [totalPriceOfToppings, setTotalPriceOfToppings] = useState(0);
   const [totalPriceOfDips, setTotalPriceOfDips] = useState(0);
   const [isAllIndiansTps, setIsAllIndiansTps] = useState(false);
+
+  const pizzaSizeRef = useRef(null);
+
+  const [loading, setLoading] = useState(false);
 
   let calcOneTpsArr = [];
   let calcTwoTpsArr = [];
@@ -512,22 +519,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   };
 
   useEffect(() => {
-    if (
-      payloadEdit !== undefined &&
-      payloadEdit?.productType === "special_pizza"
-    ) {
-      handleGetSpecial({ code: payloadEdit?.productCode });
-      setPizzaState(payloadEdit?.config?.pizza);
-      setDrinksArr(payloadEdit?.config?.drinks);
-      setDipsArr(payloadEdit?.config?.dips);
-      setSidesArr(payloadEdit?.config?.sides);
-      setPrice(Number(payloadEdit?.amount));
-      setComments(payloadEdit?.comments);
-      setPizzaSize(payloadEdit?.pizzaSize);
-    }
-  }, [payloadEdit]);
-
-  useEffect(() => {
     specialIngredients();
     dispatch(setDisplaySpecialForm(false));
   }, []);
@@ -860,10 +851,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         amount: price,
         comments: comments,
         pizzaSize: pizzaSize === "Large" ? "Large" : "Extra Large",
-        pizzaPrice:
-          pizzaSize === "Large"
-            ? getSpecialData?.largePizzaPrice
-            : getSpecialData?.extraLargePizzaPrice,
+        pizzaPrice: pizzaSizePrice,
       };
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
@@ -877,9 +865,16 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setPopsArr([]);
       setComments("");
       setPayloadEdit();
-      setPizzaSize(
-        getSpecialData?.largePizzaPrice > 0 ? "Large" : "Extra Large"
-      );
+      // setPizzaSize(
+      //   getSpecialData?.largePizzaPrice > 0 ? "Large" : "Extra Large"
+      // );
+      if (Number(getSpecialData?.largePizzaPrice) !== 0) {
+        setPizzaSize("Large");
+        setPizzaSizePrice(Number(getSpecialData?.largePizzaPrice));
+      } else {
+        setPizzaSize("Extra Large");
+        setPizzaSizePrice(Number(getSpecialData?.extraLargePizzaPrice));
+      }
       createEmptyObjects(Number(getSpecialData?.noofPizzas));
       toast.success(
         `${payloadForEdit.productName} updated to cart successfully...`
@@ -946,10 +941,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         amount: price,
         comments: comments,
         pizzaSize: pizzaSize === "Large" ? "Large" : "Extra Large",
-        pizzaPrice:
-          pizzaSize === "Large"
-            ? getSpecialData?.largePizzaPrice
-            : getSpecialData?.extraLargePizzaPrice,
+        pizzaPrice: pizzaSizePrice,
       };
       dispatch(addToCart([payload, ...cartdata]));
       setSidesArr([]);
@@ -957,9 +949,16 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setDipsArr([]);
       setPopsArr([]);
       setComments("");
-      setPizzaSize(
-        getSpecialData?.largePizzaPrice > 0 ? "Large" : "Extra Large"
-      );
+      // setPizzaSize(
+      //   getSpecialData?.largePizzaPrice > 0 ? "Large" : "Extra Large"
+      // );
+      if (Number(getSpecialData?.largePizzaPrice) !== 0) {
+        setPizzaSize("Large");
+        setPizzaSizePrice(Number(getSpecialData?.largePizzaPrice));
+      } else {
+        setPizzaSize("Extra Large");
+        setPizzaSizePrice(Number(getSpecialData?.extraLargePizzaPrice));
+      }
       setAdditionalToppingsCount(0);
       setOfferedFreeToppings(Number(getSpecialData?.noofToppings));
       setPrice(Number(getSpecialData?.price));
@@ -985,35 +984,44 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
   //API - Special Pizza
   const specialIngredients = () => {
+    setLoading(true);
     specialPizzaApi()
       .then((res) => {
         setSpecialData(res.data.data);
+        setLoading(false);
       })
       .catch((err) => {
         console.log("ERROR From Special Pizza API: ", err);
+        setLoading(false);
       });
   };
   //API - Get Special Details
 
   //API - Toppings Data
   const toppings = () => {
+    setLoading(true);
     toppingsApi()
       .then((res) => {
         setToppingsData(res.data.data);
+        setLoading(false);
       })
       .catch((err) => {
         console.log("ERROR From Toppings API: ", err);
+        setLoading(false);
       });
   };
 
   //API - Dips Data
   const dips = () => {
+    setLoading(true);
     dipsApi()
       .then((res) => {
         setDipsData(res.data.data);
+        setLoading(false);
       })
       .catch((err) => {
         console.log("ERROR From Dips API: ", err);
+        setLoading(false);
       });
   };
 
@@ -1022,12 +1030,14 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     let totalPrice = Number(0);
     let totalOneTpsPrice = Number(0);
     let totalTwoTpsPrice = Number(0);
-    totalPrice +=
-      pizzaSize === "Large"
-        ? Number(getSpecialData?.largePizzaPrice)
-        : pizzaSize === "Extra Large"
-        ? Number(getSpecialData?.extraLargePizzaPrice)
-        : 0;
+    // totalPrice +=
+    //   pizzaSize === "Large"
+    //     ? Number(getSpecialData?.largePizzaPrice)
+    //     : pizzaSize === "Extra Large"
+    //     ? Number(getSpecialData?.extraLargePizzaPrice)
+    //     : 0;
+
+    totalPrice += Number(pizzaSizePrice);
 
     let pizzaCartons = [];
     for (let i = 0; i < getSpecialData?.noofPizzas; i++) {
@@ -1180,6 +1190,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     dipsArr,
     selectedLineEntries,
     pizzaSize,
+    pizzaSizePrice,
     drinksArr,
     popsArr,
     calcOneTpsArr,
@@ -1188,36 +1199,31 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
   ]);
 
   useEffect(() => {
-    if (getSpecialData) {
-      calculatePrice();
-      if (pizzaSize === undefined) {
-        setPizzaSize(
-          Number(getSpecialData?.largePizzaPrice) > 0
-            ? "Large"
-            : Number(getSpecialData?.extraLargePizzaPrice) > 0
-            ? "Extra Large"
-            : ""
-        );
+    if (!payloadEdit) {
+      if (getSpecialData?.noofToppings !== undefined) {
+        setOfferedFreeToppings(Number(getSpecialData?.noofToppings));
+        setAdditionalToppingsCount(0);
       }
-    }
-  }, [getSpecialData]);
+      if (getSpecialData?.noofDips !== undefined) {
+        setNoOfFreeDips(Number(getSpecialData?.noofDips));
+      }
+      if (getSpecialData?.noofDrinks !== undefined) {
+        setNoofFreeDrinks(Number(getSpecialData?.noofDrinks));
+      }
+      if (payloadEdit === undefined) {
+        createEmptyObjects(Number(getSpecialData?.noofPizzas));
+      }
+      if (getSpecialData?.freesides?.length > 0) {
+        setFreeSides(getSpecialData?.freesides);
+      }
 
-  useEffect(() => {
-    if (getSpecialData?.noofToppings !== undefined) {
-      setOfferedFreeToppings(Number(getSpecialData?.noofToppings));
-      setAdditionalToppingsCount(0);
-    }
-    if (getSpecialData?.noofDips !== undefined) {
-      setNoOfFreeDips(Number(getSpecialData?.noofDips));
-    }
-    if (getSpecialData?.noofDrinks !== undefined) {
-      setNoofFreeDrinks(Number(getSpecialData?.noofDrinks));
-    }
-    if (payloadEdit === undefined) {
-      createEmptyObjects(Number(getSpecialData?.noofPizzas));
-    }
-    if (getSpecialData?.freesides?.length > 0) {
-      setFreeSides(getSpecialData?.freesides);
+      if (Number(getSpecialData?.largePizzaPrice) !== 0) {
+        setPizzaSize("Large");
+        setPizzaSizePrice(Number(getSpecialData?.largePizzaPrice));
+      } else {
+        setPizzaSize("Extra Large");
+        setPizzaSizePrice(Number(getSpecialData?.extraLargePizzaPrice));
+      }
     }
   }, [getSpecialData]);
   const updateInCart = (data) => {
@@ -1241,11 +1247,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     let price = 0;
     let sizeofpizza = data?.pizzaSize ? data.pizzaSize : pizzaSize;
 
-    let pizzaPrice =
-      sizeofpizza === "Large"
-        ? getSpecialData?.largePizzaPrice
-        : getSpecialData?.extraLargePizzaPrice;
-    price += Number(pizzaPrice);
+    price += Number(pizzaSizePrice);
 
     let calcOneTpsArr2 = [];
     let calcTwoTpsArr2 = [];
@@ -1381,6 +1383,37 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       }
       // console.log(pizzas, "vishal");
 
+      let arr_1 = [...pizzas];
+      pizzas?.map((item, index) => {
+        console.log("data", item);
+        console.log("112234", arr_1[index].toppings.isAllIndiansTps);
+        if (
+          toppingsData?.toppings?.freeToppings.length ===
+          item?.toppings?.freeToppings.length
+        ) {
+          if (arr_1[index]) {
+            arr_1[index] = {
+              ...arr_1[index],
+              toppings: {
+                ...arr_1[index].toppings,
+                isAllIndiansTps: true,
+              },
+            };
+          }
+        } else {
+          if (arr_1[index]) {
+            arr_1[index] = {
+              ...arr_1[index],
+              toppings: {
+                ...arr_1[index].toppings,
+                isAllIndiansTps: false,
+              },
+            };
+          }
+        }
+      });
+      pizzas = arr_1;
+
       calcOneTpsArr2?.forEach((tps) => {
         totalOneTpsPrice += Number(tps?.amount);
       });
@@ -1398,6 +1431,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       ).toFixed(2);
       return formattedPrice;
     };
+
     let finalVal = calculate();
     let payload = {
       id: updatedCartId !== -1 ? cartdata[updatedCartId]?.id : uuidv4(),
@@ -1415,7 +1449,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       amount: finalVal,
       comments: data?.comment ? data?.comment : comments,
       pizzaSize: data?.pizzaSize ? data.pizzaSize : pizzaSize,
-      pizzaPrice: pizzaPrice,
+      pizzaPrice: pizzaSizePrice,
     };
     console.log(payload, "arr[tpsObj?.pizzaIndex]");
 
@@ -1426,9 +1460,45 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     }
     dispatch(addToCart([...tempPayload]));
   };
-  const handleSizeOfPizza = (e) => {
-    setPizzaSize(e.target.value);
-    updateInCart({ pizzaSize: e.target.value });
+
+  // Changes in pizza price flow ( setPizzaSizePrice() state used ) - Developer: Shreyas Mahamuni, working date: 26-12-2023
+  const handleSizeOfPizza = () => {
+    // if (e.target.value === "Large") {
+    //   setPizzaSize(e.target.value);
+    //   setPizzaSizePrice(getSpecialData?.largePizzaPrice);
+
+    //   updateInCart({
+    //     pizzaSize: e.target.value,
+    //     pizzaSizePrice: getSpecialData?.largePizzaPrice,
+    //   });
+    // }
+    // if (e.target.value === "Extra Large") {
+    //   setPizzaSize(e.target.value);
+    //   setPizzaSizePrice(getSpecialData?.extraLargePizzaPrice);
+    //   updateInCart({
+    //     pizzaSize: e.target.value,
+    //     pizzaSizePrice: getSpecialData?.extraLargePizzaPrice,
+    //   });
+    // }
+
+    if (pizzaSizeRef.current) {
+      if (pizzaSizeRef.current.value === "Large") {
+        setPizzaSize("Large");
+        setPizzaSizePrice(getSpecialData?.largePizzaPrice);
+        updateInCart({
+          pizzaSize: "Large",
+          pizzaSizePrice: getSpecialData?.largePizzaPrice,
+        });
+      }
+      if (pizzaSizeRef.current.value === "Extra Large") {
+        setPizzaSize("Extra Large");
+        setPizzaSizePrice(getSpecialData?.extraLargePizzaPrice);
+        updateInCart({
+          pizzaSize: "Extra Large",
+          pizzaSizePrice: getSpecialData?.largePizzaPrice,
+        });
+      }
+    }
   };
   let specialMenuParamsObj = specialMenuParamsFn(
     handlePops,
@@ -1439,316 +1509,363 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     drinksArr
   );
 
+  useEffect(() => {
+    if (
+      payloadEdit &&
+      payloadEdit !== undefined &&
+      payloadEdit?.productType === "special_pizza"
+    ) {
+      handleGetSpecial({ code: payloadEdit?.productCode });
+      setPizzaState(payloadEdit?.config?.pizza);
+      setDrinksArr(payloadEdit?.config?.drinks);
+      setDipsArr(payloadEdit?.config?.dips);
+      setSidesArr(payloadEdit?.config?.sides);
+      setPrice(Number(payloadEdit?.amount));
+      setComments(payloadEdit?.comments);
+      setPizzaSize(payloadEdit?.pizzaSize);
+      setPizzaSizePrice(Number(payloadEdit?.pizzaPrice));
+    }
+  }, [payloadEdit]);
+
   return (
     <>
       <div className="d-flex flex-wrap justify-content-center">
         <div className="w-100">
           {displaySpecialForm ? (
             <>
-              {/* Back Button */}
-              <button
-                type="button"
-                className="btn btn-secondary btn-xs mb-1"
-                onClick={() => {
-                  if (
-                    payloadEdit !== undefined &&
-                    payloadEdit?.productType === "special_pizza"
-                  ) {
-                    toast.warn(
-                      "You cannot go back until you confirm or edit the selected pizza"
-                    );
-                    return;
-                  } else {
-                    setPayloadEdit();
-                    setShow(false);
-                    setPizzaState([]);
-                    dispatch(setDisplaySpecialForm(false));
-                  }
-                }}
-              >
-                <BiChevronLeftCircle /> Back
-              </button>
-              <div className="customizablePizza px-3">
-                <div className="d-flex justify-content-between">
-                  <h6>
-                    {getSpecialData?.name}
-                    {getSpecialData?.subtitle !== null && (
-                      <span
-                        style={{
-                          color: "#b1130be4",
-                        }}
-                        className="ms-1"
-                      >
-                        ({getSpecialData?.subtitle})
-                      </span>
-                    )}
-                  </h6>
-                  <h6 className="mx-2 text-nowrap">$ {price}</h6>
-                </div>
-                <div className="mb-1">
-                  <p className="mb-1">
-                    Toppings :{" "}
-                    <span className="mx-2">
-                      {offeredFreeToppings <= 0 ? 0 : offeredFreeToppings} /{" "}
-                      {getSpecialData?.noofToppings}
-                    </span>
-                  </p>
-
-                  <p className="mb-1">
-                    Additional Toppings Used :
-                    <span className="mx-2">
-                      {offeredFreeToppings <= 0 ? additionalToppingsCount : 0}{" "}
-                    </span>
-                  </p>
-                  <p className="mb-1 d-inline">Size : </p>
-                  <select
-                    className="form-select mx-2 my-2 w-25 d-inline"
-                    value={pizzaSize}
-                    onChange={(e) => handleSizeOfPizza(e)}
+              {loading === false ? (
+                <>
+                  {/* Back Button */}
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-xs mb-1"
+                    onClick={() => {
+                      if (
+                        payloadEdit !== undefined &&
+                        payloadEdit?.productType === "special_pizza"
+                      ) {
+                        toast.warn(
+                          "You cannot go back until you confirm or edit the selected pizza"
+                        );
+                        return;
+                      } else {
+                        setPayloadEdit();
+                        setShow(false);
+                        setPizzaState([]);
+                        dispatch(setDisplaySpecialForm(false));
+                      }
+                    }}
                   >
-                    {Number(getSpecialData?.largePizzaPrice) > 0 && (
-                      <option value="Large">Large</option>
-                    )}
-                    {Number(getSpecialData?.extraLargePizzaPrice) > 0 && (
-                      <option value="Extra Large">Extra Large</option>
-                    )}
-                  </select>
-                </div>
-
-                {newPizzaComponent()}
-
-                {/* Sides */}
-                {getSpecialData?.freesides.length === 0 ? null : (
-                  <>
-                    <h6 className="text-left mt-1 mb-2">Sides</h6>
-                    <div id="sides" className="mb-3">
-                      <ul className="list-group">
-                        {getSpecialData?.freesides?.map((sidesData) => {
-                          const comm = sidesArr.findIndex(
-                            (item) => item.sideCode === sidesData.code
-                          );
-                          return (
-                            <>
-                              <li
-                                className="list-group-item d-flex justify-content-between align-items-center"
-                                key={sidesData.code + "sidesData"}
-                              >
-                                <label className="d-flex align-items-center">
-                                  <input
-                                    type="radio"
-                                    name="sides"
-                                    className="mx-3 d-inline-block"
-                                    checked={comm !== -1 ? true : false}
-                                    onChange={(e) => handleSides(e, sidesData)}
-                                  />
-                                  {sidesData.sideName}
-                                  <span
-                                    className={
-                                      "badge-" + sidesData.type + " mx-1"
-                                    }
-                                  >
-                                    ( {sidesData.type} )
-                                  </span>
-                                </label>
-                                <div style={{ width: "12rem" }}>
-                                  <select
-                                    value={
-                                      comm !== -1
-                                        ? sidesArr[comm]?.lineCode
-                                        : ""
-                                    }
-                                    className="form-select w-100 d-inline-block"
-                                    onChange={(e) => {
-                                      handleSidelineEntries(e, sidesData);
-                                    }}
-                                  >
-                                    {sidesData?.lineEntries?.map(
-                                      (lineEntriesData) => {
-                                        return (
-                                          <option
-                                            key={lineEntriesData.code}
-                                            defaultValue={lineEntriesData.code}
-                                            value={lineEntriesData.code}
-                                          >
-                                            <span>
-                                              {lineEntriesData.size} -{" "}
-                                            </span>
-                                            <span className="mb-0 mx-2">
-                                              $ {lineEntriesData.price}
-                                            </span>
-                                          </option>
-                                        );
-                                      }
-                                    )}
-                                  </select>
-                                </div>
-                              </li>
-                            </>
-                          );
-                        })}
-                      </ul>
+                    <BiChevronLeftCircle /> Back
+                  </button>
+                  <div className="customizablePizza px-3">
+                    <div className="d-flex justify-content-between">
+                      <h6>
+                        {getSpecialData?.name}
+                        {getSpecialData?.subtitle !== null && (
+                          <span
+                            style={{
+                              color: "#b1130be4",
+                            }}
+                            className="ms-1"
+                          >
+                            ({getSpecialData?.subtitle})
+                          </span>
+                        )}
+                      </h6>
+                      <h6 className="mx-2 text-nowrap">$ {price}</h6>
                     </div>
-                  </>
-                )}
+                    <div className="mb-1">
+                      <p className="mb-1">
+                        Toppings :{" "}
+                        <span className="mx-2">
+                          {offeredFreeToppings <= 0 ? 0 : offeredFreeToppings} /{" "}
+                          {getSpecialData?.noofToppings}
+                        </span>
+                      </p>
 
-                {/* Dips */}
-                {getSpecialData?.noofDips === "0" ? (
-                  ""
-                ) : (
-                  <>
-                    <h6 className="text-left mt-1 mb-2">Dips</h6>
-                    <div id="dips" className="mb-3">
-                      <ul className="list-group">
-                        {dipsData?.map((data, index) => {
-                          const comm = dipsArr?.findIndex(
-                            (item) => item.dipsCode === data.dipsCode
-                          );
+                      <p className="mb-1">
+                        Additional Toppings Used :
+                        <span className="mx-2">
+                          {offeredFreeToppings <= 0
+                            ? additionalToppingsCount
+                            : 0}{" "}
+                        </span>
+                      </p>
+                      <p className="mb-1 d-inline">Size : </p>
+                      {console.log(
+                        "pizzaSize",
+                        pizzaSize,
+                        pizzaSizeRef.current,
+                        payloadEdit?.pizzaSize
+                      )}
+                      <select
+                        className="form-select mx-2 my-2 w-25 d-inline"
+                        // onChange={(e) => handleSizeOfPizza(e)}
+                        // value={pizzaSize}
+                        onChange={handleSizeOfPizza}
+                        ref={pizzaSizeRef}
+                        value={pizzaSize}
+                      >
+                        {Number(getSpecialData?.largePizzaPrice) > 0 && (
+                          <option value="Large">Large</option>
+                        )}
+                        {Number(getSpecialData?.extraLargePizzaPrice) > 0 && (
+                          <option value="Extra Large">Extra Large</option>
+                        )}
+                      </select>
+                    </div>
 
-                          return (
-                            <li className="list-group-item" key={data.dipsCode}>
-                              <div className="d-flex justify-content-between align-items-center">
-                                <div className="d-flex align-items-center">
+                    {newPizzaComponent()}
+
+                    {/* Sides */}
+                    {getSpecialData?.freesides.length === 0 ? null : (
+                      <>
+                        <h6 className="text-left mt-1 mb-2">Sides</h6>
+                        <div id="sides" className="mb-3">
+                          <ul className="list-group">
+                            {getSpecialData?.freesides?.map((sidesData) => {
+                              const comm = sidesArr.findIndex(
+                                (item) => item.sideCode === sidesData.code
+                              );
+                              return (
+                                <>
+                                  <li
+                                    className="list-group-item d-flex justify-content-between align-items-center"
+                                    key={sidesData.code + "sidesData"}
+                                  >
+                                    <label className="d-flex align-items-center">
+                                      <input
+                                        type="radio"
+                                        name="sides"
+                                        className="mx-3 d-inline-block"
+                                        checked={comm !== -1 ? true : false}
+                                        onChange={(e) =>
+                                          handleSides(e, sidesData)
+                                        }
+                                      />
+                                      {sidesData.sideName}
+                                      <span
+                                        className={
+                                          "badge-" + sidesData.type + " mx-1"
+                                        }
+                                      >
+                                        ( {sidesData.type} )
+                                      </span>
+                                    </label>
+                                    <div style={{ width: "12rem" }}>
+                                      <select
+                                        value={
+                                          comm !== -1
+                                            ? sidesArr[comm]?.lineCode
+                                            : ""
+                                        }
+                                        className="form-select w-100 d-inline-block"
+                                        onChange={(e) => {
+                                          handleSidelineEntries(e, sidesData);
+                                        }}
+                                      >
+                                        {sidesData?.lineEntries?.map(
+                                          (lineEntriesData) => {
+                                            return (
+                                              <option
+                                                key={lineEntriesData.code}
+                                                defaultValue={
+                                                  lineEntriesData.code
+                                                }
+                                                value={lineEntriesData.code}
+                                              >
+                                                <span>
+                                                  {lineEntriesData.size} -{" "}
+                                                </span>
+                                                <span className="mb-0 mx-2">
+                                                  $ {lineEntriesData.price}
+                                                </span>
+                                              </option>
+                                            );
+                                          }
+                                        )}
+                                      </select>
+                                    </div>
+                                  </li>
+                                </>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Dips */}
+                    {getSpecialData?.noofDips === "0" ? (
+                      ""
+                    ) : (
+                      <>
+                        <h6 className="text-left mt-1 mb-2">Dips</h6>
+                        <div id="dips" className="mb-3">
+                          <ul className="list-group">
+                            {dipsData?.map((data, index) => {
+                              const comm = dipsArr?.findIndex(
+                                (item) => item.dipsCode === data.dipsCode
+                              );
+
+                              return (
+                                <li
+                                  className="list-group-item"
+                                  key={data.dipsCode}
+                                >
+                                  <div className="d-flex justify-content-between align-items-center">
+                                    <div className="d-flex align-items-center">
+                                      <label className="d-flex align-items-center">
+                                        <input
+                                          type="radio"
+                                          name="dips"
+                                          className="mx-3 d-inline-block"
+                                          checked={comm !== -1 ? true : false}
+                                          onChange={(e) => handleDips(e, data)}
+                                        />
+                                        {data.dipsName} - ${data.price}
+                                      </label>
+                                    </div>
+
+                                    <input
+                                      type="number"
+                                      defaultValue={1}
+                                      readOnly
+                                      min={1}
+                                      value={
+                                        dipsArr[comm]?.qty
+                                          ? dipsArr[comm]?.qty
+                                          : getSpecialData?.noofDips !==
+                                              undefined ||
+                                            getSpecialData?.noofDips !== "0"
+                                          ? Number(getSpecialData?.noofDips)
+                                          : 1
+                                      }
+                                      className="form-control mx-2"
+                                      style={{ width: "75px" }}
+                                      // onChange={(e) => handleDipsCount(e, data)}
+                                    />
+                                  </div>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Drinks */}
+                    {getSpecialData?.pops && getSpecialData?.bottle && (
+                      <>
+                        {(getSpecialData?.pops.length > 0 ||
+                          getSpecialData.bottle.length > 0) && (
+                          <h6 className="text-left mt-1 mb-2">Drinks</h6>
+                        )}
+
+                        <div id="drinks" className="mb-3">
+                          <ul className="list-group">
+                            {getSpecialData?.pops.map((pop) => {
+                              const comm = drinksArr?.findIndex(
+                                (item) => item.drinksCode === pop.code
+                              );
+
+                              return (
+                                <li
+                                  className="list-group-item d-flex justify-content-between align-items-center"
+                                  key={pop.code}
+                                >
                                   <label className="d-flex align-items-center">
                                     <input
                                       type="radio"
-                                      name="dips"
+                                      name="drinks"
                                       className="mx-3 d-inline-block"
                                       checked={comm !== -1 ? true : false}
-                                      onChange={(e) => handleDips(e, data)}
+                                      onChange={(e) =>
+                                        specialMenuParamsObj.handlePops.callback(
+                                          {
+                                            ...specialMenuParamsObj.handlePops
+                                              .parameters,
+                                            e: e,
+                                            pop: pop,
+                                          }
+                                        )
+                                      }
                                     />
-                                    {data.dipsName} - ${data.price}
+                                    {pop.softDrinkName}
                                   </label>
-                                </div>
-
-                                <input
-                                  type="number"
-                                  defaultValue={1}
-                                  readOnly
-                                  min={1}
-                                  value={
-                                    dipsArr[comm]?.qty
-                                      ? dipsArr[comm]?.qty
-                                      : getSpecialData?.noofDips !==
-                                          undefined ||
-                                        getSpecialData?.noofDips !== "0"
-                                      ? Number(getSpecialData?.noofDips)
-                                      : 1
-                                  }
-                                  className="form-control mx-2"
-                                  style={{ width: "75px" }}
-                                  // onChange={(e) => handleDipsCount(e, data)}
-                                />
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  </>
-                )}
-
-                {/* Drinks */}
-                {getSpecialData?.pops && getSpecialData?.bottle && (
-                  <>
-                    {(getSpecialData?.pops.length > 0 ||
-                      getSpecialData.bottle.length > 0) && (
-                      <h6 className="text-left mt-1 mb-2">Drinks</h6>
+                                  <p className="mb-0 mx-2">$ {pop.price}</p>
+                                </li>
+                              );
+                            })}
+                            {getSpecialData?.bottle.map((pop) => {
+                              const comm = drinksArr?.findIndex(
+                                (item) => item.drinksCode === pop.code
+                              );
+                              return (
+                                <li
+                                  className="list-group-item d-flex justify-content-between align-items-center"
+                                  key={pop.code}
+                                >
+                                  <label className="d-flex align-items-center">
+                                    <input
+                                      type="radio"
+                                      name="drinks"
+                                      className="mx-3 d-inline-block"
+                                      checked={comm !== -1 ? true : false}
+                                      onChange={(e) => handleDrinks(e, pop)}
+                                    />
+                                    {pop.softDrinkName}
+                                  </label>
+                                  <p className="mb-0 mx-2">$ {pop.price}</p>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      </>
                     )}
 
-                    <div id="drinks" className="mb-3">
-                      <ul className="list-group">
-                        {getSpecialData?.pops.map((pop) => {
-                          const comm = drinksArr?.findIndex(
-                            (item) => item.drinksCode === pop.code
-                          );
-
-                          return (
-                            <li
-                              className="list-group-item d-flex justify-content-between align-items-center"
-                              key={pop.code}
-                            >
-                              <label className="d-flex align-items-center">
-                                <input
-                                  type="radio"
-                                  name="drinks"
-                                  className="mx-3 d-inline-block"
-                                  checked={comm !== -1 ? true : false}
-                                  onChange={(e) =>
-                                    specialMenuParamsObj.handlePops.callback({
-                                      ...specialMenuParamsObj.handlePops
-                                        .parameters,
-                                      e: e,
-                                      pop: pop,
-                                    })
-                                  }
-                                />
-                                {pop.softDrinkName}
-                              </label>
-                              <p className="mb-0 mx-2">$ {pop.price}</p>
-                            </li>
-                          );
-                        })}
-                        {getSpecialData?.bottle.map((pop) => {
-                          const comm = drinksArr?.findIndex(
-                            (item) => item.drinksCode === pop.code
-                          );
-                          return (
-                            <li
-                              className="list-group-item d-flex justify-content-between align-items-center"
-                              key={pop.code}
-                            >
-                              <label className="d-flex align-items-center">
-                                <input
-                                  type="radio"
-                                  name="drinks"
-                                  className="mx-3 d-inline-block"
-                                  checked={comm !== -1 ? true : false}
-                                  onChange={(e) => handleDrinks(e, pop)}
-                                />
-                                {pop.softDrinkName}
-                              </label>
-                              <p className="mb-0 mx-2">$ {pop.price}</p>
-                            </li>
-                          );
-                        })}
-                      </ul>
+                    {/* Comments */}
+                    <h6 className="text-left mt-1 mb-2">Comments</h6>
+                    <div className="">
+                      <textarea
+                        className="form-control"
+                        rows="4"
+                        cols="50"
+                        value={comments}
+                        onChange={(e) => {
+                          updateInCart({ comment: e.target.value });
+                          setComments(e.target.value);
+                        }}
+                      />
                     </div>
-                  </>
-                )}
 
-                {/* Comments */}
-                <h6 className="text-left mt-1 mb-2">Comments</h6>
-                <div className="">
-                  <textarea
-                    className="form-control"
-                    rows="4"
-                    cols="50"
-                    value={comments}
-                    onChange={(e) => {
-                      updateInCart({ comment: e.target.value });
-                      setComments(e.target.value);
-                    }}
-                  />
-                </div>
-
-                {/* Add to Cart Button */}
-                {payloadEdit !== undefined &&
-                payloadEdit?.productType.toLowerCase() === "special_pizza" ? (
-                  <div className="d-flex flex-row justify-content-center align-items-center addToCartDiv mt-3 mb-3">
-                    <button
-                      type="button"
-                      className="btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn"
-                      onClick={handleAddToCart}
-                    >
-                      Edit
-                      {/* {payloadEdit !== undefined &&
-                    payloadEdit?.productType.toLowerCase() === "special_pizza"
-                      ? "Edit"
-                      : " Add to Cart"} */}
-                    </button>
+                    {/* Add to Cart Button */}
+                    {payloadEdit !== undefined &&
+                    payloadEdit?.productType.toLowerCase() ===
+                      "special_pizza" ? (
+                      <div className="d-flex flex-row justify-content-center align-items-center addToCartDiv mt-3 mb-3">
+                        <button
+                          type="button"
+                          className="btn btn-sm my-1 mb-2 px-4 py-2 addToCartbtn"
+                          onClick={handleAddToCart}
+                        >
+                          Edit
+                          {/* {payloadEdit !== undefined &&
+                      payloadEdit?.productType.toLowerCase() === "special_pizza"
+                        ? "Edit"
+                        : " Add to Cart"} */}
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
-                ) : null}
-              </div>
+                </>
+              ) : (
+                <>
+                  <LoadingLayout />
+                </>
+              )}
             </>
           ) : (
             <ul

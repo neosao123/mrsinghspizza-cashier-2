@@ -30,6 +30,7 @@ import { isZipCodeDelivarable } from "../ongoingOrders/newOrder/newOrderApi";
 import swal from "sweetalert";
 import { $, nodeName } from "jquery";
 import { Dropdown, DropdownButton, Modal } from "react-bootstrap";
+import IntlTelInput from "react-intl-tel-input";
 
 const sideTypeArr = ["poutine", "subs"];
 
@@ -65,6 +66,15 @@ const ValidateSchemaCr = Yup.object({
 });
 // Validation Schema for credit comments - End
 
+const canadianPhoneNumberRegExp = /^\d{3}\d{3}\d{4}$/;
+
+const ValidateSchemaphoneno = Yup.object({
+  phoneno: Yup.string().matches(
+    canadianPhoneNumberRegExp,
+    "Invalid Canadian phone number format. Use (XXX) XXX-XXXX."
+  ),
+});
+
 function Order() {
   const dispatch = useDispatch();
 
@@ -78,6 +88,10 @@ function Order() {
   const [allDeliveryExecutiveData, setAllDeliveryExecutiveData] = useState();
   const [updatedDeliveryExecutive, setUpdatedDeliveryExecutive] = useState();
   const printRef = useRef();
+
+  const orderByStatusRef = useRef();
+  const orderFromRef = useRef();
+  const teleStoreRef = useRef();
   // const printRef = useSelector((state) => state.cart.printRef);
 
   const [deliveryExecutive, setDeliveryExecutive] = useState();
@@ -113,6 +127,23 @@ function Order() {
     address: "",
     deliveryExe: "",
     extraDeliveryCharges: "",
+  });
+
+  const [initialValPhoneno, setInitialValPhoneno] = useState({
+    phoneno: "",
+  });
+
+  const formikPhoneno = useFormik({
+    initialValues: initialValPhoneno,
+    validateOnBlur: true,
+    validationSchema: ValidateSchemaphoneno,
+    enableReinitialize: true,
+    onSubmit: async (values, { resetForm }) => {
+      try {
+      } catch (err) {
+        toast.error(err);
+      }
+    },
   });
 
   // Validation min and max value for extra delivery charges
@@ -197,11 +228,17 @@ function Order() {
   const orderList = async () => {
     let cashierCode = localStorage.getItem("cashierCode");
     const payload = {
+      phoneno:
+        formikPhoneno.values.phoneno.length > 9
+          ? formikPhoneno.values.phoneno
+          : "",
       cashierCode: cashierCode,
-      orderFrom: orderFrom,
-      orderStatus: orderByStatus,
+      orderFrom: orderFromRef.current.value,
+      orderStatus: orderByStatusRef.current.value,
       storeLocation:
-        user?.role === "R_4" ? teleStore ?? "" : user?.storeLocation,
+        user?.role === "R_4"
+          ? teleStoreRef.current.value ?? ""
+          : user?.storeLocation,
       role: user?.role,
     };
     orderListApi(payload)
@@ -330,13 +367,38 @@ function Order() {
   }, [orderId]);
 
   useEffect(() => {
+    console.log("data", formikPhoneno.values.phoneno.length);
+  }, [formikPhoneno.values.phoneno]);
+
+  const filterPhoneNo = () => {
+    orderList();
+  };
+  // const [reset, setReset] = useState(false);
+  const resetPhoneNo = () => {
+    // setReset(true);
+    formikPhoneno.values.phoneno = "";
+    orderFromRef.current.value = "all";
+    orderByStatusRef.current.value = "";
+    if (user?.role === "R_4") {
+      teleStoreRef.current.value = "";
+    }
+    orderList();
+  };
+
+  // useEffect(() => {
+  //   if (reset === true) {
+  //     orderList();
+  //   }
+  // }, [orderFrom, orderByStatus, teleStore]);
+
+  useEffect(() => {
+    // setOrderByStatus("");
     orderList();
     setOrderDetail();
     getAllDeliveryExecutive();
     getStoreLocation();
     getDeliveryCharges();
-    // setOrderByStatus("");
-  }, [orderFrom, orderByStatus, teleStore, cart]);
+  }, [cart]);
 
   return (
     <>
@@ -346,52 +408,110 @@ function Order() {
           <div className="col-lg-4 p-0   text-center main">
             <div className="card">
               <div className="selectDiv p-0">
-                <select
-                  className="form-select px-4 py-2 orderType-selection"
-                  onChange={(e) => setOrderFrom(e.target.value)}
-                >
-                  <option value="">--Choose --</option>
-                  <option value="store" className="options">
-                    Store Order
-                  </option>
-                  <option value="online" className="options">
-                    Online Order
-                  </option>
-                </select>
-                <select
-                  className="form-select px-4 py-2 orderType-selection"
-                  onChange={(e) => setOrderByStatus(e.target.value)}
-                >
-                  <option value="">--Filter Orders By Status --</option>
-                  <option value="">All</option>
-                  <option value="pickedup" className="options">
-                    Pickedup
-                  </option>
-                  <option value="delivered" className="options">
-                    Delivered
-                  </option>
-                  <option value="cancelled" className="options">
-                    Cancelled
-                  </option>
-                </select>
-
-                {user?.role === "R_4" && (
+                <form onSubmit={formikPhoneno.handleSubmit}>
+                  <div>
+                    <IntlTelInput
+                      containerClassName="intl-tel-input mt-2 w-100"
+                      type="tel"
+                      name="phoneno"
+                      inputClassName="form-control mb-3"
+                      placeholder="(XXX) XXX-XXXX"
+                      value={formikPhoneno?.values?.phoneno?.replace(/\D/g, "")}
+                      onBlur={formikPhoneno.handleBlur}
+                      defaultCountry="CA"
+                      onlyCountries={["CA"]}
+                      preferredCountries={["CA"]}
+                      onPhoneNumberChange={(
+                        status,
+                        value,
+                        countryData,
+                        number,
+                        id
+                      ) => {
+                        if (value.length <= 10) {
+                          formikPhoneno.setFieldValue("phoneno", value);
+                        }
+                      }}
+                    />
+                    <div class="text-start">
+                      {formikPhoneno.touched.phoneno &&
+                      formikPhoneno.errors.phoneno ? (
+                        <div className="text-danger mb-1 m-2 px-2">
+                          {formikPhoneno.errors.phoneno}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
                   <select
                     className="form-select px-4 py-2 orderType-selection"
-                    onChange={(e) => setTeleStore(e.target.value)}
+                    ref={orderFromRef}
                   >
-                    <option value="">
-                      --Filter Orders By Store Location --
+                    <option value="all">--Choose --</option>
+                    <option value="store" className="options">
+                      Store Order
                     </option>
-                    {storeLocationData?.map((data) => {
-                      return (
-                        <option value={data?.code}>
-                          {data?.storeLocation}
-                        </option>
-                      );
-                    })}
+                    <option value="online" className="options">
+                      Online Order
+                    </option>
                   </select>
-                )}
+                  <select
+                    className="form-select px-4 py-2 orderType-selection"
+                    ref={orderByStatusRef}
+                  >
+                    <option value="">--Filter Orders By Status --</option>
+                    <option value="">All</option>
+                    <option value="pickedup" className="options">
+                      Pickedup
+                    </option>
+                    <option value="delivered" className="options">
+                      Delivered
+                    </option>
+                    <option value="cancelled" className="options">
+                      Cancelled
+                    </option>
+                  </select>
+
+                  {user?.role === "R_4" && (
+                    <select
+                      className="form-select px-4 py-2 orderType-selection"
+                      ref={teleStoreRef}
+                    >
+                      <option value="">
+                        --Filter Orders By Store Location --
+                      </option>
+                      {storeLocationData?.map((data) => {
+                        return (
+                          <option value={data?.code}>
+                            {data?.storeLocation}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  )}
+
+                  <div className="text-start row justify-content-end align-items-center p-2">
+                    <div className="col-auto">
+                      <button
+                        className="btn w-100 btn-sm text-white applyfilterbtn"
+                        onClick={() => {
+                          filterPhoneNo();
+                        }}
+                      >
+                        Apply
+                      </button>
+                    </div>
+                    <div className="col-auto">
+                      <button
+                        className="btn w-100 btn-sm text-white btn-danger"
+                        onClick={() => {
+                          resetPhoneNo();
+                        }}
+                      >
+                        Reset
+                      </button>
+                    </div>
+                  </div>
+                </form>
               </div>
               <div>
                 {orderFrom && (
@@ -746,6 +866,9 @@ function Order() {
                     <h6 className="mb-2">
                       Type : {orderDetail?.orderFrom.toUpperCase()}
                     </h6>
+                    <h6 className="mb-2 fw-bolder text-danger">
+                      Order Taken By : {orderDetail?.orderTakenBy}
+                    </h6>
                   </div>
                 </div>
                 {orderDetail?.comments !== "" && (
@@ -973,9 +1096,7 @@ function Order() {
                       <td></td>
                       <td></td>
                       <th>Sub Total :</th>
-                      <td>
-                        $ {orderDetail?.subTotal - orderDetail?.discountmount}
-                      </td>
+                      <td>$ {orderDetail?.subTotal}</td>
                     </tr>
                     <tr>
                       <td></td>
