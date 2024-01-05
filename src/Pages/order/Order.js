@@ -31,6 +31,7 @@ import swal from "sweetalert";
 import { $, nodeName } from "jquery";
 import { Dropdown, DropdownButton, Modal } from "react-bootstrap";
 import IntlTelInput from "react-intl-tel-input";
+import LoadingLayout from "../../layout/LoadingLayout";
 
 const sideTypeArr = ["poutine", "subs"];
 
@@ -206,7 +207,6 @@ function Order() {
           orderCode: orderDetail?.code,
           creditComment: values.creditComment,
         };
-
         await addCreditComment(payload)
           .then((res) => {
             toast.success(res.data.message);
@@ -225,6 +225,7 @@ function Order() {
   });
   // Formik for credit comments - End
 
+  const [loading, setLoading] = useState(false);
   const orderList = async () => {
     let cashierCode = localStorage.getItem("cashierCode");
     const payload = {
@@ -241,12 +242,15 @@ function Order() {
           : user?.storeLocation,
       role: user?.role,
     };
+    setLoading(true);
     orderListApi(payload)
       .then((res) => {
         setListData(res.data.data);
+        setLoading(false);
       })
       .catch((err) => {
         console.log("ERROR From Order List API : ", err);
+        setLoading(false);
       });
   };
 
@@ -358,6 +362,12 @@ function Order() {
 
   useEffect(() => {
     console.log(orderDetail, "orderDetailorderDetail");
+
+    // Developer: Shreyas Mahamuni, Working Date: 04-12-2024
+    // Edit Credit Comments Functionality Modal Popup - Start
+    formikCr.values.creditComment =
+      orderDetail?.comments !== "" ? orderDetail?.comments : "";
+    // Edit Credit Comments Functionality Modal Popup - End
   }, [orderDetail]);
 
   useEffect(() => {
@@ -528,185 +538,203 @@ function Order() {
                   className="overflow-scroll"
                   style={{ height: "calc(100vh - 147px)" }}
                 >
-                  <ul className="list-group list-group-flush">
-                    {listData?.map((data) => {
-                      return (
-                        <li
-                          className={
-                            data.orderFrom === "store"
-                              ? "storeOrder p-1 list-group-item"
-                              : "onlineOrder p-1 list-group-item"
-                          }
-                          key={data.code}
-                          onClick={() => setOrderId(data.code)}
-                        >
-                          <div className="d-flex my-1 justify-content-between align-items-center">
-                            <div>
-                              <div style={{ textAlign: "left" }}>
-                                <span>
-                                  <b>
-                                    <span
-                                      className="text-capitalize"
-                                      style={{ fontSize: "12px" }}
-                                    >
-                                      {data?.orderFrom}
-                                    </span>
+                  {loading === false ? (
+                    <ul className="list-group list-group-flush">
+                      {listData?.map((data) => {
+                        return (
+                          <li
+                            className={
+                              data.orderFrom === "store"
+                                ? "storeOrder p-1 list-group-item"
+                                : "onlineOrder p-1 list-group-item"
+                            }
+                            key={data.code}
+                            onClick={() => setOrderId(data.code)}
+                          >
+                            <div className="d-flex my-1 justify-content-between align-items-center">
+                              <div>
+                                <div style={{ textAlign: "left" }}>
+                                  <span>
+                                    <b>
+                                      <span
+                                        className="text-capitalize"
+                                        style={{ fontSize: "12px" }}
+                                      >
+                                        {data?.orderFrom}
+                                      </span>
+                                    </b>
+                                  </span>
+                                  <b className="mx-1">
+                                    Order #{data.orderCode}
                                   </b>
-                                </span>
-                                <b className="mx-1">Order #{data.orderCode}</b>
-                              </div>
-                              <div
-                                className={
-                                  data.orderFrom === "store"
-                                    ? "rounded s_store"
-                                    : "rounded o_store"
-                                }
-                              >
-                                {data?.storeName}
-                              </div>
-                            </div>
-
-                            <div>
-                              <b className="mx-3 text-dark">
-                                $ {data.grandTotal}
-                              </b>
-                            </div>
-                            {data?.deliveryType === "pickup" ? (
-                              <div className="d-flex flex-wrap">
-                                {" "}
-                                {data?.orderStatus !== "cancelled" &&
-                                data?.orderStatus === "placed" ? (
-                                  <div className="d-flex  my-1 justify-content-end ">
-                                    <span
-                                      className="mx-2 py-2 badge bg-secondary"
-                                      style={{ fontSize: "12px" }}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleStatusChange({
-                                          orderCode: data.code,
-                                          orderCurrentStatus: data.orderStatus,
-                                          orderStatus: "pickedup",
-                                        });
-                                      }}
-                                    >
-                                      Pickedup
-                                    </span>
-                                  </div>
-                                ) : null}
-                                {data?.orderStatus !== "cancelled" &&
-                                data?.orderStatus !== "delivered" &&
-                                data?.orderStatus === "placed" ? (
-                                  <div className="d-flex my-1 justify-content-end">
-                                    <span
-                                      className="mx-2 py-2 badge bg-danger"
-                                      style={{ fontSize: "12px" }}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleStatusChange({
-                                          orderCode: data.code,
-                                          orderCurrentStatus: data.orderStatus,
-                                          orderStatus: "cancelled",
-                                        });
-                                      }}
-                                    >
-                                      Cancel
-                                    </span>
-                                  </div>
-                                ) : null}
-                              </div>
-                            ) : (
-                              <div className="d-flex flex-wrap">
-                                {data.orderStatus === "placed" && (
-                                  <div className="d-flex  my-1 justify-content-end ">
-                                    <span
-                                      className="mx-2 py-2 badge bg-secondary"
-                                      style={{ fontSize: "12px" }}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleStatusChange({
-                                          orderCode: data.code,
-                                          orderType: data.deliveryType,
-                                          orderCurrentStatus: data.orderStatus,
-                                          orderStatus: "shipping",
-                                        });
-                                      }}
-                                    >
-                                      Shipping
-                                    </span>
-                                  </div>
-                                )}
-                                {data.orderStatus === "shipping" && (
-                                  <div className="d-flex my-1 justify-content-end">
-                                    <span
-                                      className="mx-2 py-2 badge bg-success"
-                                      style={{ fontSize: "12px" }}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleStatusChange({
-                                          orderCode: data.code,
-                                          orderCurrentStatus: data.orderStatus,
-                                          orderStatus: "delivered",
-                                        });
-                                      }}
-                                    >
-                                      Delivered
-                                    </span>
-                                  </div>
-                                )}
-                                {data.orderStatus === "placed" ? (
-                                  <div className="d-flex my-1 justify-content-end">
-                                    <span
-                                      className="mx-2  py-2 badge bg-danger"
-                                      style={{ fontSize: "12px" }}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleStatusChange({
-                                          orderCode: data.code,
-                                          orderCurrentStatus: data.orderStatus,
-                                          orderStatus: "cancelled",
-                                        });
-                                      }}
-                                    >
-                                      Cancel
-                                    </span>
-                                  </div>
-                                ) : null}
-                              </div>
-                            )}
-                          </div>
-                          <div className="d-flex justify-content-between">
-                            <div className="d-flex px-1 my-1 justify-content-start">
-                              <span>
-                                <i class="fa fa-user" aria-hidden="true"></i>
-                              </span>
-                              <span className="mx-3">{data.customerName}</span>
-                            </div>
-                            <div className="d-flex px-2 my-1 justify-content-between">
-                              <span className="px-3">
-                                <i
-                                  class="fa fa-phone mx-2"
-                                  aria-hidden="true"
-                                  style={{ fontSize: "14px" }}
-                                ></i>
-                                <span className="" style={{ fontSize: "14px" }}>
-                                  {data.mobileNumber}
-                                </span>
-                              </span>
-                              <span className="px-3">
-                                <i class="" aria-hidden="true"></i>
-                                <strong
-                                  className="text-capitalize"
-                                  style={{ fontSize: "14px" }}
+                                </div>
+                                <div
+                                  className={
+                                    data.orderFrom === "store"
+                                      ? "rounded s_store"
+                                      : "rounded o_store"
+                                  }
                                 >
-                                  {data.orderStatus}
-                                </strong>
-                              </span>
+                                  {data?.storeName}
+                                </div>
+                              </div>
+
+                              <div>
+                                <b className="mx-3 text-dark">
+                                  $ {data.grandTotal}
+                                </b>
+                              </div>
+                              {data?.deliveryType === "pickup" ? (
+                                <div className="d-flex flex-wrap">
+                                  {" "}
+                                  {data?.orderStatus !== "cancelled" &&
+                                  data?.orderStatus === "placed" ? (
+                                    <div className="d-flex  my-1 justify-content-end ">
+                                      <span
+                                        className="mx-2 py-2 badge bg-secondary"
+                                        style={{ fontSize: "12px" }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleStatusChange({
+                                            orderCode: data.code,
+                                            orderCurrentStatus:
+                                              data.orderStatus,
+                                            orderStatus: "pickedup",
+                                          });
+                                        }}
+                                      >
+                                        Pickedup
+                                      </span>
+                                    </div>
+                                  ) : null}
+                                  {data?.orderStatus !== "cancelled" &&
+                                  data?.orderStatus !== "delivered" &&
+                                  data?.orderStatus === "placed" ? (
+                                    <div className="d-flex my-1 justify-content-end">
+                                      <span
+                                        className="mx-2 py-2 badge bg-danger"
+                                        style={{ fontSize: "12px" }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleStatusChange({
+                                            orderCode: data.code,
+                                            orderCurrentStatus:
+                                              data.orderStatus,
+                                            orderStatus: "cancelled",
+                                          });
+                                        }}
+                                      >
+                                        Cancel
+                                      </span>
+                                    </div>
+                                  ) : null}
+                                </div>
+                              ) : (
+                                <div className="d-flex flex-wrap">
+                                  {data.orderStatus === "placed" && (
+                                    <div className="d-flex  my-1 justify-content-end ">
+                                      <span
+                                        className="mx-2 py-2 badge bg-secondary"
+                                        style={{ fontSize: "12px" }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleStatusChange({
+                                            orderCode: data.code,
+                                            orderType: data.deliveryType,
+                                            orderCurrentStatus:
+                                              data.orderStatus,
+                                            orderStatus: "shipping",
+                                          });
+                                        }}
+                                      >
+                                        Shipping
+                                      </span>
+                                    </div>
+                                  )}
+                                  {data.orderStatus === "shipping" && (
+                                    <div className="d-flex my-1 justify-content-end">
+                                      <span
+                                        className="mx-2 py-2 badge bg-success"
+                                        style={{ fontSize: "12px" }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleStatusChange({
+                                            orderCode: data.code,
+                                            orderCurrentStatus:
+                                              data.orderStatus,
+                                            orderStatus: "delivered",
+                                          });
+                                        }}
+                                      >
+                                        Delivered
+                                      </span>
+                                    </div>
+                                  )}
+                                  {data.orderStatus === "placed" ? (
+                                    <div className="d-flex my-1 justify-content-end">
+                                      <span
+                                        className="mx-2  py-2 badge bg-danger"
+                                        style={{ fontSize: "12px" }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleStatusChange({
+                                            orderCode: data.code,
+                                            orderCurrentStatus:
+                                              data.orderStatus,
+                                            orderStatus: "cancelled",
+                                          });
+                                        }}
+                                      >
+                                        Cancel
+                                      </span>
+                                    </div>
+                                  ) : null}
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
+                            <div className="d-flex justify-content-between">
+                              <div className="d-flex px-1 my-1 justify-content-start">
+                                <span>
+                                  <i class="fa fa-user" aria-hidden="true"></i>
+                                </span>
+                                <span className="mx-3">
+                                  {data.customerName}
+                                </span>
+                              </div>
+                              <div className="d-flex px-2 my-1 justify-content-between">
+                                <span className="px-3">
+                                  <i
+                                    class="fa fa-phone mx-2"
+                                    aria-hidden="true"
+                                    style={{ fontSize: "14px" }}
+                                  ></i>
+                                  <span
+                                    className=""
+                                    style={{ fontSize: "14px" }}
+                                  >
+                                    {data.mobileNumber}
+                                  </span>
+                                </span>
+                                <span className="px-3">
+                                  <i class="" aria-hidden="true"></i>
+                                  <strong
+                                    className="text-capitalize"
+                                    style={{ fontSize: "14px" }}
+                                  >
+                                    {data.orderStatus}
+                                  </strong>
+                                </span>
+                              </div>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : (
+                    <>
+                      <LoadingLayout />
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -744,7 +772,7 @@ function Order() {
                       >
                         <li>
                           {/* Credit Comments Functionality handle Button - Start */}
-                          {orderDetail?.comments === "" && (
+                          {orderDetail?.comments === "" ? (
                             <button
                               className="btn dropdown-item"
                               onClick={handleShowCredit}
@@ -752,6 +780,17 @@ function Order() {
                             >
                               Add Credits
                             </button>
+                          ) : (
+                            // Developer: Shreyas Mahamuni, Working Date: 04-12-2024
+                            // Edit Credit Comments Functionality Modal Popup - Start
+                            <button
+                              className="btn dropdown-item"
+                              onClick={handleShowCredit}
+                              type="button"
+                            >
+                              Edit Credits
+                            </button>
+                            // Edit Credit Comments Functionality Modal Popup - End
                           )}
                           {/* Credit Comments Functionality handle Button - END */}
                         </li>
@@ -1485,14 +1524,28 @@ function Order() {
             Close
           </button>
 
-          <button
-            type="submit"
-            style={{ backgroundColor: "#ff8c00" }}
-            class="btn text-white"
-            onClick={formikCr.handleSubmit}
-          >
-            Add Credit
-          </button>
+          {orderDetail?.comments === "" ? (
+            <button
+              type="submit"
+              style={{ backgroundColor: "#ff8c00" }}
+              class="btn text-white"
+              onClick={formikCr.handleSubmit}
+            >
+              Add Credit
+            </button>
+          ) : (
+            // Developer: Shreyas Mahamuni, Working Date: 04-12-2024
+            // Edit Credit Comments Functionality Modal Popup - Start
+            <button
+              type="submit"
+              style={{ backgroundColor: "#ff8c00" }}
+              class="btn text-white"
+              onClick={formikCr.handleSubmit}
+            >
+              Edit Credit
+            </button>
+            // Edit Credit Comments Functionality Modal Popup - End
+          )}
         </Modal.Footer>
       </Modal>
       {/* Add Credits Comments Modal Popup - END */}

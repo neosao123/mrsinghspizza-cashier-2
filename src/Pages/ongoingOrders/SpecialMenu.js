@@ -757,45 +757,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       );
     });
   };
-  // for (let i = 1; i <= getSpecialData?.noofPizzas; i++) {
-  //   console.log(i, "pizzaState count for loop");
-  //   elements.push(
-  //     <SpecialPizzaSelection
-  //       pizzaState={pizzaState}
-  //       handleFreeToppings={handleFreeToppings}
-  //       handleSauseChange={handleSauseChange}
-  //       handleSpicyChange={handleSpicyChange}
-  //       handleCookChange={handleCookChange}
-  //       handleOneToppings={handleOneToppings}
-  //       handleTwoToppings={handleTwoToppings}
-  //       getSpecialData={getSpecialData}
-  //       count1={i}
-  //       key={i}
-  //       toppingsData={toppingsData}
-  //       handleChangeAllIndianToppings={handleChangeAllIndianToppings}
-  //       handleCrustChange={handleCrustChange}
-  //       crustSelected={crustSelected}
-  //       cheeseSelected={cheeseSelected}
-  //       setOfferedFreeToppings={setOfferedFreeToppings}
-  //       offeredFreeToppings={offeredFreeToppings}
-  //       additionalToppingsCount={additionalToppingsCount}
-  //       setAdditionalToppingsCount={setAdditionalToppingsCount}
-  //       specialBasesSelected={specialBasesSelected}
-  //       setCheeseSelected={setCheeseSelected}
-  //       handleSpecialBasesChange={handleSpecialBasesChange}
-  //       handleCheeseChange={handleCheeseChange}
-  //       handleCountAsTwoToppingsPlacementChange={
-  //         handleCountAsTwoToppingsPlacementChange
-  //       }
-  //       handleCountAsOneToppingsPlacementChange={
-  //         handleCountAsOneToppingsPlacementChange
-  //       }
-  //       handleFreeToppingsPlacementChange={handleFreeToppingsPlacementChange}
-  //     />
-  //   );
-  // }
-
-  // console.log(calcTwoTpsArr, "calcTwoTpsArr")
 
   const handleAddToCart = () => {
     if (
@@ -853,6 +814,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         pizzaSize: pizzaSize === "Large" ? "Large" : "Extra Large",
         pizzaPrice: pizzaSizePrice,
       };
+      console.log("edit to cart payload: ", payloadForEdit);
       const updatedCart = cartdata.findIndex(
         (item) => item.id === payloadEdit.id
       );
@@ -943,6 +905,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         pizzaSize: pizzaSize === "Large" ? "Large" : "Extra Large",
         pizzaPrice: pizzaSizePrice,
       };
+      console.log("add to cart payload: ", payload);
       dispatch(addToCart([payload, ...cartdata]));
       setSidesArr([]);
       setDrinksArr([]);
@@ -1030,14 +993,42 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     let totalPrice = Number(0);
     let totalOneTpsPrice = Number(0);
     let totalTwoTpsPrice = Number(0);
-    // totalPrice +=
-    //   pizzaSize === "Large"
-    //     ? Number(getSpecialData?.largePizzaPrice)
-    //     : pizzaSize === "Extra Large"
-    //     ? Number(getSpecialData?.extraLargePizzaPrice)
-    //     : 0;
+    totalPrice +=
+      pizzaSize === "Large"
+        ? Number(getSpecialData?.largePizzaPrice)
+        : pizzaSize === "Extra Large"
+        ? Number(getSpecialData?.extraLargePizzaPrice)
+        : 0;
 
-    totalPrice += Number(pizzaSizePrice);
+    setPizzaSizePrice(
+      pizzaSize === "Large"
+        ? Number(getSpecialData?.largePizzaPrice)
+        : pizzaSize === "Extra Large"
+        ? Number(getSpecialData?.extraLargePizzaPrice)
+        : 0
+    );
+
+    // if (
+    //   isNaN(Number(pizzaSizePrice)) ||
+    //   pizzaSizePrice === undefined ||
+    //   pizzaSizePrice === ""
+    // ) {
+    //   totalPrice +=
+    //     pizzaSize === "Large"
+    //       ? Number(getSpecialData?.largePizzaPrice)
+    //       : pizzaSize === "Extra Large"
+    //       ? Number(getSpecialData?.extraLargePizzaPrice)
+    //       : 0;
+    //   setPizzaSizePrice(
+    //     pizzaSize === "Large"
+    //       ? Number(getSpecialData?.largePizzaPrice)
+    //       : pizzaSize === "Extra Large"
+    //       ? Number(getSpecialData?.extraLargePizzaPrice)
+    //       : 0
+    //   );
+    // } else {
+    //   totalPrice += Number(pizzaSizePrice);
+    // }
 
     let pizzaCartons = [];
     for (let i = 0; i < getSpecialData?.noofPizzas; i++) {
@@ -1129,46 +1120,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       totalTwoTpsPrice += Number(tps?.amount);
     });
 
-    console.log("calc two toppings: ", calcTwoTpsArr);
-
     totalPrice += totalOneTpsPrice;
     totalPrice += totalTwoTpsPrice;
-
-    // Iterate through dipsArr
-    // let totalQtyDips = 0;
-
-    // dipsArr?.forEach((item) => {
-    //   totalQtyDips += Number(item?.qty);
-    // });
-
-    // if (totalQtyDips >= noOfFreeDips) {
-    //   let paidDips = Number(totalQtyDips) - noOfFreeDips;
-    //   let priceOfOneDips = dipsArr[0]?.price ? Number(dipsArr[0]?.price) : null;
-    //   let paidPrice = paidDips * priceOfOneDips;
-    //   totalPrice += paidPrice;
-    // }
-
-    // sidesArr?.forEach((item) => {
-    //   let ind = freeSides?.findIndex(
-    //     (side) => side.lineEntries[0].code === item?.lineCode
-    //   );
-    //   // if (ind === -1) {
-    //   //   totalPrice += Number(item?.lineEntries[0]?.price)
-    //   //     ? Number(item?.lineEntries[0]?.price)
-    //   //     : null;
-    //   // }
-    //   if (ind === -1) {
-    //     totalPrice += Number(item?.totalPrice)
-    //       ? Number(item?.totalPrice)
-    //       : Number(0);
-    //   }
-    // });
-
-    // drinksArr?.forEach((drinks, index) => {
-    //   if (noofFreeDrinks < index + 1) {
-    //     totalPrice += drinks?.drinksPrice ? Number(drinks?.drinksPrice) : 0;
-    //   }
-    // });
 
     const formattedPrice = (
       Number(totalPrice) +
@@ -1248,7 +1201,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
     let sizeofpizza = data?.pizzaSize ? data.pizzaSize : pizzaSize;
 
     price += Number(pizzaSizePrice);
-
     let calcOneTpsArr2 = [];
     let calcTwoTpsArr2 = [];
 
@@ -1350,11 +1302,8 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
               ],
             },
           };
-          // console.log(arr[tpsObj?.pizzaIndex], "arr[tpsObj?.pizzaIndex]");
-          // console.log(arr, "arr[tpsObj?.pizzaIndex]");
         });
         pizzas = arr;
-        console.log(pizzas, "arr[tpsObj?.pizzaIndex]");
       }
       if (calcOneTpsArr2?.length > 0) {
         let arr = [...pizzas];
@@ -1385,8 +1334,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
       let arr_1 = [...pizzas];
       pizzas?.map((item, index) => {
-        console.log("data", item);
-        console.log("112234", arr_1[index].toppings.isAllIndiansTps);
         if (
           toppingsData?.toppings?.freeToppings.length ===
           item?.toppings?.freeToppings.length
@@ -1445,14 +1392,13 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
         drinks: drinksArray,
       },
       quantity: "1",
-      price: finalVal,
-      amount: finalVal,
+      price: Number(finalVal),
+      amount: Number(finalVal),
       comments: data?.comment ? data?.comment : comments,
       pizzaSize: data?.pizzaSize ? data.pizzaSize : pizzaSize,
-      pizzaPrice: pizzaSizePrice,
+      pizzaPrice: Number(pizzaSizePrice),
     };
-    console.log(payload, "arr[tpsObj?.pizzaIndex]");
-
+    console.log("upadte to cart payload: ", payload);
     if (updatedCartId !== -1) {
       tempPayload[updatedCartId] = payload;
     } else {
@@ -1463,24 +1409,6 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
 
   // Changes in pizza price flow ( setPizzaSizePrice() state used ) - Developer: Shreyas Mahamuni, working date: 26-12-2023
   const handleSizeOfPizza = () => {
-    // if (e.target.value === "Large") {
-    //   setPizzaSize(e.target.value);
-    //   setPizzaSizePrice(getSpecialData?.largePizzaPrice);
-
-    //   updateInCart({
-    //     pizzaSize: e.target.value,
-    //     pizzaSizePrice: getSpecialData?.largePizzaPrice,
-    //   });
-    // }
-    // if (e.target.value === "Extra Large") {
-    //   setPizzaSize(e.target.value);
-    //   setPizzaSizePrice(getSpecialData?.extraLargePizzaPrice);
-    //   updateInCart({
-    //     pizzaSize: e.target.value,
-    //     pizzaSizePrice: getSpecialData?.extraLargePizzaPrice,
-    //   });
-    // }
-
     if (pizzaSizeRef.current) {
       if (pizzaSizeRef.current.value === "Large") {
         setPizzaSize("Large");
@@ -1515,6 +1443,9 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       payloadEdit !== undefined &&
       payloadEdit?.productType === "special_pizza"
     ) {
+      let pizzaChangePrice = 0;
+      console.log("payload edit, final price", Number(payloadEdit?.amount));
+      console.log("final pizza Price: ", Number(payloadEdit?.pizzaPrice));
       handleGetSpecial({ code: payloadEdit?.productCode });
       setPizzaState(payloadEdit?.config?.pizza);
       setDrinksArr(payloadEdit?.config?.drinks);
@@ -1523,6 +1454,21 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
       setPrice(Number(payloadEdit?.amount));
       setComments(payloadEdit?.comments);
       setPizzaSize(payloadEdit?.pizzaSize);
+      // if (
+      //   isNaN(Number(pizzaSizePrice)) ||
+      //   pizzaSizePrice === undefined ||
+      //   pizzaSizePrice === ""
+      // ) {
+      //   pizzaChangePrice +=
+      //     pizzaSize === "Large"
+      //       ? Number(getSpecialData?.largePizzaPrice)
+      //       : pizzaSize === "Extra Large"
+      //       ? Number(getSpecialData?.extraLargePizzaPrice)
+      //       : 0;
+      //   setPizzaSizePrice(Number(pizzaChangePrice));
+      // } else {
+
+      // }
       setPizzaSizePrice(Number(payloadEdit?.pizzaPrice));
     }
   }, [payloadEdit]);
@@ -1573,6 +1519,7 @@ function SpecialMenu({ setPayloadEdit, payloadEdit, specialTabRef }) {
                           </span>
                         )}
                       </h6>
+                      {console.log("final price: ", price)}
                       <h6 className="mx-2 text-nowrap">$ {price}</h6>
                     </div>
                     <div className="mb-1">

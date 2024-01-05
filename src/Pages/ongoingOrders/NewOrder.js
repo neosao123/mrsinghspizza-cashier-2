@@ -374,6 +374,7 @@ function NewOrder() {
     setPrevOrderLoading(true);
     await prevOrderDetails(phoneno)
       .then((res) => {
+        console.log(res.data.data);
         setPrevOrders(res.data.data);
         setPrevOrderLoading(false);
       })
@@ -753,6 +754,9 @@ function NewOrder() {
                       </tr>
                     ) : prevOrders?.length > 0 ? (
                       prevOrders?.map((order) => {
+                        {
+                          console.log("prev", order);
+                        }
                         return (
                           <tr
                             key={order?.code}
